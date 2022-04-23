@@ -1,0 +1,21 @@
+[Unit]
+Description=edumeet is a audio / video meeting service running in the browser and powered by webRTC
+After=network.target
+
+[Service]
+# modify the paths accordingly with your installation
+ExecStart=/usr/local/src/edumeet/server/dist/server.js
+WorkingDirectory=/usr/local/src/edumeet/server
+Restart=always
+RestartSec=1
+User=nobody
+Group=nogroup
+Environment=PATH=/usr/bin:/usr/local/bin
+Environment=NODE_ENV=production
+Environment=DEBUG="*ERROR*,*WARN*,*INFO*"
+StandardOutput=syslog
+StandardError=syslog
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+
+[Install]
+WantedBy=multi-user.target
