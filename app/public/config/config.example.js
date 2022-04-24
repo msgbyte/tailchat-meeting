@@ -299,10 +299,10 @@ var config = {
 	lockLastN : false,
 
 	// If not null, it shows the logo loaded from the specified URL, otherwise it shows the title.
-	logo : 'images/logo.edumeet.svg',
+	logo : 'images/logo.tailchat.svg',
 
 	// The title to show if the logo is not specified.
-	title : 'edumeet',
+	title : 'tailchat',
 
 	// The service & Support URL; if `null`, it will be not displayed on the about dialogs.
 	supportUrl : 'https://support.example.com',
