@@ -23,6 +23,7 @@ import { createIntl } from 'react-intl';
 import * as recorderActions from './store/actions/recorderActions';
 import { directReceiverTransform, opusReceiverTransform } from './transforms/receiver';
 import { config } from './config';
+import { applyVirtualBg } from './transforms/virtualBg';
 
 let createTorrent;
 
@@ -1720,6 +1721,12 @@ export default class RoomClient
 					});
 
 				([ track ] = stream.getVideoTracks());
+
+				logger.debug('开始加载虚拟背景', track);
+
+				track = applyVirtualBg(stream);
+
+				logger.debug('加载虚拟背景完毕', track);
 
 				const { deviceId: trackDeviceId, width, height } = track.getSettings();
 
