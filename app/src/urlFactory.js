@@ -1,6 +1,6 @@
 import { config } from './config';
 
-export function getSignalingUrl(peerId, roomId)
+export function getHost()
 {
 	const hostname = config.serverHostname || window.location.hostname;
 	const port =
@@ -9,7 +9,12 @@ export function getSignalingUrl(peerId, roomId)
 			:
 			config.productionPort;
 
-	const url = `wss://${hostname}:${port}/?peerId=${peerId}&roomId=${roomId}`;
+	return `${hostname}:${port}`;
+}
+
+export function getSignalingUrl(peerId, roomId)
+{
+	const url = `wss://${getHost()}/?peerId=${peerId}&roomId=${roomId}`;
 
 	return url;
 }

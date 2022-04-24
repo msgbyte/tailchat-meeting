@@ -39,6 +39,7 @@ import { useHistory, useLocation } from 'react-router-dom';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import { config } from '../config';
+import { getHost } from '../urlFactory';
 
 const styles = (theme) =>
 	({
@@ -303,7 +304,7 @@ const JoinDialog = ({
 	};
 
 	// TODO: prefix with the Edumeet server HTTP endpoint
-	fetch('/auth/check_login_status', {
+	fetch(`${location.protocol}//${getHost()}/auth/check_login_status`, {
 		credentials    : 'include',
 		method         : 'GET',
 		cache          : 'no-cache',
