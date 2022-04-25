@@ -14,7 +14,6 @@
 	"license": "MIT",
 	"homepage": "./",
 	"main": "src/electron-starter.js",
-	"type": "module",
 	"dependencies": {
 		"@material-ui/core": "^4.11.3",
 		"@material-ui/icons": "^4.11.2",
@@ -42,11 +41,11 @@
 		"hark": "^1.2.3",
 		"idb": "^6.0.0",
 		"is-electron": "^2.2.0",
-		"lodash-es": "^4.17.21",
 		"marked": "^0.8.0",
 		"material-ui-popup-state": "^1.8.0",
 		"mediasoup-client": "^3.6.47",
 		"notistack": "^0.9.5",
+		"path-browserify": "^1.0.1",
 		"prop-types": "^15.7.2",
 		"random-string": "^0.2.0",
 		"react": "^16.10.2",
@@ -59,7 +58,6 @@
 		"react-intl-redux": "^2.2.0",
 		"react-redux": "^7.2.3",
 		"react-router-dom": "^5.1.2",
-		"react-scripts": "^4.0.3",
 		"react-wakelock-react16": "0.0.7",
 		"redux": "^4.0.4",
 		"redux-logger": "^3.0.6",
@@ -72,7 +70,6 @@
 		"source-map-explorer": "^2.1.0",
 		"streamsaver": "^2.0.5",
 		"typescript": "^4.2.4",
-		"virtual-bg": "^0.1.1",
 		"web-streams-polyfill": "^3.0.2",
 		"webtorrent": "^0.108.1"
 	},
@@ -113,6 +110,7 @@
 		"eslint-plugin-react-hooks": "^4.2.0",
 		"eslint-webpack-plugin": "^2.5.3",
 		"foreman": "^3.0.1",
+		"react-scripts": "^4.0.3",
 		"redux-mock-store": "^1.5.3",
 		"ts-node": "^10.5.0"
 	}
