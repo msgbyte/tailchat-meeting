@@ -21,7 +21,7 @@ import ConfigError from './components/ConfigError';
 import JoinDialog from './components/JoinDialog';
 import LoginDialog from './components/AccessControl/LoginDialog';
 import LoadingView from './components/Loader/LoadingView';
-import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import { MuiThemeProvider, createTheme } from '@material-ui/core/styles';
 import { PersistGate } from 'redux-persist/lib/integration/react';
 import { persistor, store } from './store/store';
 import { SnackbarProvider } from 'notistack';
@@ -67,7 +67,7 @@ let roomClient;
 
 RoomClient.init({ store });
 
-const theme = createMuiTheme(config.theme);
+const theme = createTheme(config.theme);
 
 let Router;
 

@@ -100,6 +100,7 @@
 		"@types/convict-format-with-validator": "^6.0.2",
 		"@types/lodash-es": "^4.17.6",
 		"@types/prop-types": "^15.7.5",
+		"@types/react-redux": "^7.1.24",
 		"@typescript-eslint/eslint-plugin": "^4.20.0",
 		"@typescript-eslint/parser": "^4.20.0",
 		"babel-eslint": "^10.1.0",
