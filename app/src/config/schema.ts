@@ -1,25 +1,4 @@
-import convict from 'convict';
-import * as convictFormatWithValidator from 'convict-format-with-validator';
-
-convict.addFormat(convictFormatWithValidator.url);
-
-function assert(assertion: boolean, msg: string) {
-  if (!assertion) throw new Error(msg);
-}
-
-convict.addFormat({
-  name: 'float',
-  coerce: (v: string) => parseFloat(v),
-  validate: (v: number) => assert(Number.isFinite(v), 'must be a number'),
-});
-
-/**
- * The Edumeet configuration schema.
- *
- * Use `yarn gen-config-docs` to re-generate the README.md and the
- * public/config/config.example.js files.
- */
-const configSchema = convict({
+export const configSchema = {
   loginEnabled: {
     doc: 'If the login is enabled.',
     format: 'Boolean',
@@ -88,7 +67,7 @@ const configSchema = convict({
   // aspectRatios EXACTLY (e.g. 1.333)
   aspectRatio: {
     doc: `The aspect ratio of the videos as shown on the screen.
-This value must match exactly one of the values defined in aspectRatios.`,
+   This value must match exactly one of the values defined in aspectRatios.`,
     format: 'float',
     default: 1.777,
   },
@@ -329,10 +308,10 @@ This value must match exactly one of the values defined in aspectRatios.`,
 
   autoMuteThreshold: {
     doc: `It sets the maximum number of participants in one room that can join unmuted.
-The next participant will join automatically muted.
-Set it to 0 to auto mute all.
-Set it to negative (-1) to never automatically auto mute but use it with caution, 
-full mesh audio strongly decrease room capacity!`,
+   The next participant will join automatically muted.
+   Set it to 0 to auto mute all.
+   Set it to negative (-1) to never automatically auto mute but use it with caution, 
+   full mesh audio strongly decrease room capacity!`,
     format: 'nat',
     default: 4,
   },
@@ -358,7 +337,7 @@ full mesh audio strongly decrease room capacity!`,
 
   drawerOverlayed: {
     doc: `If false, will push videos away to make room for side drawer.
-If true, will overlay side drawer over videos.`,
+   If true, will overlay side drawer over videos.`,
     format: 'Boolean',
     default: true,
   },
@@ -371,11 +350,11 @@ If true, will overlay side drawer over videos.`,
 
   notificationSounds: {
     doc: `It sets the notifications sounds.
-Valid keys are: 'parkedPeer', 'parkedPeers', 'raisedHand', 
-'chatMessage', 'sendFile', 'newPeer' and 'default'.
-Not defining a key is equivalent to using the default notification sound.
-Setting 'play' to null disables the sound notification.		
-`,
+   Valid keys are: 'parkedPeer', 'parkedPeers', 'raisedHand', 
+   'chatMessage', 'sendFile', 'newPeer' and 'default'.
+   Not defining a key is equivalent to using the default notification sound.
+   Setting 'play' to null disables the sound notification.		
+   `,
     format: Object,
     default: {
       chatMessage: {
@@ -473,27 +452,27 @@ Setting 'play' to null disables the sound notification.
         },
 
         /*
-				MuiIconButton :
-				{
-					colorPrimary :
-					{
-						backgroundColor : '#5F9B2D',
-						'&:hover'	   :
-						{
-							backgroundColor : '#5F9B2D'
-						}
-					},
-					colorSecondary :
-					{
-						backgroundColor : '#f50057',
-						'&:hover'	   :
-						{
-							backgroundColor : '#f50057'
-						}
-					}
-
-				},
-				*/
+                   MuiIconButton :
+                   {
+                       colorPrimary :
+                       {
+                           backgroundColor : '#5F9B2D',
+                           '&:hover'	   :
+                           {
+                               backgroundColor : '#5F9B2D'
+                           }
+                       },
+                       colorSecondary :
+                       {
+                           backgroundColor : '#f50057',
+                           '&:hover'	   :
+                           {
+                               backgroundColor : '#f50057'
+                           }
+                       }
+   
+                   },
+                   */
 
         MuiFab: {
           primary: {
@@ -533,122 +512,4 @@ Setting 'play' to null disables the sound notification.
       },
     },
   },
-});
-
-function formatDocs() {
-  function _formatDocs(docs: any, property: string | null, schema: any) {
-    if (schema._cvtProperties) {
-      Object.entries(schema._cvtProperties).forEach(([name, value]) => {
-        _formatDocs(docs, `${property ? `${property}.` : ''}${name}`, value);
-      });
-
-      return docs;
-    } else if (property) {
-      docs[property] = {
-        doc: schema.doc,
-        format: JSON.stringify(schema.format, null, 2),
-        default: JSON.stringify(schema.default, null, 2),
-      };
-    }
-
-    return docs;
-  }
-
-  return _formatDocs({}, null, configSchema.getSchema());
-}
-
-function formatJson(data: string) {
-  return data ? `\`${data.replace(/\n/g, '')}\`` : '';
-}
-
-function dumpDocsMarkdown() {
-  let data = `# ![edumeet logo](/app/public/images/logo.edumeet.svg) App Configuration properties list:
-
-| Name | Description | Format | Default value |
-| :--- | :---------- | :----- | :------------ |
-`;
-
-  Object.entries(formatDocs()).forEach((entry: [string, any]) => {
-    const [name, value] = entry;
-
-    data += `| ${name} | ${value.doc.replace(/\n/g, ' ')} | ${formatJson(
-      value.format
-    )} | \`${formatJson(value.default)}\` |\n`;
-  });
-
-  data += `
-
----
-
-*Document generated with:* \`yarn gen-config-docs\` *from:* [config.ts](src/config.ts).
-`;
-
-  return data;
-}
-
-function dumpExampleConfigJs() {
-  let data = `/**
- * Edumeet App Configuration
- *
- * The configuration documentation is available also:
- * - in the app/README.md file in the source tree
- * - visiting the /?config=true page in a running instance
- */
-
-// eslint-disable-next-line
-var config = {
-`;
-
-  Object.entries(formatDocs()).forEach((entry: [string, any]) => {
-    // eslint-disable-next-line
-    let [name, value] = entry;
-
-    if (name.includes('.')) name = `'${name}'`;
-
-    data += `\n\t// ${value.doc.replace(/\n/g, '\n\t// ')}
-\t${name} : ${value.default},
-`;
-  });
-
-  data += `};
-
-// Generated with: \`yarn gen-config-docs\` from app/src/config.ts
-`;
-
-  return data;
-}
-
-// run the docs generator
-// TODO: Ignore in browser env
-// if (typeof window === 'undefined')
-// {
-// 	import('fs').then((fs) =>
-// 	{
-// 		fs.writeFileSync('public/config/README.md', dumpDocsMarkdown());
-// 		fs.writeFileSync('public/config/config.example.js', dumpExampleConfigJs());
-// 	});
-// }
-
-//
-let config: any = {};
-let configError = '';
-
-// Load config from window object
-if (typeof window !== 'undefined' && (window as any).config !== undefined) {
-  configSchema.load((window as any).config);
-}
-
-// Perform validation
-try {
-  configSchema.validate({ allowed: 'strict' });
-  config = configSchema.getProperties();
-} catch (error: any) {
-  configError = error.message;
-}
-
-// Override the window config with the validated properties.
-if (typeof window !== 'undefined') {
-  (window as any)['config'] = config;
-}
-
-export { configSchema, config, configError, formatDocs };
+};
