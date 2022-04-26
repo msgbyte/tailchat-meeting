@@ -1,8 +1,8 @@
 {
-	"name": "edumeet-server",
+	"name": "tailchat-meeting-server",
 	"version": "3.5.3",
 	"private": true,
-	"description": "edumeet server",
+	"description": "tailchat meeting server",
 	"author": "Håvar Aambø Fosstveit <h@fosstveit.net>",
 	"contributors": [
 		"Stefan Otto",

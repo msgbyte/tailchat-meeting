@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-process.title = 'edumeet-server';
+process.title = 'tailchat-meeting-server';
 
 import Logger from './lib/logger/Logger';
 const Room = require('./lib/Room');
