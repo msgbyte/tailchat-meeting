@@ -50,6 +50,7 @@ let backgroundImage: HTMLImageElement | null = null;
 let backgroundVideo: HTMLVideoElement | null = null;
 let foregroundType = 'normal'; // normal | presenter
 let presenterModeOffset = 0;
+let selfieSegmentation: SelfieSegmentation | null = null;
 
 /**
  * 背景分割
@@ -65,9 +66,15 @@ async function segmentBackground(
     outputCanvasElement.height;
   outputCanvasCtx = outputCanvasElement.getContext('2d');
 
-  let selfieSegmentation = new SelfieSegmentation({
+  if (selfieSegmentation) {
+    // 清理掉上一次的实例
+    await selfieSegmentation.close();
+  }
+
+  selfieSegmentation = new SelfieSegmentation({
     locateFile: (file) => {
-      return `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`;
+      // return `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`;
+      return `/vendor/selfie_segmentation/${file}`;
     },
   });
   selfieSegmentation.setOptions({
