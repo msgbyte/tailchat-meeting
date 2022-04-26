@@ -1,14 +1,16 @@
-import { createStore, applyMiddleware, compose } from 'redux';
-import thunk from 'redux-thunk';
-import { createLogger } from 'redux-logger';
-import { createMigrate, persistStore, persistReducer } from 'redux-persist';
+import {
+  createMigrate,
+  persistStore,
+  persistReducer,
+  PersistConfig,
+} from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
-// import { createFilter } from 'redux-persist-transform-filter';
 import { diff } from 'deep-object-diff';
-import rootReducer from './reducers/rootReducer';
+import { AppState, rootReducer } from './reducers/rootReducer';
 import Logger from '../Logger';
 import { config } from '../config';
+import { configureStore } from '@reduxjs/toolkit';
 
 const logger = new Logger('store');
 
@@ -44,9 +46,9 @@ const migrations = {
   //	}
 };
 
-const persistConfig = {
+const persistConfig: PersistConfig<AppState> = {
   key: 'root',
-  storage: storage,
+  storage,
   // migrate will iterate state over all version-functions
   // from migrations until version is reached
   version: 2,
@@ -55,44 +57,7 @@ const persistConfig = {
   whitelist: ['settings', 'intl', 'config'],
 };
 
-/* const saveSubsetFilter = createFilter(
-	'me',
-	[ 'loggedIn' ]
-);*/
-
-const reduxMiddlewares = [thunk];
-
-if (
-  process.env.REACT_APP_DEBUG === '*' ||
-  process.env.NODE_ENV !== 'production'
-) {
-  const LOG_IGNORE = [
-    'SET_PEER_VOLUME',
-    'SET_ROOM_ACTIVE_SPEAKER',
-    'ADD_TRANSPORT_STATS',
-  ];
-
-  const reduxLogger = createLogger({
-    predicate: (getState, action) => LOG_IGNORE.indexOf(action.type) === -1,
-    duration: true,
-    collapsed: true,
-    timestamp: false,
-    level: 'info',
-    logErrors: true,
-  });
-
-  reduxMiddlewares.push(reduxLogger);
-}
-
-const composeEnhancers =
-  typeof window === 'object' &&
-  (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
-    ? (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({})
-    : compose;
-
-const enhancer = composeEnhancers(applyMiddleware(...reduxMiddlewares));
-
-const pReducer = persistReducer(persistConfig, rootReducer);
+const pReducer = persistReducer<AppState>(persistConfig, rootReducer);
 
 const initialState: any = {
   intl: {
@@ -102,7 +67,22 @@ const initialState: any = {
   // ...other initialState
 };
 
-export const store = createStore(pReducer, initialState, enhancer);
+export const store = configureStore({
+  reducer: pReducer,
+  preloadedState: initialState,
+  middleware: (getDefaultMiddleware) => [
+    ...getDefaultMiddleware({
+      immutableCheck: false,
+      serializableCheck: {
+        ignoredPaths: [
+          'me.browser.bowser',
+          'room.userRoles',
+          'me.audioOutputDevices.*',
+        ],
+      },
+    }),
+  ],
+});
 
 export const persistor = persistStore(store, null, () => {
   // Check if the app config differs from the stored version.
@@ -122,13 +102,3 @@ export const persistor = persistStore(store, null, () => {
     store.dispatch({ type: 'CONFIG_SET', payload: config });
   }
 });
-
-/*
-
-export const persistor = persistStore(store, {
-	transforms : [
-		saveSubsetFilter
-	]
-
-});
-*/

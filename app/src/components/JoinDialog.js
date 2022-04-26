@@ -303,13 +303,13 @@ const JoinDialog = ({
 		}
 	};
 
-	// TODO: prefix with the Edumeet server HTTP endpoint
-	fetch(`${location.protocol}//${getHost()}/auth/check_login_status`, {
-		credentials    : 'include',
-		method         : 'GET',
-		cache          : 'no-cache',
-		redirect       : 'follow',
-		referrerPolicy : 'no-referrer' })
+	useEffect(() => {
+		fetch(`${location.protocol}//${getHost()}/auth/check_login_status`, {
+			credentials    : 'include',
+			method         : 'GET',
+			cache          : 'no-cache',
+			redirect       : 'follow',
+			referrerPolicy : 'no-referrer' })
 		.then((response) => response.json())
 		.then((json) =>
 		{
@@ -322,6 +322,7 @@ const JoinDialog = ({
 		{
 			logger.error('Error checking login status', error);
 		});
+	}, [])
 
 	return (
 		<div className={classes.root}>
@@ -337,7 +338,7 @@ const JoinDialog = ({
 					<Grid
 						container
 						direction='row'
-						justify='space-between'
+						justifyContent='space-between'
 						alignItems='center'
 					>
 						<Grid item>
@@ -351,7 +352,7 @@ const JoinDialog = ({
 							<Grid
 								container
 								direction='row'
-								justify='flex-end'
+								justifyContent='flex-end'
 								alignItems='center'
 							>
 
@@ -487,7 +488,7 @@ const JoinDialog = ({
 					{false &&
 					<Grid container
 						direction='row'
-						justify='space-between'
+						justifyContent='space-between'
 						alignItems='center'
 					>
 						<Grid item>
@@ -580,7 +581,7 @@ const JoinDialog = ({
 
 						<Grid container
 							direction='row'
-							justify='space-between'
+							justifyContent='space-between'
 							alignItems='flex-end'
 							spacing={1}
 						>

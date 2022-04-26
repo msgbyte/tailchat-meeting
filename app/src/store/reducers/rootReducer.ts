@@ -1,4 +1,4 @@
-import { combineReducers } from 'redux';
+import { CombinedState, combineReducers, Reducer } from '@reduxjs/toolkit';
 import room from './room';
 import me from './me';
 import producers from './producers';
@@ -16,7 +16,7 @@ import settings from './settings';
 import config from './config';
 import intl from './intl';
 
-export default combineReducers({
+export const rootReducer = combineReducers({
   // intl : intlReducer,
   room,
   me,
@@ -35,3 +35,9 @@ export default combineReducers({
   config,
   intl,
 });
+
+export type AppState = typeof rootReducer extends Reducer<
+  CombinedState<infer P>
+>
+  ? P
+  : never;

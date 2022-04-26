@@ -308,7 +308,7 @@ class Filmstrip extends React.PureComponent
 				</div>
 
 				<div className={classes.filmStrip} ref={this.filmStripContainer}>
-					<Grid container justify='center' spacing={0}>
+					<Grid container justifyContent='center' spacing={0}>
 						<Grid item>
 							<div
 								className={classnames(classes.filmItem, {

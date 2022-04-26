@@ -238,7 +238,7 @@ const ChatInput = (props) =>
 					<Divider orientation='horizontal'/>
 				</Grid>
 
-				<Grid item container justify='space-between' alignItems='center'>
+				<Grid item container justifyContent='space-between' alignItems='center'>
 
 					{/* Buttons of format */}
 					{(browser.platform !== 'mobile') ?
