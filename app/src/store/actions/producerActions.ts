@@ -8,12 +8,12 @@ export const removeProducer = (producerId) => ({
   payload: { producerId },
 });
 
-export const setProducerPaused = (producerId, originator) => ({
+export const setProducerPaused = (producerId, originator?) => ({
   type: 'SET_PRODUCER_PAUSED',
   payload: { producerId, originator },
 });
 
-export const setProducerResumed = (producerId, originator) => ({
+export const setProducerResumed = (producerId, originator?) => ({
   type: 'SET_PRODUCER_RESUMED',
   payload: { producerId, originator },
 });

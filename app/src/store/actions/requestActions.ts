@@ -2,7 +2,15 @@ import randomString from 'random-string';
 import * as notificationActions from './notificationActions';
 
 // This returns a redux-thunk action (a function).
-export const notify = ({ type = 'info', text, timeout }) => {
+export const notify = ({
+  type = 'info',
+  text,
+  timeout,
+}: {
+  type?: string;
+  text: string;
+  timeout?: number;
+}) => {
   if (!timeout) {
     switch (type) {
       case 'info':

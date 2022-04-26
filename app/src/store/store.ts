@@ -70,18 +70,12 @@ const initialState: any = {
 export const store = configureStore({
   reducer: pReducer,
   preloadedState: initialState,
-  middleware: (getDefaultMiddleware) => [
-    ...getDefaultMiddleware({
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      // TODO: 不推荐的配置, 待优化
       immutableCheck: false,
-      serializableCheck: {
-        ignoredPaths: [
-          'me.browser.bowser',
-          'room.userRoles',
-          'me.audioOutputDevices.*',
-        ],
-      },
+      serializableCheck: false,
     }),
-  ],
 });
 
 export const persistor = persistStore(store, null, () => {
