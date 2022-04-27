@@ -66,10 +66,6 @@ if (
 
 const logger = new Logger();
 
-let roomClient;
-
-RoomClient.init({ store });
-
 // TODO
 const theme = createTheme(config.theme as any);
 
@@ -189,7 +185,7 @@ function run() {
     })
   );
 
-  roomClient = new RoomClient({
+  const roomClient = new RoomClient({
     peerId,
     accessCode,
     device,

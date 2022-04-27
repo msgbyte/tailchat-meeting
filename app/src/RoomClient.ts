@@ -26,7 +26,11 @@ import {
   opusReceiverTransform,
 } from './transforms/receiver';
 import { config } from './config';
-import { applyVirtualBg } from './transforms/virtualBg';
+import { store } from './store/store';
+import { virtualBackgroundEffect } from './transforms/virtualBg';
+import type * as MediasoupClient from 'mediasoup-client';
+
+type Priority = 'high' | 'medium' | 'low' | 'very-low';
 
 let createTorrent;
 
@@ -34,7 +38,7 @@ let WebTorrent;
 
 let saveAs;
 
-let mediasoupClient;
+let mediasoupClient: typeof MediasoupClient;
 
 let io;
 
@@ -60,7 +64,7 @@ const VIDEO_CONSTRAINS = {
   },
 };
 
-const DEFAULT_NETWORK_PRIORITIES = {
+const DEFAULT_NETWORK_PRIORITIES: Record<string, Priority> = {
   audio: 'high',
   mainVideo: 'high',
   additionalVideos: 'medium',
@@ -160,8 +164,6 @@ function getResolutionScalings(encodings) {
   return resolutionScalings;
 }
 
-let store;
-
 let intl;
 
 const insertableStreamsSupported = Boolean(
@@ -169,15 +171,6 @@ const insertableStreamsSupported = Boolean(
 );
 
 export class RoomClient {
-  /**
-   * @param  {Object} data
-   * @param  {Object} data.store - The Redux store.
-   * @param  {Object} data.intl - react-intl object
-   */
-  static init(data) {
-    store = data.store;
-  }
-
   _signalingUrl: any;
 
   // Closed flag.
@@ -228,7 +221,7 @@ export class RoomClient {
 
   // mediasoup-client Device instance.
   // @type {mediasoupClient.Device}
-  _mediasoupDevice: any;
+  _mediasoupDevice: MediasoupClient.Device;
 
   // Our WebTorrent client
   _webTorrent: any;
@@ -236,7 +229,7 @@ export class RoomClient {
   // Manager of spotlight
   _spotlights: any;
   // Transport for sending.
-  _sendTransport: any;
+  _sendTransport: MediasoupClient.types.Transport;
 
   // Transport for receiving.
   _recvTransport: any;
@@ -251,7 +244,7 @@ export class RoomClient {
   _harkStream: any;
 
   // Local webcam mediasoup Producer.
-  _webcamProducer: any;
+  _webcamProducer: MediasoupClient.types.Producer;
 
   // Extra videos being produced
   _extraVideoProducers: any;
@@ -469,7 +462,9 @@ export class RoomClient {
   }
 
   close() {
-    if (this._closed) return;
+    if (this._closed) {
+      return;
+    }
 
     this._closed = true;
 
@@ -1480,8 +1475,8 @@ export class RoomClient {
 
         store.dispatch(settingsActions.setSelectedAudioDevice(trackDeviceId));
 
-        const networkPriority = config.networkPriorities?.audio
-          ? config.networkPriorities?.audio
+        const networkPriority: Priority = config.networkPriorities?.audio
+          ? (config.networkPriorities?.audio as Priority)
           : DEFAULT_NETWORK_PRIORITIES.audio;
 
         this._micProducer = await this._sendTransport.produce({
@@ -1562,7 +1557,7 @@ export class RoomClient {
       }
 
       // TODO update recorder inputs
-      /* 
+      /*
 			if (recorder != null)
 			{
 				recorder.addTrack(new MediaStream([ this._micProducer.track ]));
@@ -1633,12 +1628,22 @@ export class RoomClient {
       const deviceId = await this._getWebcamDeviceId();
       const device = this._webcams[deviceId];
 
-      if (!device) throw new Error('no webcam devices');
+      if (!device) {
+        throw new Error('no webcam devices');
+      }
 
-      const { resolution, aspectRatio, frameRate } = store.getState().settings;
+      const {
+        resolution,
+        aspectRatio,
+        frameRate,
+        virtualBackgroundEnabled,
+        virtualBackgroundUrl,
+      } = store.getState().settings;
 
       if ((restart && this._webcamProducer) || start) {
-        if (this._webcamProducer) await this.disableWebcam();
+        if (this._webcamProducer) {
+          await this.disableWebcam();
+        }
 
         const stream = await navigator.mediaDevices.getUserMedia({
           video: {
@@ -1650,11 +1655,19 @@ export class RoomClient {
 
         [track] = stream.getVideoTracks();
 
-        logger.debug('开始加载虚拟背景', track);
+        if (virtualBackgroundEnabled) {
+          logger.debug('开始加载虚拟背景', track);
 
-        track = applyVirtualBg(stream);
+          track = virtualBackgroundEffect.start(stream);
 
-        logger.debug('加载虚拟背景完毕', track);
+          if (virtualBackgroundUrl === 'blur') {
+            virtualBackgroundEffect.applyBlur();
+          } else {
+            virtualBackgroundEffect.applyImageBackground(virtualBackgroundUrl);
+          }
+
+          logger.debug('加载虚拟背景完毕', track);
+        }
 
         const { deviceId: trackDeviceId, width, height } = track.getSettings();
 
@@ -1663,17 +1676,17 @@ export class RoomClient {
         store.dispatch(settingsActions.setSelectedWebcamDevice(trackDeviceId));
 
         const networkPriority = config.networkPriorities?.mainVideo
-          ? config.networkPriorities?.mainVideo
+          ? (config.networkPriorities?.mainVideo as Priority)
           : DEFAULT_NETWORK_PRIORITIES.mainVideo;
 
         if (this._useSimulcast) {
           const encodings = this._getEncodings(width, height);
           const resolutionScalings = getResolutionScalings(encodings);
 
-          /** 
-					 * TODO: 
-					 * I receive DOMException: 
-					 * Failed to execute 'addTransceiver' on 'RTCPeerConnection': 
+          /**
+					 * TODO:
+					 * I receive DOMException:
+					 * Failed to execute 'addTransceiver' on 'RTCPeerConnection':
 					 * Attempted to set an unimplemented parameter of RtpParameters.
 					encodings.forEach((encoding) =>
 					{
@@ -4073,10 +4086,10 @@ export class RoomClient {
           const encodings = this._getEncodings(width, height);
           const resolutionScalings = getResolutionScalings(encodings);
 
-          /** 
-					 * TODO: 
-					 * I receive DOMException: 
-					 * Failed to execute 'addTransceiver' on 'RTCPeerConnection': 
+          /**
+					 * TODO:
+					 * I receive DOMException:
+					 * Failed to execute 'addTransceiver' on 'RTCPeerConnection':
 					 * Attempted to set an unimplemented parameter of RtpParameters.
 					encodings.forEach((encoding) =>
 					{
@@ -4289,7 +4302,7 @@ export class RoomClient {
         logger.debug('screenSharing track settings:', track.getSettings());
 
         const networkPriority = config.networkPriorities?.screenShare
-          ? config.networkPriorities?.screenShare
+          ? (config.networkPriorities?.screenShare as Priority)
           : DEFAULT_NETWORK_PRIORITIES.screenShare;
 
         if (this._useSharingSimulcast) {
@@ -4310,10 +4323,10 @@ export class RoomClient {
 
           const resolutionScalings = getResolutionScalings(encodings);
 
-          /** 
-					 * TODO: 
-					 * I receive DOMException: 
-					 * Failed to execute 'addTransceiver' on 'RTCPeerConnection': 
+          /**
+					 * TODO:
+					 * I receive DOMException:
+					 * Failed to execute 'addTransceiver' on 'RTCPeerConnection':
 					 * Attempted to set an unimplemented parameter of RtpParameters.
 					encodings.forEach((encoding) =>
 					{
@@ -4540,7 +4553,15 @@ export class RoomClient {
   async disableWebcam() {
     logger.debug('disableWebcam()');
 
-    if (!this._webcamProducer) return;
+    if (!this._webcamProducer) {
+      return;
+    }
+
+    const { virtualBackgroundEnabled } = store.getState().settings;
+    if (virtualBackgroundEnabled === true) {
+      // 清理所有的虚拟背景效果
+      virtualBackgroundEffect.stop();
+    }
 
     store.dispatch(meActions.setWebcamInProgress(true));
 

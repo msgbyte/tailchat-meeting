@@ -72,6 +72,7 @@ importers:
       hark: ^1.2.3
       idb: ^6.0.0
       is-electron: ^2.2.0
+      lodash-es: ^4.17.21
       magnet-uri: 5.4.0
       marked: ^0.8.0
       material-ui-popup-state: ^1.8.0
@@ -134,6 +135,7 @@ importers:
       hark: 1.2.3
       idb: 6.1.5
       is-electron: 2.2.1
+      lodash-es: 4.17.21
       magnet-uri: 5.4.0
       marked: 0.8.2
       material-ui-popup-state: 1.9.3_e42396252f6d17e36799f5878fa13b8b
@@ -9904,6 +9906,10 @@ packages:
     dependencies:
       p-locate: 4.1.0
     dev: true
+
+  /lodash-es/4.17.21:
+    resolution: {integrity: sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==}
+    dev: false
 
   /lodash-node/2.4.1:
     resolution: {integrity: sha512-egEt8eNQp2kZWRmngahiqMoDCDCENv3uM188S7Ed5t4k3v6RrLELXC+FqLNMUnhCo7gvQX3G1V8opK/Lcslahg==}

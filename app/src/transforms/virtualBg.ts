@@ -1,4 +1,6 @@
 import { SelfieSegmentation, Results } from '@mediapipe/selfie_segmentation';
+import { once } from 'lodash-es';
+import Logger from '../Logger';
 
 /* eslint-disable */
 
@@ -8,211 +10,254 @@ import { SelfieSegmentation, Results } from '@mediapipe/selfie_segmentation';
  * - https://github.com/akhil-rana/virtual-bg/blob/HEAD/virtual-bg.js
  */
 
-/**
- * 应用虚拟背景功能
- */
-export function applyVirtualBg(inputVideoStream: MediaStream) {
-  const inputVideoElement = document.createElement('video');
-  const outputCanvasElement = document.createElement('canvas');
-
-  const firstVideoTrack = inputVideoStream.getVideoTracks()[0];
-  const { height, width, frameRate } = firstVideoTrack.getSettings
-    ? firstVideoTrack.getSettings()
-    : firstVideoTrack.getConstraints();
-
-  inputVideoElement.srcObject = inputVideoStream;
-  inputVideoElement.autoplay = true;
-  inputVideoElement.width = parseInt(String(width), 10);
-  inputVideoElement.height = parseInt(String(height), 10);
-  outputCanvasElement.width = parseInt(String(width), 10);
-  outputCanvasElement.height = parseInt(String(height), 10);
-
-  // segments foreground & background
-  segmentBackground(inputVideoElement, outputCanvasElement);
-
-  // applies a blur intensity of 7px to the background
-  applyBlur(7);
-
-  return (outputCanvasElement as any)
-    .captureStream(frameRate)
-    .getVideoTracks()[0];
-}
-
-// virtual-bg
-
-const foregroundCanvasElement = document.createElement('canvas');
-const backgroundCanvasElement = document.createElement('canvas');
-const backgroundCanvasCtx = backgroundCanvasElement.getContext('2d');
-
-let outputCanvasCtx: CanvasRenderingContext2D | null = null;
-let effectType = 'blur'; // blur | video | image
-let backgroundImage: HTMLImageElement | null = null;
-let backgroundVideo: HTMLVideoElement | null = null;
-let foregroundType = 'normal'; // normal | presenter
-let presenterModeOffset = 0;
-let selfieSegmentation: SelfieSegmentation | null = null;
+const logger = new Logger('VirtualBg');
 
 /**
- * 背景分割
+ * 虚拟背景
  */
-async function segmentBackground(
-  inputVideoElement: HTMLVideoElement,
-  outputCanvasElement: HTMLCanvasElement,
-  modelSelection = 1
-) {
-  foregroundCanvasElement.width = backgroundCanvasElement.width =
-    outputCanvasElement.width;
-  foregroundCanvasElement.height = backgroundCanvasElement.height =
-    outputCanvasElement.height;
-  outputCanvasCtx = outputCanvasElement.getContext('2d');
+class VirtualBackgroundEffect {
+  inputVideoElement = document.createElement('video');
+  outputCanvasElement = document.createElement('canvas');
 
-  if (selfieSegmentation) {
-    // 清理掉上一次的实例
-    await selfieSegmentation.close();
+  constructor() {
+    document.body.append(this.inputVideoElement, this.outputCanvasElement);
+    document.body.append(
+      this.foregroundCanvasElement,
+      this.backgroundCanvasElement
+    );
   }
 
-  selfieSegmentation = new SelfieSegmentation({
-    locateFile: (file) => {
-      // return `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`;
-      return `/vendor/selfie_segmentation/${file}`;
-    },
-  });
-  selfieSegmentation.setOptions({
-    modelSelection: modelSelection,
-  });
-  selfieSegmentation.onResults((results) => {
-    mergeForegroundBackground(
-      foregroundCanvasElement,
-      backgroundCanvasElement,
-      results
-    );
-  });
+  /**
+   * 开始应用虚拟背景
+   */
+  start(inputVideoStream: MediaStream) {
+    const firstVideoTrack = inputVideoStream.getVideoTracks()[0];
+    const { height, width, frameRate } = firstVideoTrack.getSettings
+      ? firstVideoTrack.getSettings()
+      : firstVideoTrack.getConstraints();
 
-  inputVideoElement.addEventListener('play', () => {
-    async function step() {
-      await selfieSegmentation.send({ image: inputVideoElement });
-      requestAnimationFrame(step);
+    this.inputVideoElement.srcObject = inputVideoStream;
+    this.inputVideoElement.width = parseInt(String(width), 10);
+    this.inputVideoElement.height = parseInt(String(height), 10);
+    this.outputCanvasElement.width = parseInt(String(width), 10);
+    this.outputCanvasElement.height = parseInt(String(height), 10);
+
+    this.segmentBackground().then(() => {
+      this.inputVideoElement.play();
+    });
+
+    return this.outputCanvasElement
+      .captureStream(Number(frameRate))
+      .getVideoTracks()[0];
+  }
+
+  /**
+   * 停止所有的虚拟背景
+   */
+  stop() {
+    this.selfieSegmentation.close();
+    this.selfieSegmentation = null;
+  }
+
+  /**
+   * 应用背景虚化
+   */
+  applyBlur(blurIntensity = 7) {
+    if (!this.backgroundCanvasCtx) {
+      return;
     }
-    requestAnimationFrame(step);
+
+    this.effectType = 'blur';
+    this.foregroundType = 'normal';
+    this.backgroundCanvasCtx.filter = `blur(${blurIntensity}px)`;
+  }
+
+  /**
+   * 应用图片背景
+   */
+  applyImageBackground(imageUrl: string) {
+    const image = document.createElement('img');
+    image.src = imageUrl;
+    this.effectType = 'image';
+    this.foregroundType = 'normal';
+    this.backgroundImage = image;
+  }
+
+  /**
+   * 应用视频背景
+   */
+  applyVideoBackground(video: HTMLVideoElement) {
+    this.backgroundVideo = video;
+    video.autoplay = true;
+    video.loop = true;
+    video.addEventListener('play', () => {
+      video.muted = true;
+    });
+    this.effectType = 'video';
+  }
+
+  /**
+   * 应用屏幕共享背景
+   */
+  applyScreenBackground(stream: MediaStream) {
+    const videoElement = document.createElement('video');
+    videoElement.srcObject = stream;
+    this.backgroundVideo = videoElement;
+
+    videoElement.autoplay = true;
+    videoElement.loop = true;
+    videoElement.addEventListener('play', () => {
+      videoElement.muted = true;
+    });
+    this.effectType = 'video';
+  }
+
+  changeForegroundType(type: 'normal' | 'presenter', offset = 0) {
+    this.foregroundType = type;
+    this.presenterModeOffset = offset;
+  }
+
+  private foregroundCanvasElement = document.createElement('canvas');
+  private backgroundCanvasElement = document.createElement('canvas');
+  private backgroundCanvasCtx = this.backgroundCanvasElement.getContext('2d');
+
+  private outputCanvasCtx: CanvasRenderingContext2D | null = null;
+  private effectType = 'blur'; // blur | video | image
+  private backgroundImage: HTMLImageElement | null = null;
+  private backgroundVideo: HTMLVideoElement | null = null;
+  private foregroundType = 'normal'; // normal | presenter
+  private presenterModeOffset = 0;
+  private selfieSegmentation: SelfieSegmentation | null = null;
+
+  /**
+   * 背景分割
+   */
+  private async segmentBackground(modelSelection = 1) {
+    this.foregroundCanvasElement.width = this.backgroundCanvasElement.width =
+      this.outputCanvasElement.width;
+    this.foregroundCanvasElement.height = this.backgroundCanvasElement.height =
+      this.outputCanvasElement.height;
+    this.outputCanvasCtx = this.outputCanvasElement.getContext('2d');
+
+    if (this.selfieSegmentation) {
+      logger.warn('Skip because of selfieSegmentation existed');
+      return;
+    }
+    this.selfieSegmentation = new SelfieSegmentation({
+      locateFile: (file) => {
+        // return `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`;
+        return `/vendor/selfie_segmentation/${file}`;
+      },
+    });
+    await this.selfieSegmentation.initialize();
+    this.selfieSegmentation.setOptions({
+      modelSelection: modelSelection,
+    });
+    this.selfieSegmentation.onResults((results) => {
+      this.mergeForegroundBackground(
+        this.foregroundCanvasElement,
+        this.backgroundCanvasElement,
+        results
+      );
+    });
+
+    this.bindInputVideoElementEventListener();
+  }
+
+  /**
+   * 发送事件
+   */
+  private bindInputVideoElementEventListener = once(() => {
+    this.inputVideoElement.addEventListener('play', () => {
+      const step = async () => {
+        if (this.selfieSegmentation) {
+          await this.selfieSegmentation.send({ image: this.inputVideoElement });
+          requestAnimationFrame(step);
+        }
+      };
+
+      logger.debug('Start run selfieSegmentation');
+      requestAnimationFrame(step);
+    });
   });
-}
 
-function mergeForegroundBackground(
-  foregroundCanvasElement: HTMLCanvasElement,
-  backgroundCanvasElement: HTMLCanvasElement,
-  results: Results
-) {
-  if (!backgroundCanvasCtx || !outputCanvasCtx) {
-    return;
+  private mergeForegroundBackground(
+    foregroundCanvasElement: HTMLCanvasElement,
+    backgroundCanvasElement: HTMLCanvasElement,
+    results: Results
+  ) {
+    if (!this.backgroundCanvasCtx || !this.outputCanvasCtx) {
+      return;
+    }
+
+    this.makeCanvasLayer(results, foregroundCanvasElement, 'foreground');
+    if (this.effectType === 'blur') {
+      this.makeCanvasLayer(results, backgroundCanvasElement, 'background');
+    } else if (this.effectType === 'image' && !!this.backgroundImage) {
+      this.backgroundCanvasCtx.drawImage(
+        this.backgroundImage,
+        0,
+        0,
+        backgroundCanvasElement.width,
+        backgroundCanvasElement.height
+      );
+    } else if (this.effectType === 'video' && !!this.backgroundVideo) {
+      this.backgroundCanvasCtx.drawImage(
+        this.backgroundVideo,
+        0,
+        0,
+        backgroundCanvasElement.width,
+        backgroundCanvasElement.height
+      );
+    }
+    this.outputCanvasCtx.drawImage(backgroundCanvasElement, 0, 0);
+    if (this.foregroundType === 'presenter') {
+      this.outputCanvasCtx.drawImage(
+        foregroundCanvasElement,
+        foregroundCanvasElement.width * 0.5 - this.presenterModeOffset,
+        foregroundCanvasElement.height * 0.5,
+        foregroundCanvasElement.width * 0.5,
+        foregroundCanvasElement.height * 0.5
+      );
+    } else {
+      this.outputCanvasCtx.drawImage(foregroundCanvasElement, 0, 0);
+    }
   }
 
-  makeCanvasLayer(results, foregroundCanvasElement, 'foreground');
-  if (effectType === 'blur')
-    makeCanvasLayer(results, backgroundCanvasElement, 'background');
-  else if (effectType === 'image' && !!backgroundImage) {
-    backgroundCanvasCtx.drawImage(
-      backgroundImage,
+  private makeCanvasLayer(
+    results: Results,
+    canvasElement: HTMLCanvasElement,
+    type: 'foreground' | 'background'
+  ) {
+    const canvasCtx = canvasElement.getContext('2d');
+    if (!canvasCtx) {
+      return;
+    }
+
+    canvasCtx.save();
+
+    canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+    canvasCtx.drawImage(
+      results.segmentationMask,
       0,
       0,
-      backgroundCanvasElement.width,
-      backgroundCanvasElement.height
+      canvasElement.width,
+      canvasElement.height
     );
-  } else if (effectType === 'video' && !!backgroundVideo) {
-    backgroundCanvasCtx.drawImage(
-      backgroundVideo,
+    if (type === 'foreground') {
+      canvasCtx.globalCompositeOperation = 'source-in';
+    }
+
+    canvasCtx.drawImage(
+      results.image,
       0,
       0,
-      backgroundCanvasElement.width,
-      backgroundCanvasElement.height
+      canvasElement.width,
+      canvasElement.height
     );
+
+    canvasCtx.restore();
   }
-  outputCanvasCtx.drawImage(backgroundCanvasElement, 0, 0);
-  if (foregroundType === 'presenter')
-    outputCanvasCtx.drawImage(
-      foregroundCanvasElement,
-      foregroundCanvasElement.width * 0.5 - presenterModeOffset,
-      foregroundCanvasElement.height * 0.5,
-      foregroundCanvasElement.width * 0.5,
-      foregroundCanvasElement.height * 0.5
-    );
-  else outputCanvasCtx.drawImage(foregroundCanvasElement, 0, 0);
 }
 
-function makeCanvasLayer(
-  results: Results,
-  canvasElement: HTMLCanvasElement,
-  type: 'foreground' | 'background'
-) {
-  const canvasCtx = canvasElement.getContext('2d');
-  if (!canvasCtx) {
-    return;
-  }
-
-  canvasCtx.save();
-
-  canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-  canvasCtx.drawImage(
-    results.segmentationMask,
-    0,
-    0,
-    canvasElement.width,
-    canvasElement.height
-  );
-  if (type === 'foreground') {
-    canvasCtx.globalCompositeOperation = 'source-in';
-  }
-
-  canvasCtx.drawImage(
-    results.image,
-    0,
-    0,
-    canvasElement.width,
-    canvasElement.height
-  );
-
-  canvasCtx.restore();
-}
-
-export function applyBlur(blurIntensity = 7) {
-  if (!backgroundCanvasCtx) {
-    return;
-  }
-
-  effectType = 'blur';
-  foregroundType = 'normal';
-  backgroundCanvasCtx.filter = `blur(${blurIntensity}px)`;
-}
-
-export function applyImageBackground(image: HTMLImageElement) {
-  backgroundImage = image;
-  foregroundType = 'normal';
-  effectType = 'image';
-}
-
-export function applyVideoBackground(video: HTMLVideoElement) {
-  backgroundVideo = video;
-  video.autoplay = true;
-  video.loop = true;
-  video.addEventListener('play', () => {
-    video.muted = true;
-  });
-  effectType = 'video';
-}
-
-export function applyScreenBackground(stream: MediaStream) {
-  const videoElement = document.createElement('video');
-  videoElement.srcObject = stream;
-  backgroundVideo = videoElement;
-
-  videoElement.autoplay = true;
-  videoElement.loop = true;
-  videoElement.addEventListener('play', () => {
-    videoElement.muted = true;
-  });
-  effectType = 'video';
-}
-
-export function changeForegroundType(type: string, offset = 0) {
-  foregroundType = type;
-  presenterModeOffset = offset;
-}
+export const virtualBackgroundEffect = new VirtualBackgroundEffect();
