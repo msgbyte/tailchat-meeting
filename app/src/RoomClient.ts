@@ -1655,6 +1655,12 @@ export class RoomClient {
 
         [track] = stream.getVideoTracks();
 
+        const { deviceId: trackDeviceId, width, height } = track.getSettings();
+
+        logger.debug('getUserMedia track settings:', track.getSettings());
+
+        store.dispatch(settingsActions.setSelectedWebcamDevice(trackDeviceId));
+
         if (virtualBackgroundEnabled) {
           logger.debug('开始加载虚拟背景', track);
 
@@ -1668,12 +1674,6 @@ export class RoomClient {
 
           logger.debug('加载虚拟背景完毕', track);
         }
-
-        const { deviceId: trackDeviceId, width, height } = track.getSettings();
-
-        logger.debug('getUserMedia track settings:', track.getSettings());
-
-        store.dispatch(settingsActions.setSelectedWebcamDevice(trackDeviceId));
 
         const networkPriority = config.networkPriorities?.mainVideo
           ? (config.networkPriorities?.mainVideo as Priority)

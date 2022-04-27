@@ -38,6 +38,7 @@
 		"draft-js-export-html": "^1.4.1",
 		"draft-js-plugins-editor": "^3.0.0",
 		"draft-js-single-line-plugin": "^2.0.5",
+		"electron": "^18.1.0",
 		"end-of-stream": "1.4.1",
 		"file-saver": "^2.0.2",
 		"hark": "^1.2.3",
