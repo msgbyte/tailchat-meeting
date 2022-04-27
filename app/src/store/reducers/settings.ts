@@ -42,6 +42,10 @@ const initialState = {
   opusPtime: config.opusPtime,
   opusMaxPlaybackRate: config.opusMaxPlaybackRate,
   enableOpusDetails: false,
+  recorderSupportedMimeTypes: [],
+  selectedAudioOutputDevice: '',
+  virtualBackgroundEnabled: false,
+  virtualBackgroundUrl: 'blur',
 };
 
 const settings = (state = initialState, action) => {
@@ -290,6 +294,18 @@ const settings = (state = initialState, action) => {
       const { recorderPreferredMimeType } = action.payload;
 
       return { ...state, recorderPreferredMimeType };
+    }
+
+    case 'SET_VIRTUAL_BACKGROUND_ENABLE': {
+      const { enabled } = action.payload;
+
+      return { ...state, virtualBackgroundEnabled: enabled };
+    }
+
+    case 'SET_VIRTUAL_BACKGROUND_URL': {
+      const { virtualBackgroundUrl } = action.payload;
+
+      return { ...state, virtualBackgroundUrl };
     }
 
     default:

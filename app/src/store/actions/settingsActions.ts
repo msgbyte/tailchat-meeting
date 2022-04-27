@@ -194,3 +194,17 @@ export const setRecorderPreferredMimeType = (recorderPreferredMimeType) => ({
   type: 'SET_RECORDER_PREFERRED_MIME_TYPE',
   payload: { recorderPreferredMimeType: recorderPreferredMimeType },
 });
+
+export const setVirtualBackgroundEnable = (enabled: boolean) => ({
+  type: 'SET_VIRTUAL_BACKGROUND_ENABLE',
+  payload: {
+    enabled,
+  },
+});
+
+export const setVirtualBackgroundUrl = (virtualBackgroundUrl: string) => ({
+  type: 'SET_VIRTUAL_BACKGROUND_URL',
+  payload: {
+    virtualBackgroundUrl,
+  },
+});

@@ -420,6 +420,16 @@ export const configSchema = {
     nullable: true,
   },
 
+  virtualBackground: {
+    doc: '虚拟背景图片列表',
+    format: Array,
+    default: [
+      'images/virtual-background/1.jpg',
+      'images/virtual-background/2.jpg',
+      'images/virtual-background/3.jpg',
+    ],
+  },
+
   theme: {
     doc: 'UI theme elements colors.',
     format: Object,

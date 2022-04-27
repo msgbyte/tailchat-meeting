@@ -76,7 +76,7 @@
 	},
 	"scripts": {
 		"analyze": "source-map-explorer build/static/js/*",
-		"start": "HTTPS=true PORT=4443 react-scripts start",
+		"start": "cross-env HTTPS=true PORT=4443 react-scripts start",
 		"build": "react-scripts build && rm -rf ../server/public && DEST='../server/dist/public' && rm -rf $DEST && mkdir -p $DEST && mv -T build/ $DEST",
 		"test": "react-scripts test",
 		"eject": "react-scripts eject",
@@ -102,7 +102,7 @@
 		"@typescript-eslint/eslint-plugin": "^4.20.0",
 		"@typescript-eslint/parser": "^4.20.0",
 		"babel-eslint": "^10.1.0",
-		"electron": "^12.0.0",
+		"cross-env": "^7.0.3",
 		"eslint-config-react-app": "^6.0.0",
 		"eslint-import-resolver-typescript": "^2.4.0",
 		"eslint-plugin-flowtype": "^5.4.0",
