@@ -32,5 +32,6 @@ module.exports = {
     'prettier/prettier': 'off',
     '@typescript-eslint/ban-ts-comment': 'off',
     'react/no-string-refs': 'off',
+    'react/display-name': 'off',
   },
 };

@@ -89,11 +89,17 @@ async function segmentBackground(
   });
 
   inputVideoElement.addEventListener('play', () => {
+    console.log('staaaaaaaaaaaaaaaaaaaaaaaaaaaart');
     async function step() {
+      console.log('stepstepstepstepstepstepstepstepstep');
       await selfieSegmentation.send({ image: inputVideoElement });
       requestAnimationFrame(step);
     }
     requestAnimationFrame(step);
+  });
+  inputVideoElement.addEventListener('abort', () => {
+    console.log('abortabortabortabortabortabortabortabortabort');
+    selfieSegmentation.close();
   });
 }
 

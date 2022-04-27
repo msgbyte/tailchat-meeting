@@ -1,5 +1,5 @@
 import React from 'react';
-import { connect } from 'react-redux';
+import { connect, useDispatch } from 'react-redux';
 import * as appPropTypes from '../appPropTypes';
 import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../../RoomContext';
@@ -29,7 +29,9 @@ import Videocam from '@material-ui/icons/Videocam';
 import Switch from '@material-ui/core/Switch';
 import ImageUploader from 'react-images-upload';
 import Resizer from 'react-image-file-resizer';
+import { AppState } from '../../store/reducers/rootReducer';
 import { config } from '../../config';
+import { VirtualBackgroundItems } from './MediaSettings/VirtualBackgroundItems';
 
 const insertableStreamsSupported = Boolean(
   // @ts-ignore
@@ -97,7 +99,11 @@ const styles = (theme) => ({
 
 const tabs = ['videoSettings', 'audioSettings'];
 
-const MediaSettings = ({
+interface MediaSettingsProps extends Pick<AppState, 'settings'> {
+  [key: string]: any;
+}
+
+const MediaSettings: React.FC<MediaSettingsProps> = ({
   setAudioPreset,
   setEchoCancellation,
   setAutoGainControl,
@@ -117,6 +123,7 @@ const MediaSettings = ({
   classes,
 }) => {
   const intl = useIntl();
+  const dispatch = useDispatch();
 
   const [audioSettingsOpen, setAudioSettingsOpen] = React.useState(false);
   const [videoSettingsOpen, setVideoSettingsOpen] = React.useState(false);
@@ -303,6 +310,29 @@ const MediaSettings = ({
                   })}
             </FormHelperText>
           </FormControl>
+
+          <FormControlLabel
+            className={classnames(classes.setting, classes.switchLabel)}
+            control={
+              <Switch
+                checked={settings.enableVirtualBackground}
+                onChange={() => {
+                  // TODO
+                  // roomClient.setHideNoVideoParticipants(!settings.hideNoVideoParticipants);
+                  // onToggleHideNoVideoParticipants();
+                  dispatch(settingsActions.setVirtualBackgroundEnable(true))
+                }}
+                value="enableVirtualBackground"
+              />
+            }
+            labelPlacement="start"
+            label={intl.formatMessage({
+              id: 'settings.enableVirtualBackground',
+              defaultMessage: 'Enable Virtual Background',
+            })}
+          />
+          {settings.enableVirtualBackground && <VirtualBackgroundItems />}
+
           <List className={classes.root} component="nav">
             <ListItem
               button
@@ -915,6 +945,7 @@ const MediaSettings = ({
     </React.Fragment>
   );
 };
+MediaSettings.displayName = 'MediaSettings';
 
 MediaSettings.propTypes = {
   roomClient: PropTypes.any.isRequired,
@@ -932,7 +963,7 @@ MediaSettings.propTypes = {
   setEnableOpusDetails: PropTypes.func.isRequired,
   me: appPropTypes.Me.isRequired,
   volume: PropTypes.number,
-  settings: PropTypes.object.isRequired,
+  // settings: PropTypes.object.isRequired,
   classes: PropTypes.object.isRequired,
 };
 

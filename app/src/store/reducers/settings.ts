@@ -42,6 +42,9 @@ const initialState = {
   opusPtime: config.opusPtime,
   opusMaxPlaybackRate: config.opusMaxPlaybackRate,
   enableOpusDetails: false,
+  recorderSupportedMimeTypes: [],
+  selectedAudioOutputDevice: '',
+  enableVirtualBackground: false,
 };
 
 const settings = (state = initialState, action) => {
