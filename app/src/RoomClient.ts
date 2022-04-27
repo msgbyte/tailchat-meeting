@@ -27,7 +27,7 @@ import {
 } from './transforms/receiver';
 import { config } from './config';
 import { store } from './store/store';
-import { virtualBackgroundEffect } from './transforms/virtualBg';
+import { virtualBackgroundEffect } from './transforms/virtualBackgroundEffect';
 import type * as MediasoupClient from 'mediasoup-client';
 
 type Priority = 'high' | 'medium' | 'low' | 'very-low';

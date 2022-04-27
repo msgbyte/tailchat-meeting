@@ -19,14 +19,6 @@ class VirtualBackgroundEffect {
   inputVideoElement = document.createElement('video');
   outputCanvasElement = document.createElement('canvas');
 
-  constructor() {
-    document.body.append(this.inputVideoElement, this.outputCanvasElement);
-    document.body.append(
-      this.foregroundCanvasElement,
-      this.backgroundCanvasElement
-    );
-  }
-
   /**
    * 开始应用虚拟背景
    */
