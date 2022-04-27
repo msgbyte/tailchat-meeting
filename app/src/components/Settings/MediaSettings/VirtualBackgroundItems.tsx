@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { config } from '../../../config';
 import classNames from 'classnames';
 import { useAppDispatch, useAppSelector } from '../../../store/selectors';
 import { setVirtualBackgroundUrl } from '../../../store/actions/settingsActions';
+import { useIntl } from 'react-intl';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -43,12 +44,28 @@ const useStyles = makeStyles((theme) => ({
 /**
  * 虚拟背景渲染
  */
-export const VirtualBackgroundItems: React.FC = React.memo(() => {
+export const VirtualBackgroundItems: React.FC<{
+  onChange: (imageUrl: string) => void;
+}> = React.memo((props) => {
   const classes = useStyles();
+  const intl = useIntl();
   const virtualBackgroundUrl = useAppSelector(
     (state) => state.settings.virtualBackgroundUrl
   );
   const dispatch = useAppDispatch();
+
+  const handleChangeUrl = useCallback(
+    (url: string) => {
+      if (virtualBackgroundUrl === url) {
+        // 过滤不变量
+        return;
+      }
+
+      dispatch(setVirtualBackgroundUrl(url));
+      props.onChange(url);
+    },
+    [virtualBackgroundUrl, props.onChange]
+  );
 
   return (
     <div className={classes.root}>
@@ -56,9 +73,12 @@ export const VirtualBackgroundItems: React.FC = React.memo(() => {
         className={classNames(classes.virtualBgItem, classes.blurItem, {
           [classes.virtualBgItemSelected]: virtualBackgroundUrl === 'blur',
         })}
-        onClick={() => dispatch(setVirtualBackgroundUrl('blur'))}
+        onClick={() => handleChangeUrl('blur')}
       >
-        Blur
+        {intl.formatMessage({
+          id: 'settings.virtualBg.blur',
+          defaultMessage: 'Blur',
+        })}
       </div>
       {config.virtualBackground.map((url, i) => (
         <div
@@ -66,7 +86,7 @@ export const VirtualBackgroundItems: React.FC = React.memo(() => {
           className={classNames(classes.virtualBgItem, {
             [classes.virtualBgItemSelected]: virtualBackgroundUrl === url,
           })}
-          onClick={() => dispatch(setVirtualBackgroundUrl(url))}
+          onClick={() => handleChangeUrl(url)}
         >
           <img src={url} />
         </div>

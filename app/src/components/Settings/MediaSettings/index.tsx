@@ -318,6 +318,9 @@ const MediaSettings: React.FC<MediaSettingsProps> = ({
                 checked={settings.virtualBackgroundEnabled}
                 onChange={(_, checked) => {
                   dispatch(settingsActions.setVirtualBackgroundEnable(checked));
+                  roomClient.updateWebcam({
+                    restart: true,
+                  });
                 }}
                 value="enableVirtualBackground"
               />
@@ -328,7 +331,15 @@ const MediaSettings: React.FC<MediaSettingsProps> = ({
               defaultMessage: 'Enable Virtual Background',
             })}
           />
-          {settings.virtualBackgroundEnabled && <VirtualBackgroundItems />}
+          {settings.virtualBackgroundEnabled && (
+            <VirtualBackgroundItems
+              onChange={() => {
+                roomClient.updateWebcam({
+                  restart: true,
+                });
+              }}
+            />
+          )}
 
           <List className={classes.root} component="nav">
             <ListItem

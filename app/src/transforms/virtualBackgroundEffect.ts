@@ -47,8 +47,10 @@ class VirtualBackgroundEffect {
    * 停止所有的虚拟背景
    */
   stop() {
-    this.selfieSegmentation.close();
-    this.selfieSegmentation = null;
+    if (this.selfieSegmentation) {
+      this.selfieSegmentation.close();
+      this.selfieSegmentation = null;
+    }
   }
 
   /**
