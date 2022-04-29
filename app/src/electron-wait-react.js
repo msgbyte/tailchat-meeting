@@ -21,13 +21,16 @@ const tryConnection = () =>
 
 			const exec = require('child_process').exec;
 
-			const electron = exec('npm run electron');
+			const electron = exec('pnpm run electron');
 
 			electron.stdout.on('data', (data) =>
 			{
 				// eslint-disable-next-line no-console
 				console.log(`stdout: ${data.toString()}`);
 			});
+			electron.stderr.on('data', (data) => {
+				console.log(`stderr: ${data.toString()}`);
+			})
 		}
 	});
 

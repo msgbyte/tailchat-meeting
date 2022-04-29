@@ -1,4 +1,5 @@
 const electron = require('electron');
+const isDev = require('electron-is-dev');
 
 const app = electron.app;
 
@@ -10,44 +11,46 @@ const url = require('url');
 
 let mainWindow;
 
-function createWindow()
-{
-	mainWindow = new BrowserWindow({
-		width          : 1280,
-		height         : 720,
-		webPreferences : { nodeIntegration: true }
-	});
+function createWindow() {
+  if(isDev) {
+    app.commandLine.appendSwitch('ignore-certificate-errors')
+  }
 
-	Menu.setApplicationMenu(null);
+  mainWindow = new BrowserWindow({
+    width: 1280,
+    height: 720,
+    webPreferences: { nodeIntegration: true },
+  });
 
-	const startUrl = process.env.ELECTRON_START_URL || url.format({
-		pathname : path.join(__dirname, '/../build/index.html'),
-		protocol : 'file:',
-		slashes  : true
-	});
+  if(!isDev) {
+    Menu.setApplicationMenu(null);
+  }
 
-	mainWindow.loadURL(startUrl);
+  const startUrl =
+    process.env.ELECTRON_START_URL ||
+    url.format({
+      pathname: path.join(__dirname, '/../build/index.html'),
+      protocol: 'file:',
+      slashes: true,
+    });
 
-	mainWindow.on('closed', () =>
-	{
-		mainWindow = null;
-	});
+  mainWindow.loadURL(startUrl);
+
+  mainWindow.on('closed', () => {
+    mainWindow = null;
+  });
 }
 
 app.on('ready', createWindow);
 
-app.on('window-all-closed', () =>
-{
-	if (process.platform !== 'darwin')
-	{
-		app.quit();
-	}
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
 });
 
-app.on('activate', () =>
-{
-	if (mainWindow === null)
-	{
-		createWindow();
-	}
+app.on('activate', () => {
+  if (mainWindow === null) {
+    createWindow();
+  }
 });

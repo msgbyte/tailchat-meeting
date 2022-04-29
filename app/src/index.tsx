@@ -51,6 +51,7 @@ const supportedBrowsers = {
   chromium: '>=74',
   opera: '>=62',
   'samsung internet for android': '>=11.1.1.52',
+  electron: '>=18.1.0',
 };
 
 const intl = createIntl({ locale: 'en', defaultLocale: 'en' });

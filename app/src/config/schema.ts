@@ -42,6 +42,7 @@ export const configSchema = {
       chromium: '>=74',
       opera: '>=62',
       'samsung internet for android': '>=11.1.1.52',
+      electron: '>=18.1.0',
     },
   },
 
@@ -310,7 +311,7 @@ export const configSchema = {
     doc: `It sets the maximum number of participants in one room that can join unmuted.
    The next participant will join automatically muted.
    Set it to 0 to auto mute all.
-   Set it to negative (-1) to never automatically auto mute but use it with caution, 
+   Set it to negative (-1) to never automatically auto mute but use it with caution,
    full mesh audio strongly decrease room capacity!`,
     format: 'nat',
     default: 4,
@@ -350,10 +351,10 @@ export const configSchema = {
 
   notificationSounds: {
     doc: `It sets the notifications sounds.
-   Valid keys are: 'parkedPeer', 'parkedPeers', 'raisedHand', 
+   Valid keys are: 'parkedPeer', 'parkedPeers', 'raisedHand',
    'chatMessage', 'sendFile', 'newPeer' and 'default'.
    Not defining a key is equivalent to using the default notification sound.
-   Setting 'play' to null disables the sound notification.		
+   Setting 'play' to null disables the sound notification.
    `,
     format: Object,
     default: {
@@ -480,7 +481,7 @@ export const configSchema = {
                                backgroundColor : '#f50057'
                            }
                        }
-   
+
                    },
                    */
 

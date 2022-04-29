@@ -58,6 +58,7 @@ importers:
       draft-js-plugins-editor: ^3.0.0
       draft-js-single-line-plugin: ^2.0.5
       electron: ^18.1.0
+      electron-is-dev: ^2.0.0
       end-of-stream: 1.4.1
       eslint-config-react-app: ^6.0.0
       eslint-import-resolver-typescript: ^2.4.0
@@ -132,6 +133,7 @@ importers:
       draft-js-plugins-editor: 3.0.0_81b8b0ad9777e2b0f63d571d3e717da7
       draft-js-single-line-plugin: 2.0.5_81b8b0ad9777e2b0f63d571d3e717da7
       electron: 18.1.0
+      electron-is-dev: 2.0.0
       end-of-stream: 1.4.1
       file-saver: 2.0.5
       hark: 1.2.3
@@ -6324,6 +6326,10 @@ packages:
     hasBin: true
     dependencies:
       jake: 10.8.5
+    dev: false
+
+  /electron-is-dev/2.0.0:
+    resolution: {integrity: sha512-3X99K852Yoqu9AcW50qz3ibYBWY79/pBhlMCab8ToEWS48R0T9tyxRiQhwylE7zQdXrMnx2JKqUJyMPmt5FBqA==}
     dev: false
 
   /electron-to-chromium/1.4.118:
