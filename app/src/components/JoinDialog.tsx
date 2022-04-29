@@ -145,45 +145,46 @@ const DialogActions = withStyles((theme) => ({
   },
 }))(MuiDialogActions);
 
-const JoinDialog = ({
-  roomClient,
-  room,
-  mediaPerms,
-  displayName,
-  displayNameInProgress,
-  loggedIn,
-  changeDisplayName,
-  setMediaPerms,
-  classes,
-  setAudioMuted,
-  setVideoMuted,
-  locale,
-  localesList,
-}) => {
-  const location = useLocation();
+const JoinDialog: React.FC = React.memo(
+  ({
+    roomClient,
+    room,
+    mediaPerms,
+    displayName,
+    displayNameInProgress,
+    loggedIn,
+    changeDisplayName,
+    setMediaPerms,
+    classes,
+    setAudioMuted,
+    setVideoMuted,
+    locale,
+    localesList,
+  }: any) => {
+    const location = useLocation();
 
-  const history = useHistory();
+    const history = useHistory();
 
-  const intl = useIntl();
+    const intl = useIntl();
 
-  displayName = displayName.trimLeft();
+    displayName = displayName.trimLeft();
 
-  const [authType, setAuthType] = useState(loggedIn ? 'auth' : 'guest');
+    const [authType, setAuthType] = useState(loggedIn ? 'auth' : 'guest');
 
-  const [roomId, setRoomId] = useState(
-    decodeURIComponent(location.pathname.slice(1)) ||
-      randomString({ length: 8 }).toLowerCase()
-  );
+    const [roomId, setRoomId] = useState(
+      decodeURIComponent(location.pathname.slice(1)) ||
+        randomString({ length: 8 }).toLowerCase()
+    );
 
-  useEffect(() => {
-    window.history.replaceState({}, null, encodeURIComponent(roomId) || '/');
-  }, [roomId]);
+    useEffect(() => {
+      window.history.replaceState({}, null, encodeURIComponent(roomId) || '/');
+    }, [roomId]);
 
-  useEffect(() => {
-    location.pathname === '/' && history.push(encodeURIComponent(roomId));
-  });
+    useEffect(() => {
+      location.pathname === '/' && history.push(encodeURIComponent(roomId));
+    });
 
-  /* const _askForPerms = () =>
+    /* const _askForPerms = () =>
 	{
 		if (mediaPerms.video || mediaPerms.audio)
 		{
@@ -191,37 +192,37 @@ const JoinDialog = ({
 		}
 	}; */
 
-  const handleSetMediaPerms = (event, newMediaPerms) => {
-    if (newMediaPerms !== null) {
-      setMediaPerms(JSON.parse(newMediaPerms));
-    }
-  };
+    const handleSetMediaPerms = (event, newMediaPerms) => {
+      if (newMediaPerms !== null) {
+        setMediaPerms(JSON.parse(newMediaPerms));
+      }
+    };
 
-  const handleSetAuthType = (event, newAuthType) => {
-    if (newAuthType !== null) {
-      setAuthType(newAuthType);
-    }
-  };
+    const handleSetAuthType = (event, newAuthType) => {
+      if (newAuthType !== null) {
+        setAuthType(newAuthType);
+      }
+    };
 
-  const handleJoin = () => {
-    setAudioMuted(false);
+    const handleJoin = () => {
+      setAudioMuted(false);
 
-    setVideoMuted(false);
+      setVideoMuted(false);
 
-    // _askForPerms();
+      // _askForPerms();
 
-    const encodedRoomId = encodeURIComponent(roomId);
+      const encodedRoomId = encodeURIComponent(roomId);
 
-    roomClient.join({
-      roomId: encodedRoomId,
-      joinVideo: mediaPerms.video,
-      joinAudio: mediaPerms.audio,
-    });
-  };
+      roomClient.join({
+        roomId: encodedRoomId,
+        joinVideo: mediaPerms.video,
+        joinAudio: mediaPerms.audio,
+      });
+    };
 
-  const handleFocus = (event) => event.target.select();
+    const handleFocus = (event) => event.target.select();
 
-  /*
+    /*
 	const handleAuth = () =>
 	{
 		_askForPerms();
@@ -239,195 +240,55 @@ const JoinDialog = ({
 	};
 	*/
 
-  const handleJoinUsingEnterKey = (event) => {
-    if (event.key === 'Enter') document.getElementById('joinButton').click();
-  };
+    const handleJoinUsingEnterKey = (event) => {
+      if (event.key === 'Enter') document.getElementById('joinButton').click();
+    };
 
-  const handleChangeDisplayName = (event) => {
-    const { key } = event;
+    const handleChangeDisplayName = (event) => {
+      const { key } = event;
 
-    switch (key) {
-      case 'Enter':
-      case 'Escape': {
-        displayName = displayName.trim();
+      switch (key) {
+        case 'Enter':
+        case 'Escape': {
+          displayName = displayName.trim();
 
-        if (room.inLobby) roomClient.changeDisplayName(displayName);
-        break;
-      }
-      default:
-        break;
-    }
-  };
-
-  useEffect(() => {
-    fetch(`${location.protocol}//${getHost()}/auth/check_login_status`, {
-      credentials: 'include',
-      method: 'GET',
-      cache: 'no-cache',
-      redirect: 'follow',
-      referrerPolicy: 'no-referrer',
-    })
-      .then((response) => response.json())
-      .then((json) => {
-        if (json.loggedIn) {
-          roomClient.setLoggedIn(json.loggedIn);
+          if (room.inLobby) roomClient.changeDisplayName(displayName);
+          break;
         }
+        default:
+          break;
+      }
+    };
+
+    useEffect(() => {
+      fetch(`${location.protocol}//${getHost()}/auth/check_login_status`, {
+        credentials: 'include',
+        method: 'GET',
+        cache: 'no-cache',
+        redirect: 'follow',
+        referrerPolicy: 'no-referrer',
       })
-      .catch((error) => {
-        logger.error('Error checking login status', error);
-      });
-  }, []);
+        .then((response) => response.json())
+        .then((json) => {
+          if (json.loggedIn) {
+            roomClient.setLoggedIn(json.loggedIn);
+          }
+        })
+        .catch((error) => {
+          logger.error('Error checking login status', error);
+        });
+    }, []);
 
-  return (
-    <div className={classes.root}>
-      <Dialog
-        onKeyDown={handleJoinUsingEnterKey}
-        open
-        classes={{
-          paper: classes.dialogPaper,
-        }}
-      >
-        <DialogTitle className={classes.dialogTitle}>
-          <Grid
-            container
-            direction="row"
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <Grid item>
-              {config.logo ? (
-                <img alt="Logo" src={config.logo} />
-              ) : (
-                <Typography variant="h5"> {config.title} </Typography>
-              )}
-            </Grid>
-
-            <Grid item>
-              <Grid
-                container
-                direction="row"
-                justifyContent="flex-end"
-                alignItems="center"
-              >
-                {/* LOCALE SELECTOR */}
-                <Grid item>
-                  <Grid container direction="column" alignItems="center">
-                    <Grid item>
-                      <PopupState variant="popover" popupId="demo-popup-menu">
-                        {(popupState) => (
-                          <React.Fragment>
-                            <Button
-                              className={classes.actionButton}
-                              aria-label={locale.split(/[-_]/)[0]}
-                              color="secondary"
-                              disableRipple
-                              style={{ backgroundColor: 'transparent' }}
-                              {...bindTrigger(popupState)}
-                            >
-                              {locale.split(/[-_]/)[0]}
-                            </Button>
-                            <Menu {...bindMenu(popupState)}>
-                              {localesList.map((item, index) => (
-                                <MenuItem
-                                  selected={item.locale.includes(locale)}
-                                  key={index}
-                                  onClick={() => {
-                                    roomClient.setLocale(item.locale[0]);
-                                    // handleMenuClose();
-                                  }}
-                                >
-                                  {item.name}
-                                </MenuItem>
-                              ))}
-                            </Menu>
-                          </React.Fragment>
-                        )}
-                      </PopupState>
-                    </Grid>
-
-                    {config.loginEnabled && (
-                      <Grid item>
-                        <div className={classes.loginLabel}>&nbsp;</div>
-                      </Grid>
-                    )}
-                  </Grid>
-                </Grid>
-                {/* /LOCALE SELECTOR */}
-
-                {/* LOGIN BUTTON */}
-                {config.loginEnabled && (
-                  <Grid item>
-                    <Grid container direction="column" alignItems="center">
-                      <Grid item>
-                        <IconButton
-                          className={classes.accountButton}
-                          onClick={
-                            loggedIn
-                              ? () => roomClient.logout(roomId)
-                              : () => roomClient.login(roomId)
-                          }
-                        >
-                          <AccountCircle
-                            className={classnames(
-                              classes.accountButtonAvatar,
-                              loggedIn ? classes.green : null
-                            )}
-                          />
-                        </IconButton>
-                      </Grid>
-                      <Grid item>
-                        <div className={classes.loginLabel}>
-                          <FormattedMessage
-                            id={loggedIn ? 'label.logout' : 'label.login'}
-                            defaultMessage={loggedIn ? 'Logout' : 'Login'}
-                          />
-                        </div>
-                      </Grid>
-                    </Grid>
-                  </Grid>
-                )}
-                {/* /LOGIN BUTTON */}
-              </Grid>
-            </Grid>
-          </Grid>
-        </DialogTitle>
-
-        <DialogContent>
-          <hr />
-          {/* ROOM NAME */}
-          <TextField
-            autoFocus
-            id="roomId"
-            label={intl.formatMessage({
-              id: 'label.roomName',
-              defaultMessage: 'Room name',
-            })}
-            value={roomId}
-            variant="outlined"
-            margin="normal"
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <MeetingRoomIcon />
-                </InputAdornment>
-              ),
-            }}
-            onChange={(event) => {
-              const { value } = event.target;
-
-              setRoomId(value.toLowerCase());
-            }}
-            onFocus={handleFocus}
-            onBlur={() => {
-              if (roomId === '')
-                setRoomId(randomString({ length: 8 }).toLowerCase());
-            }}
-            fullWidth
-          />
-          {/* /ROOM NAME */}
-
-          {/* AUTH TOGGLE BUTTONS */}
-          {false && (
+    return (
+      <div className={classes.root}>
+        <Dialog
+          onKeyDown={handleJoinUsingEnterKey}
+          open
+          classes={{
+            paper: classes.dialogPaper,
+          }}
+        >
+          <DialogTitle className={classes.dialogTitle}>
             <Grid
               container
               direction="row"
@@ -435,177 +296,321 @@ const JoinDialog = ({
               alignItems="center"
             >
               <Grid item>
-                <ToggleButtonGroup
-                  value={authType}
-                  onChange={handleSetAuthType}
-                  aria-label="choose auth"
-                  exclusive
-                >
-                  <ToggleButton value="guest">
-                    <WorkOutlineIcon />
-                    &nbsp;
-                    <FormattedMessage id="label.guest" defaultMessage="Guest" />
-                  </ToggleButton>
-
-                  <ToggleButton value="auth">
-                    <VpnKeyIcon />
-                    &nbsp;
-                    <FormattedMessage id="label.auth" defaultMessage="Auth" />
-                  </ToggleButton>
-                </ToggleButtonGroup>
+                {config.logo ? (
+                  <img alt="Logo" src={config.logo} />
+                ) : (
+                  <Typography variant="h5"> {config.title} </Typography>
+                )}
               </Grid>
-            </Grid>
-          )}
-          {/* /AUTH TOGGLE BUTTONS */}
-
-          {/* NAME FIELD */}
-          <TextField
-            id="displayname"
-            label={intl.formatMessage({
-              id: 'label.yourName',
-              defaultMessage: 'Your name',
-            })}
-            value={displayName}
-            variant="outlined"
-            onFocus={handleFocus}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <AccountCircle />
-                </InputAdornment>
-              ),
-            }}
-            margin="normal"
-            disabled={displayNameInProgress}
-            onChange={(event) => {
-              const { value } = event.target;
-
-              changeDisplayName(value);
-            }}
-            onKeyDown={handleChangeDisplayName}
-            onBlur={() => {
-              displayName = displayName.trim();
-
-              if (room.inLobby) roomClient.changeDisplayName(displayName);
-            }}
-            fullWidth
-          />
-          {/* NAME FIELD*/}
-
-          {!room.inLobby && room.overRoomLimit && (
-            <DialogContentText
-              className={classes.red}
-              variant="h6"
-              gutterBottom
-            >
-              <FormattedMessage
-                id="room.overRoomLimit"
-                defaultMessage={'The room is full, retry after some time.'}
-              />
-            </DialogContentText>
-          )}
-        </DialogContent>
-
-        {!room.inLobby ? (
-          <DialogActions>
-            <Grid
-              container
-              direction="row"
-              justifyContent="space-between"
-              alignItems="flex-end"
-              spacing={1}
-            >
-              {/* MEDIA PERMISSIONS TOGGLE BUTTONS */}
 
               <Grid item>
-                <FormControl component="fieldset">
-                  <Box mb={1}>
-                    <FormLabel component="legend">
-                      <FormattedMessage
-                        id="devices.chooseMedia"
-                        defaultMessage="Choose Media"
-                      />
-                    </FormLabel>
-                  </Box>
+                <Grid
+                  container
+                  direction="row"
+                  justifyContent="flex-end"
+                  alignItems="center"
+                >
+                  {/* LOCALE SELECTOR */}
+                  <Grid item>
+                    <Grid container direction="column" alignItems="center">
+                      <Grid item>
+                        <PopupState variant="popover" popupId="demo-popup-menu">
+                          {(popupState) => (
+                            <React.Fragment>
+                              <Button
+                                className={classes.actionButton}
+                                aria-label={locale.split(/[-_]/)[0]}
+                                color="secondary"
+                                disableRipple
+                                style={{ backgroundColor: 'transparent' }}
+                                {...bindTrigger(popupState)}
+                              >
+                                {locale.split(/[-_]/)[0]}
+                              </Button>
+                              <Menu {...bindMenu(popupState)}>
+                                {localesList.map((item, index) => (
+                                  <MenuItem
+                                    selected={item.locale.includes(locale)}
+                                    key={index}
+                                    onClick={() => {
+                                      roomClient.setLocale(item.locale[0]);
+                                      // handleMenuClose();
+                                    }}
+                                  >
+                                    {item.name}
+                                  </MenuItem>
+                                ))}
+                              </Menu>
+                            </React.Fragment>
+                          )}
+                        </PopupState>
+                      </Grid>
+
+                      {config.loginEnabled && (
+                        <Grid item>
+                          <div className={classes.loginLabel}>&nbsp;</div>
+                        </Grid>
+                      )}
+                    </Grid>
+                  </Grid>
+                  {/* /LOCALE SELECTOR */}
+
+                  {/* LOGIN BUTTON */}
+                  {config.loginEnabled && (
+                    <Grid item>
+                      <Grid container direction="column" alignItems="center">
+                        <Grid item>
+                          <IconButton
+                            className={classes.accountButton}
+                            onClick={
+                              loggedIn
+                                ? () => roomClient.logout(roomId)
+                                : () => roomClient.login(roomId)
+                            }
+                          >
+                            <AccountCircle
+                              className={classnames(
+                                classes.accountButtonAvatar,
+                                loggedIn ? classes.green : null
+                              )}
+                            />
+                          </IconButton>
+                        </Grid>
+                        <Grid item>
+                          <div className={classes.loginLabel}>
+                            <FormattedMessage
+                              id={loggedIn ? 'label.logout' : 'label.login'}
+                              defaultMessage={loggedIn ? 'Logout' : 'Login'}
+                            />
+                          </div>
+                        </Grid>
+                      </Grid>
+                    </Grid>
+                  )}
+                  {/* /LOGIN BUTTON */}
+                </Grid>
+              </Grid>
+            </Grid>
+          </DialogTitle>
+
+          <DialogContent>
+            <hr />
+            {/* ROOM NAME */}
+            <TextField
+              autoFocus
+              id="roomId"
+              label={intl.formatMessage({
+                id: 'label.roomName',
+                defaultMessage: 'Room name',
+              })}
+              value={roomId}
+              variant="outlined"
+              margin="normal"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <MeetingRoomIcon />
+                  </InputAdornment>
+                ),
+              }}
+              onChange={(event) => {
+                const { value } = event.target;
+
+                setRoomId(value.toLowerCase());
+              }}
+              onFocus={handleFocus}
+              onBlur={() => {
+                if (roomId === '')
+                  setRoomId(randomString({ length: 8 }).toLowerCase());
+              }}
+              fullWidth
+            />
+            {/* /ROOM NAME */}
+
+            {/* AUTH TOGGLE BUTTONS */}
+            {false && (
+              <Grid
+                container
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <Grid item>
                   <ToggleButtonGroup
-                    value={JSON.stringify(mediaPerms)}
-                    size="small"
-                    onChange={handleSetMediaPerms}
-                    className={
-                      JSON.stringify(mediaPerms) ===
-                      '{"audio":false,"video":false}'
-                        ? classes.mediaDevicesNoneSelectedButton
-                        : classes.mediaDevicesAnySelectedButton
-                    }
-                    aria-label="choose permission"
+                    value={authType}
+                    onChange={handleSetAuthType}
+                    aria-label="choose auth"
                     exclusive
                   >
-                    <ToggleButton value='{"audio":false,"video":false}'>
-                      <Tooltip
-                        title={intl.formatMessage({
-                          id: 'devices.disableBothMicrophoneAndCamera',
-                          defaultMessage: 'Disable both Microphone And Camera',
-                        })}
-                        placement="bottom"
-                      >
-                        <BlockIcon />
-                      </Tooltip>
+                    <ToggleButton value="guest">
+                      <WorkOutlineIcon />
+                      &nbsp;
+                      <FormattedMessage
+                        id="label.guest"
+                        defaultMessage="Guest"
+                      />
                     </ToggleButton>
-                    <ToggleButton value='{"audio":true,"video":false}'>
-                      <Tooltip
-                        title={intl.formatMessage({
-                          id: 'devices.enableOnlyMicrophone',
-                          defaultMessage: 'Enable only Microphone',
-                        })}
-                        placement="bottom"
-                      >
-                        <MicIcon />
-                      </Tooltip>
-                    </ToggleButton>
-                    <ToggleButton value='{"audio":false,"video":true}'>
-                      <Tooltip
-                        title={intl.formatMessage({
-                          id: 'devices.enableOnlyCamera',
-                          defaultMessage: 'Enable only Camera',
-                        })}
-                        placement="bottom"
-                      >
-                        <VideocamIcon />
-                      </Tooltip>
-                    </ToggleButton>
-                    <ToggleButton value='{"audio":true,"video":true}'>
-                      <Tooltip
-                        title={intl.formatMessage({
-                          id: 'devices.enableBothMicrophoneAndCamera',
-                          defaultMessage: 'Enable both Microphone and Camera',
-                        })}
-                        placement="bottom"
-                      >
-                        <span style={{ display: 'flex', flexDirection: 'row' }}>
-                          <MicIcon />+<VideocamIcon />
-                        </span>
-                      </Tooltip>
+
+                    <ToggleButton value="auth">
+                      <VpnKeyIcon />
+                      &nbsp;
+                      <FormattedMessage id="label.auth" defaultMessage="Auth" />
                     </ToggleButton>
                   </ToggleButtonGroup>
-                </FormControl>
+                </Grid>
               </Grid>
+            )}
+            {/* /AUTH TOGGLE BUTTONS */}
 
-              {/* /MEDIA PERMISSION BUTTONS */}
+            {/* NAME FIELD */}
+            <TextField
+              id="displayname"
+              label={intl.formatMessage({
+                id: 'label.yourName',
+                defaultMessage: 'Your name',
+              })}
+              value={displayName}
+              variant="outlined"
+              onFocus={handleFocus}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <AccountCircle />
+                  </InputAdornment>
+                ),
+              }}
+              margin="normal"
+              disabled={displayNameInProgress}
+              onChange={(event) => {
+                const { value } = event.target;
 
-              {/* JOIN/AUTH BUTTON */}
-              <Grid item className={classes.joinButton}>
-                <Button
-                  onClick={handleJoin}
-                  variant="contained"
-                  color="primary"
-                  id="joinButton"
-                  disabled={displayName === ''}
-                  fullWidth
-                >
-                  <FormattedMessage id="label.join" defaultMessage="Join" />
-                </Button>
-              </Grid>
-              {/*
+                changeDisplayName(value);
+              }}
+              onKeyDown={handleChangeDisplayName}
+              onBlur={() => {
+                displayName = displayName.trim();
+
+                if (room.inLobby) roomClient.changeDisplayName(displayName);
+              }}
+              fullWidth
+            />
+            {/* NAME FIELD*/}
+
+            {!room.inLobby && room.overRoomLimit && (
+              <DialogContentText
+                className={classes.red}
+                variant="h6"
+                gutterBottom
+              >
+                <FormattedMessage
+                  id="room.overRoomLimit"
+                  defaultMessage={'The room is full, retry after some time.'}
+                />
+              </DialogContentText>
+            )}
+          </DialogContent>
+
+          {!room.inLobby ? (
+            <DialogActions>
+              <Grid
+                container
+                direction="row"
+                justifyContent="space-between"
+                alignItems="flex-end"
+                spacing={1}
+              >
+                {/* MEDIA PERMISSIONS TOGGLE BUTTONS */}
+
+                <Grid item>
+                  <FormControl component="fieldset">
+                    <Box mb={1}>
+                      <FormLabel component="legend">
+                        <FormattedMessage
+                          id="devices.chooseMedia"
+                          defaultMessage="Choose Media"
+                        />
+                      </FormLabel>
+                    </Box>
+                    <ToggleButtonGroup
+                      value={JSON.stringify(mediaPerms)}
+                      size="small"
+                      onChange={handleSetMediaPerms}
+                      className={
+                        JSON.stringify(mediaPerms) ===
+                        '{"audio":false,"video":false}'
+                          ? classes.mediaDevicesNoneSelectedButton
+                          : classes.mediaDevicesAnySelectedButton
+                      }
+                      aria-label="choose permission"
+                      exclusive
+                    >
+                      <ToggleButton value='{"audio":false,"video":false}'>
+                        <Tooltip
+                          title={intl.formatMessage({
+                            id: 'devices.disableBothMicrophoneAndCamera',
+                            defaultMessage:
+                              'Disable both Microphone And Camera',
+                          })}
+                          placement="bottom"
+                        >
+                          <BlockIcon />
+                        </Tooltip>
+                      </ToggleButton>
+                      <ToggleButton value='{"audio":true,"video":false}'>
+                        <Tooltip
+                          title={intl.formatMessage({
+                            id: 'devices.enableOnlyMicrophone',
+                            defaultMessage: 'Enable only Microphone',
+                          })}
+                          placement="bottom"
+                        >
+                          <MicIcon />
+                        </Tooltip>
+                      </ToggleButton>
+                      <ToggleButton value='{"audio":false,"video":true}'>
+                        <Tooltip
+                          title={intl.formatMessage({
+                            id: 'devices.enableOnlyCamera',
+                            defaultMessage: 'Enable only Camera',
+                          })}
+                          placement="bottom"
+                        >
+                          <VideocamIcon />
+                        </Tooltip>
+                      </ToggleButton>
+                      <ToggleButton value='{"audio":true,"video":true}'>
+                        <Tooltip
+                          title={intl.formatMessage({
+                            id: 'devices.enableBothMicrophoneAndCamera',
+                            defaultMessage: 'Enable both Microphone and Camera',
+                          })}
+                          placement="bottom"
+                        >
+                          <span
+                            style={{ display: 'flex', flexDirection: 'row' }}
+                          >
+                            <MicIcon />+<VideocamIcon />
+                          </span>
+                        </Tooltip>
+                      </ToggleButton>
+                    </ToggleButtonGroup>
+                  </FormControl>
+                </Grid>
+
+                {/* JOIN/AUTH BUTTON */}
+                <Grid item className={classes.joinButton}>
+                  <Button
+                    onClick={handleJoin}
+                    variant="contained"
+                    color="primary"
+                    id="joinButton"
+                    disabled={displayName === ''}
+                    fullWidth
+                  >
+                    <FormattedMessage id="label.join" defaultMessage="Join" />
+                  </Button>
+                </Grid>
+                {/*
 							{authType === 'auth' && !loggedIn &&
 							<Grid item>
 								<Button
@@ -640,67 +645,68 @@ const JoinDialog = ({
 							}
 							*/}
 
-              {/* /JOIN BUTTON */}
-            </Grid>
-          </DialogActions>
-        ) : (
-          <DialogContent>
-            <DialogContentText
-              className={classes.green}
-              gutterBottom
-              variant="h6"
-              style={{ fontWeight: '600' }}
-              align="center"
+                {/* /JOIN BUTTON */}
+              </Grid>
+            </DialogActions>
+          ) : (
+            <DialogContent>
+              <DialogContentText
+                className={classes.green}
+                gutterBottom
+                variant="h6"
+                style={{ fontWeight: '600' }}
+                align="center"
+              >
+                <FormattedMessage
+                  id="room.youAreReady"
+                  defaultMessage="Ok, you are ready"
+                />
+              </DialogContentText>
+              {room.signInRequired ? (
+                <DialogContentText
+                  gutterBottom
+                  variant="h5"
+                  style={{ fontWeight: '600' }}
+                >
+                  <FormattedMessage
+                    id="room.emptyRequireLogin"
+                    defaultMessage={`The room is empty! You can Log In to start
+										the meeting or wait until the host joins`}
+                  />
+                </DialogContentText>
+              ) : (
+                <DialogContentText
+                  gutterBottom
+                  variant="h5"
+                  style={{ fontWeight: '600' }}
+                >
+                  <FormattedMessage
+                    id="room.locketWait"
+                    defaultMessage="The room is locked - hang on until somebody lets you in ..."
+                  />
+                </DialogContentText>
+              )}
+            </DialogContent>
+          )}
+
+          {!isElectron() && (
+            <CookieConsent
+              buttonText={intl.formatMessage({
+                id: 'room.consentUnderstand',
+                defaultMessage: 'I understand',
+              })}
             >
               <FormattedMessage
-                id="room.youAreReady"
-                defaultMessage="Ok, you are ready"
+                id="room.cookieConsent"
+                defaultMessage="This website uses cookies to enhance the user experience"
               />
-            </DialogContentText>
-            {room.signInRequired ? (
-              <DialogContentText
-                gutterBottom
-                variant="h5"
-                style={{ fontWeight: '600' }}
-              >
-                <FormattedMessage
-                  id="room.emptyRequireLogin"
-                  defaultMessage={`The room is empty! You can Log In to start
-										the meeting or wait until the host joins`}
-                />
-              </DialogContentText>
-            ) : (
-              <DialogContentText
-                gutterBottom
-                variant="h5"
-                style={{ fontWeight: '600' }}
-              >
-                <FormattedMessage
-                  id="room.locketWait"
-                  defaultMessage="The room is locked - hang on until somebody lets you in ..."
-                />
-              </DialogContentText>
-            )}
-          </DialogContent>
-        )}
-
-        {!isElectron() && (
-          <CookieConsent
-            buttonText={intl.formatMessage({
-              id: 'room.consentUnderstand',
-              defaultMessage: 'I understand',
-            })}
-          >
-            <FormattedMessage
-              id="room.cookieConsent"
-              defaultMessage="This website uses cookies to enhance the user experience"
-            />
-          </CookieConsent>
-        )}
-      </Dialog>
-    </div>
-  );
-};
+            </CookieConsent>
+          )}
+        </Dialog>
+      </div>
+    );
+  }
+);
 
 JoinDialog.propTypes = {
   roomClient: PropTypes.any.isRequired,
