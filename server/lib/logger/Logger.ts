@@ -11,7 +11,7 @@ export default class Logger {
 
   private _error: debug.Debugger;
 
-  constructor(prefix: string) {
+  constructor(prefix?: string) {
     if (prefix) {
       this._debug = debug(`${APP_NAME}:${prefix}`);
       this._info = debug(`${APP_NAME}:INFO:${prefix}`);
