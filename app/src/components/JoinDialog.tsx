@@ -384,10 +384,17 @@ const JoinDialog: React.FC = React.memo(
                         </Grid>
                         <Grid item>
                           <div className={classes.loginLabel}>
-                            <FormattedMessage
-                              id={loggedIn ? 'label.logout' : 'label.login'}
-                              defaultMessage={loggedIn ? 'Logout' : 'Login'}
-                            />
+                            {loggedIn ? (
+                              <FormattedMessage
+                                id={'label.logout'}
+                                defaultMessage={'Logout'}
+                              />
+                            ) : (
+                              <FormattedMessage
+                                id={'label.login'}
+                                defaultMessage={'Login'}
+                              />
+                            )}
                           </div>
                         </Grid>
                       </Grid>
@@ -555,7 +562,7 @@ const JoinDialog: React.FC = React.memo(
                           title={intl.formatMessage({
                             id: 'devices.disableBothMicrophoneAndCamera',
                             defaultMessage:
-                              'Disable both Microphone And Camera',
+                              'Disable both Microphone and Camera',
                           })}
                           placement="bottom"
                         >
@@ -610,8 +617,9 @@ const JoinDialog: React.FC = React.memo(
                     <Box pb={1}>
                       <FormattedMessage
                         id="label.online"
-                        defaultMessage="Online:"
+                        defaultMessage="Online"
                       />
+                      :
                       <span>
                         {roomStatus.joined}
                         {roomStatus.count !== roomStatus.joined && (
@@ -684,7 +692,7 @@ const JoinDialog: React.FC = React.memo(
               >
                 <FormattedMessage
                   id="room.youAreReady"
-                  defaultMessage="Ok, you are ready"
+                  defaultMessage="Everything is ready"
                 />
               </DialogContentText>
               {room.signInRequired ? (
@@ -695,8 +703,7 @@ const JoinDialog: React.FC = React.memo(
                 >
                   <FormattedMessage
                     id="room.emptyRequireLogin"
-                    defaultMessage={`The room is empty! You can Log In to start
-										the meeting or wait until the host joins`}
+                    defaultMessage={`If you are the host, you can Log In to start the meeting. If not, please wait until the host lets you in.`}
                   />
                 </DialogContentText>
               ) : (

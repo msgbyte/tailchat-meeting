@@ -494,7 +494,7 @@ const MediaSettings: React.FC<MediaSettingsProps> = ({
               displayEmpty
               name={intl.formatMessage({
                 id: 'settings.audio',
-                defaultMessage: 'Audio input device',
+                defaultMessage: 'Audio device',
               })}
               autoWidth
               className={classes.selectEmpty}

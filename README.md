@@ -13,3 +13,10 @@ Tailchat 视频会议
 ```
 MEDIASOUP_WORKER_BIN=/path/to/mediasoup-worker
 ```
+
+### 翻译
+
+```
+cd app
+pnpm i18n:extract -- './src/**/*.{ts,tsx,js}' --ignore='**/*.d.ts' --out-file src/intl/translations/en.json --format simple
+```

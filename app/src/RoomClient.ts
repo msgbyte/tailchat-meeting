@@ -4169,7 +4169,7 @@ export class RoomClient {
             type: 'error',
             text: intl.formatMessage({
               id: 'room.extraVideoDuplication',
-              defaultMessage: 'Extra videodevice duplication errordefault',
+              defaultMessage: 'The video source is already in use.',
             }),
           })
         );

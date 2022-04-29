@@ -493,7 +493,7 @@ const Me = (props) => {
               <div>
                 <FormattedMessage
                   id="me.mutedPTT"
-                  defaultMessage="You are muted, {br} hold down SPACE-BAR to talk"
+                  defaultMessage="You are muted{br}hold down SPACE-BAR to talk"
                   values={{
                     br: <br />,
                   }}

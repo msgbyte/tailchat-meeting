@@ -54,7 +54,7 @@ const ListLobbyPeer = (props) =>
 			<Tooltip
 				title={intl.formatMessage({
 					id             : 'tooltip.admitFromLobby',
-					defaultMessage : 'Click to let them in'
+					defaultMessage : 'Admit from lobby'
 				})}
 			>
 				<IconButton

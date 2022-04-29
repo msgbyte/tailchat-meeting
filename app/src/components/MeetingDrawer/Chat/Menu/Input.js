@@ -492,7 +492,7 @@ const ChatInput = (props) =>
 								<Tooltip
 									title={intl.formatMessage({
 										id             : 'label.shareGalleryFile',
-										defaultMessage : 'Share gallery file'
+										defaultMessage : 'Share image'
 									})}
 
 									placement='top'
@@ -505,7 +505,7 @@ const ChatInput = (props) =>
 										disabled={!canShareFiles || !canShare}
 										aria-label={intl.formatMessage({
 											id             : 'label.shareGalleryFile',
-											defaultMessage : 'Share gallery file'
+											defaultMessage : 'Share image'
 										})}
 										component='span'
 										onMouseDown={(e) => e.preventDefault()}

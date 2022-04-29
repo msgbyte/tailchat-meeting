@@ -94,7 +94,7 @@ const Help = ({
 					label={
 						intl.formatMessage({
 							id             : 'room.shortcutKeys',
-							defaultMessage : 'Shortcut keys'
+							defaultMessage : 'Shortcut Keys'
 						})
 					}
 				/>

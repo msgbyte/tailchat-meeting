@@ -325,7 +325,7 @@ const TopBar = (props) =>
 					intl.formatMessage(
 						{
 							id             : 'room.recordingConsent',
-							defaultMessage : 'When attending this meeting you agree and give your consent that the meeting will be audio and video recorded and/or live broadcasted through web streaming'
+							defaultMessage : 'When attending this meeting you agree and give your consent that information (audio, video and metadata) about you can be part of that recording or broadcast'
 						}
 					),
 					peerid     : meId,
@@ -377,7 +377,7 @@ const TopBar = (props) =>
 	const recordingPausedTooltip = localRecordingState.status === 'pause' ?
 		intl.formatMessage({
 			id             : 'tooltip.resumeLocalRecording',
-			defaultMessage : 'Resume local recording'
+			defaultMessage : 'Resume paused local recording'
 		})
 		:
 		intl.formatMessage({
@@ -732,7 +732,7 @@ const TopBar = (props) =>
 									<p className={classes.moreAction}>
 										<FormattedMessage
 											id='tooltip.resumeLocalRecording'
-											defaultMessage='Resume local recording'
+											defaultMessage='Resume paused local recording'
 										/>
 									</p>
 									:
@@ -834,13 +834,13 @@ const TopBar = (props) =>
 							<VideoCallIcon
 								aria-label={intl.formatMessage({
 									id             : 'label.addVideo',
-									defaultMessage : 'Add video'
+									defaultMessage : 'Add new video input'
 								})}
 							/>
 							<p className={classes.moreAction}>
 								<FormattedMessage
 									id='label.addVideo'
-									defaultMessage='Add video'
+									defaultMessage='Add new video input'
 								/>
 							</p>
 						</MenuItem>
@@ -1018,7 +1018,7 @@ const TopBar = (props) =>
 							<p className={classes.moreAction}>
 								<FormattedMessage
 									id='tooltip.resumeLocalRecording'
-									defaultMessage='Resume local recording'
+									defaultMessage='Resume paused local recording'
 								/>
 							</p>
 							:
@@ -1150,13 +1150,13 @@ const TopBar = (props) =>
 					<VideoCallIcon
 						aria-label={intl.formatMessage({
 							id             : 'label.addVideo',
-							defaultMessage : 'Add video'
+							defaultMessage : 'Add new video input'
 						})}
 					/>
 					<p className={classes.moreAction}>
 						<FormattedMessage
 							id='label.addVideo'
-							defaultMessage='Add video'
+							defaultMessage='Add new video input'
 						/>
 					</p>
 				</MenuItem>

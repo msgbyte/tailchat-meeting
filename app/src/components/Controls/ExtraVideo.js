@@ -124,7 +124,7 @@ const ExtraVideo = ({
 				<Button onClick={() => roomClient.addExtraVideo(videoDevice)} color='primary'>
 					<FormattedMessage
 						id='label.addVideo'
-						defaultMessage='Add video'
+						defaultMessage='Add new video input'
 					/>
 				</Button>
 			</DialogActions>

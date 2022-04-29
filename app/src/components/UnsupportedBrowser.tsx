@@ -73,22 +73,19 @@ const UnsupportedBrowser = ({ platform, webrtcUnavailable, classes }) => {
         {webrtcUnavailable ? (
           <FormattedMessage
             id="unsupportedBrowser.titlewebrtcUnavailable"
-            defaultMessage="Required functionality not availble in your browser"
+            defaultMessage="Required functionality not available in your browser!"
           />
         ) : (
           <FormattedMessage
             id="unsupportedBrowser.titleUnsupportedBrowser"
-            defaultMessage="Browser not supported"
+            defaultMessage="Detected unsupported browser!"
           />
         )}
       </DialogTitle>
       <DialogContent dividers>
         <FormattedMessage
           id="unsupportedBrowser.bodyText"
-          defaultMessage="This meeting service requires
-						functionality not supported by your browser.
-						Please upgrade, switch to a different browser, or
-						check your settings. Supported browsers:"
+          defaultMessage="This meeting service requires a functionality that is not supported by your browser. Please upgrade, or switch to a different browser or check your settings. Supported browsers:"
         />
         <Grid container spacing={2} justifyContent="center" alignItems="center">
           <Grid item xs={12} md={7}>

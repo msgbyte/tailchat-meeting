@@ -97,7 +97,7 @@ const ListModerator = (props) =>
 			>
 				<FormattedMessage
 					id='room.closeMeeting'
-					defaultMessage='Close meeting'
+					defaultMessage='Close meeting for all'
 				/>
 			</Button>
 		</div>

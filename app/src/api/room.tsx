@@ -13,7 +13,6 @@ export async function getRoomStatus(roomId: string): Promise<{
    */
   joined: number;
 }> {
-  return { count: 1, joined: 1 };
   const { data } = await request.get(`/api/room-status?roomId=${roomId}`);
 
   return data;
