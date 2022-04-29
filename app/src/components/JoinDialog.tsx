@@ -40,6 +40,8 @@ import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import { config } from '../config';
 import { getHost } from '../urlFactory';
+import { useRequest } from 'ahooks';
+import { getRoomStatus } from '../api/room';
 
 const styles = (theme) => ({
   root: {
@@ -175,6 +177,10 @@ const JoinDialog: React.FC = React.memo(
       decodeURIComponent(location.pathname.slice(1)) ||
         randomString({ length: 8 }).toLowerCase()
     );
+
+    const { data: roomStatus } = useRequest(() => getRoomStatus(roomId), {
+      pollingInterval: 3000,
+    });
 
     useEffect(() => {
       window.history.replaceState({}, null, encodeURIComponent(roomId) || '/');
@@ -596,6 +602,25 @@ const JoinDialog: React.FC = React.memo(
                     </ToggleButtonGroup>
                   </FormControl>
                 </Grid>
+
+                {/* Status */}
+
+                {roomStatus && (
+                  <Grid item>
+                    <Box pb={1}>
+                      <FormattedMessage
+                        id="label.online"
+                        defaultMessage="Online:"
+                      />
+                      <span>
+                        {roomStatus.joined}
+                        {roomStatus.count !== roomStatus.joined && (
+                          <span>/{roomStatus.count}</span>
+                        )}
+                      </span>
+                    </Box>
+                  </Grid>
+                )}
 
                 {/* JOIN/AUTH BUTTON */}
                 <Grid item className={classes.joinButton}>
