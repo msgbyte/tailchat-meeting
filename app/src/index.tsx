@@ -143,7 +143,7 @@ function run() {
           </IntlProvider>
         </MuiThemeProvider>
       </Provider>,
-      document.getElementById('edumeet')
+      document.getElementById('tailchat-meeting')
     );
 
     return;
@@ -158,7 +158,7 @@ function run() {
           </IntlProvider>
         </MuiThemeProvider>
       </Provider>,
-      document.getElementById('edumeet')
+      document.getElementById('tailchat-meeting')
     );
 
     return;
@@ -173,7 +173,7 @@ function run() {
           </IntlProvider>
         </MuiThemeProvider>
       </Provider>,
-      document.getElementById('edumeet')
+      document.getElementById('tailchat-meeting')
     );
 
     return;
@@ -229,7 +229,7 @@ function run() {
         </IntlProvider>
       </MuiThemeProvider>
     </Provider>,
-    document.getElementById('edumeet')
+    document.getElementById('tailchat-meeting')
   );
 }
 

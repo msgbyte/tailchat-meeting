@@ -2,8 +2,8 @@ FROM node:14-buster-slim
 RUN apt-get update && \
     apt-get install -y git build-essential python pkg-config libssl-dev && \
     apt-get clean
-WORKDIR /edumeet
-ENV DEBUG=edumeet*,mediasoup*
+WORKDIR /tailchat-meeting
+ENV DEBUG=tailchat-meeting*,mediasoup*
 RUN npm install -g nodemon && \
     npm install -g concurrently
 RUN touch /.yarnrc && mkdir -p /.yarn /.cache/yarn && chmod -R 775 /.yarn /.yarnrc /.cache

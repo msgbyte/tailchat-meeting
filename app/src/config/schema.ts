@@ -400,13 +400,13 @@ export const configSchema = {
   logo: {
     doc: 'If not null, it shows the logo loaded from the specified URL, otherwise it shows the title.',
     format: 'url',
-    default: 'images/logo.edumeet.svg',
+    default: 'images/logo.tailchat.svg',
     nullable: true,
   },
   title: {
     doc: 'The title to show if the logo is not specified.',
     format: 'String',
-    default: 'edumeet',
+    default: 'tailchat',
   },
   supportUrl: {
     doc: 'The service & Support URL; if `null`, it will be not displayed on the about dialogs.',

@@ -4,14 +4,14 @@ exports.loginHelper = function(data)
 	<html>
 		<head>
 			<meta charset='utf-8'>
-			<title>edumeet</title>
+			<title>tailchat-meeting</title>
 		</head>
 		<body>
 			<script type='text/javascript'>
 				let data = ${JSON.stringify(data)};
-	
+
 				window.opener.CLIENT.receiveLoginChildWindow(data);
-	
+
 				window.close();
 			</script>
 		</body>
@@ -26,7 +26,7 @@ exports.logoutHelper = function()
 	<html>
 		<head>
 			<meta charset='utf-8'>
-			<title>edumeet</title>
+			<title>tailchat-meeting</title>
 		</head>
 		<body>
 			<script type='text/javascript'>
