@@ -3,8 +3,10 @@
 process.title = 'tailchat-meeting-server';
 
 import Logger from './lib/logger/Logger';
-const Room = require('./lib/Room');
-const Peer = require('./lib/Peer');
+import express from 'express';
+import { Room } from './lib/Room';
+import { Peer } from './lib/Peer';
+
 const userRoles = require('./lib/access/roles');
 const { loginHelper, logoutHelper } = require('./lib/helpers/httpHelper');
 const { config, configError } = require('./lib/config/config');
@@ -22,7 +24,6 @@ if (Number(process.versions.node.split('.')[0]) < 15) {
   spdy = require('spdy');
 }
 
-const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const compression = require('compression');
@@ -42,6 +43,20 @@ const expressSession = require('express-session');
 const RedisStore = require('connect-redis')(expressSession);
 const sharedSession = require('express-socket.io-session');
 const { v4: uuidv4 } = require('uuid');
+
+declare global {
+  namespace Express {
+    interface User {
+      [key: string]: any;
+    }
+  }
+}
+
+declare module 'express-session' {
+  interface SessionData {
+    [key: string]: any;
+  }
+}
 
 if (configError) {
   /* eslint-disable no-console */
@@ -75,10 +90,10 @@ if ('StatusLogger' in config) statusLogger = new config.StatusLogger();
 const mediasoupWorkers = new Map();
 
 // Map of Room instances indexed by roomId.
-const rooms = new Map();
+const rooms = new Map<string, Room>();
 
 // Map of Peer instances indexed by peerId.
-const peers = new Map();
+const peers = new Map<string, Peer>();
 
 // TLS server configuration.
 const tls = {
@@ -151,6 +166,8 @@ async function run() {
     } else {
       await setupAuth();
     }
+
+    await setupRoute();
 
     // Run a mediasoup Worker.
     await runMediasoupWorkers();
@@ -402,7 +419,7 @@ async function setupAuth() {
       }
     }
 
-    if (authStrategy === 'local' && !(req.user && req.password)) {
+    if (authStrategy === 'local' && !(req.user && (req as any).password)) {
       res.redirect('/login_dialog');
     } else {
       passport.authenticate(authStrategy, {
@@ -469,10 +486,13 @@ async function setupAuth() {
         res.set('Content-Type', 'text/xml');
         res.send(metadata);
       } else {
-        res.status('Error generating SAML metadata', 500);
+        res.status(500);
+        res.send('Error generating SAML metadata');
       }
-    } else
-      res.status('Missing SAML decryptionCert or signingKey from config', 500);
+    } else {
+      res.status(500);
+      res.send('Missing SAML decryptionCert or signingKey from config');
+    }
   });
 
   // callback
@@ -540,6 +560,26 @@ async function setupAuth() {
   );
 }
 
+async function setupRoute() {
+  // 房间状态
+  app.get('/room-status', (req, res) => {
+    const roomId = (req.query as any).roomId;
+
+    const room = rooms.get(roomId);
+    if (!room) {
+      res.status(404);
+      res.send(`Room Not Found: ${roomId}`);
+      return;
+    }
+
+    const peers = room.getJoinedPeers();
+    res.json({
+      count: peers.length,
+      joined: peers.filter((p) => p.joined).length,
+    });
+  });
+}
+
 async function runHttpsServer() {
   app.use(compression());
 
@@ -570,8 +610,12 @@ async function runHttpsServer() {
         ltiURL.searchParams.append('displayName', req.user.displayName);
 
         res.redirect(ltiURL);
-      } else return next();
-    } else res.redirect(`https://${req.hostname}${req.url}`);
+      } else {
+        return next();
+      }
+    } else {
+      res.redirect(`https://${req.hostname}${req.url}`);
+    }
   });
 
   // Serve all files in the public folder as static files.
@@ -879,7 +923,7 @@ async function runMediasoupWorkers() {
  * Get a Room instance (or create one if it does not exist).
  */
 async function getOrCreateRoom({ roomId }) {
-  let room = rooms.get(roomId);
+  let room: Room = rooms.get(roomId);
 
   // If the Room does not exist create a new one.
   if (!room) {

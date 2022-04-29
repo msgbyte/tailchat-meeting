@@ -14,6 +14,7 @@ const jwt = require('jsonwebtoken');
 const userRoles = require('./access/roles');
 
 import { BYPASS_ROOM_LOCK, BYPASS_LOBBY } from './access/access';
+import { Peer } from './Peer';
 
 const permissions = require('./access/perms'),
   {
@@ -64,7 +65,7 @@ const roomAllowWhenRoleMissing = config.allowWhenRoleMissing || [];
 
 const ROUTER_SCALE_SIZE = config.routerScaleSize || 40;
 
-class Room extends EventEmitter {
+export class Room extends EventEmitter {
   static getLeastLoadedRouter(
     allMediasoupWorkersOnServer,
     allPeersOnServer,
@@ -166,7 +167,7 @@ class Room extends EventEmitter {
    * @param {Map [mediasoup.Worker.pid,mediasoup.Worker]} map of mediasoupWorkers.
    * @param {String} roomId - Id of the Room instance.
    */
-  static async create({ mediasoupWorkers, roomId, peers }) {
+  static async create({ mediasoupWorkers, roomId, peers }): Promise<Room> {
     logger.info('create() [roomId:"%s"]', roomId);
 
     // Router media codecs.
@@ -249,7 +250,9 @@ class Room extends EventEmitter {
 
     this._lastN = [];
 
-    this._peers = {};
+    this._peers = {} as {
+      [key: string]: Peer;
+    };
 
     this._selfDestructTimeout = null;
 
@@ -359,7 +362,9 @@ class Room extends EventEmitter {
     }
 
     // Returning user
-    if (returning) this._peerJoining(peer, true);
+    if (returning) {
+      this._peerJoining(peer, true);
+    }
     // Has a role that is allowed to bypass room lock
     else if (this._hasAccess(peer, BYPASS_ROOM_LOCK)) this._peerJoining(peer);
     else if (
@@ -382,9 +387,9 @@ class Room extends EventEmitter {
   }
 
   _handleGuest(peer) {
-    if (config.activateOnHostJoin && !this.checkEmpty())
+    if (config.activateOnHostJoin && !this.checkEmpty()) {
       this._peerJoining(peer);
-    else {
+    } else {
       this._parkPeer(peer);
       this._notification(peer.socket, 'signInRequired');
     }
@@ -1971,9 +1976,9 @@ class Room extends EventEmitter {
   /**
    * Get the list of joined peers.
    */
-  getJoinedPeers(excludePeer = undefined): any {
-    return Object.values(this._peers).filter(
-      (peer: any) => peer.joined && peer !== excludePeer
+  getJoinedPeers(excludePeer = undefined): Peer[] {
+    return Object.values<Peer>(this._peers).filter(
+      (peer) => peer.joined && peer !== excludePeer
     );
   }
 
@@ -2123,5 +2128,3 @@ class Room extends EventEmitter {
       );
   }
 }
-
-module.exports = Room;

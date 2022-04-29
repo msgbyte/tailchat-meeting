@@ -7,8 +7,8 @@ const logger = new Logger('Peer');
 
 const RECORDING_TYPE_LOCAL = 'local';
 
-class Peer extends EventEmitter {
-  constructor({ id, roomId, socket }) {
+export class Peer extends EventEmitter {
+  constructor({ id, roomId, socket }: any) {
     logger.info('constructor() [id:"%s"]', id);
     super();
 
@@ -367,5 +367,3 @@ class Peer extends EventEmitter {
     return peerInfo;
   }
 }
-
-module.exports = Peer;
