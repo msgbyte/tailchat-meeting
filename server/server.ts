@@ -562,7 +562,7 @@ async function setupAuth() {
 
 async function setupRoute() {
   // 房间状态
-  app.get('/room-status', (req, res) => {
+  app.get('/api/room-status', (req, res) => {
     const roomId = (req.query as any).roomId;
 
     const room = rooms.get(roomId);
