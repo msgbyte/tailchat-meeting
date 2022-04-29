@@ -442,7 +442,7 @@ const Peer = (props) => {
                     style={{ ...controls.item.style }}
                     className={classnames('fab')}
                     color={micEnabled ? 'default' : 'secondary'}
-                    size={controls.item.size}
+                    size={controls.item.size as any}
                     onClick={() => {
                       micEnabled
                         ? roomClient.modifyPeerConsumer(peer.id, 'mic', true)
@@ -473,7 +473,7 @@ const Peer = (props) => {
                       })}
                       style={{ ...controls.item.style }}
                       className={classnames('fab')}
-                      size={controls.item.size}
+                      size={controls.item.size as any}
                       onClick={() => {
                         toggleConsumerWindow(webcamConsumer);
                       }}
@@ -502,7 +502,7 @@ const Peer = (props) => {
                     style={{ ...controls.item.style }}
                     className={classnames('fab')}
                     disabled={!videoVisible}
-                    size={controls.item.size}
+                    size={controls.item.size as any}
                     onClick={() => {
                       toggleConsumerFullscreen(webcamConsumer);
                     }}
@@ -544,7 +544,7 @@ const Peer = (props) => {
                     // className={classes.fab}
                     style={{ ...controls.item.style }}
                     className={classnames('fab')}
-                    size={controls.item.size}
+                    size={controls.item.size as any}
                     onClick={() => {
                       isSelected
                         ? roomClient.removeSelectedPeer(peer.id)
@@ -576,7 +576,7 @@ const Peer = (props) => {
                       })}
                       style={{ ...controls.item.style }}
                       className={classnames('fab')}
-                      size={controls.item.size}
+                      size={controls.item.size as any}
                       onClick={handleMenuOpen}
                     >
                       <MoreHorizIcon />
@@ -725,7 +725,7 @@ const Peer = (props) => {
                         disabled={
                           !videoVisible || windowConsumer === consumer.id
                         }
-                        size={controls.item.size}
+                        size={controls.item.size as any}
                         onClick={() => {
                           toggleConsumerWindow(consumer);
                         }}
@@ -753,7 +753,7 @@ const Peer = (props) => {
                       style={{ ...controls.item.style }}
                       className={classnames('fab')}
                       disabled={!videoVisible}
-                      size={controls.item.size}
+                      size={controls.item.size as any}
                       onClick={() => {
                         toggleConsumerFullscreen(consumer);
                       }}
@@ -870,7 +870,7 @@ const Peer = (props) => {
                       disabled={
                         !screenVisible || windowConsumer === screenConsumer.id
                       }
-                      size={controls.item.size}
+                      size={controls.item.size as any}
                       onClick={() => {
                         toggleConsumerWindow(screenConsumer);
                       }}
@@ -900,7 +900,7 @@ const Peer = (props) => {
                       height <= 170 ? 'smallest' : null
                     )}
                     disabled={!screenVisible}
-                    size={controls.item.size}
+                    size={controls.item.size as any}
                     onClick={() => {
                       toggleConsumerFullscreen(screenConsumer);
                     }}
@@ -982,7 +982,7 @@ const makeMapStateToProps = (initialState, { id }) => {
   const mapStateToProps = (state) => {
     return {
       peer: state.peers[id],
-      ...getPeerConsumers(state, id),
+      ...(getPeerConsumers as any)(state, id),
       windowConsumer: state.room.windowConsumer,
       fullScreenConsumer: state.room.fullScreenConsumer,
       activeSpeaker: id === state.room.activeSpeakerId,
@@ -990,7 +990,7 @@ const makeMapStateToProps = (initialState, { id }) => {
       isSelected: state.room.selectedPeers.includes(id),
       mode: state.room.mode,
       localRecordingState: state.recorder.localRecordingState.status,
-      recordingConsents: recordingConsentsPeersSelector(state),
+      recordingConsents: recordingConsentsPeersSelector(state as never),
     };
   };
 
@@ -1023,9 +1023,9 @@ export default withRoomContext(
         prev.enableLayersSwitch === next.enableLayersSwitch &&
         prev.recorder.localRecordingState.status ===
           next.recorder.localRecordingState.status &&
-        recordingConsentsPeersSelector(prev) ===
-          recordingConsentsPeersSelector(next)
+        recordingConsentsPeersSelector(prev as never) ===
+          recordingConsentsPeersSelector(next as never)
       );
     },
-  })(withStyles(styles, { withTheme: true })(Peer))
+  })(withStyles(styles as any, { withTheme: true })(Peer)) as any
 );

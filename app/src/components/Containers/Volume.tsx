@@ -145,4 +145,4 @@ const makeMapStateToProps = (initialState, props) => {
   return mapStateToProps;
 };
 
-export default connect(makeMapStateToProps)(withStyles(styles)(Volume));
+export default connect(makeMapStateToProps)(withStyles(styles as any)(Volume));

@@ -407,7 +407,7 @@ const Me = (props) => {
     screenShareTooltipHandleClose();
   }
 
-  const spacingStyle = {
+  const spacingStyle: React.CSSProperties = {
     margin: spacing,
   };
 
@@ -564,7 +564,7 @@ const Me = (props) => {
                             : 'default'
                           : 'secondary'
                       }
-                      size={controls.item.size}
+                      size={controls.item.size as any}
                       onClick={() => {
                         if (micState === 'off')
                           roomClient.updateMic({ start: true });
@@ -594,7 +594,7 @@ const Me = (props) => {
                             </svg>
                             <SettingsVoiceIcon
                               style={{ position: 'absolute' }}
-                              color={'default'}
+                              color={'inherit'}
                             />
                             <SettingsVoiceIcon
                               clipPath="url(#cut-off-indicator)"
@@ -602,7 +602,7 @@ const Me = (props) => {
                                 position: 'absolute',
                                 opacity: '0.6',
                               }}
-                              color={me.isAutoMuted ? 'primary' : 'default'}
+                              color={me.isAutoMuted ? 'primary' : 'inherit'}
                             />
                           </React.Fragment>
                         ) : (
@@ -637,7 +637,7 @@ const Me = (props) => {
                         me.webcamInProgress
                       }
                       color={webcamState === 'on' ? 'default' : 'secondary'}
-                      size={controls.item.size}
+                      size={controls.item.size as any}
                       onClick={() => {
                         webcamState === 'on'
                           ? roomClient.disableWebcam()
@@ -673,7 +673,7 @@ const Me = (props) => {
                           me.screenShareInProgress
                         }
                         color={screenState === 'on' ? 'primary' : 'default'}
-                        size={controls.item.size}
+                        size={controls.item.size as any}
                         onClick={() => {
                           if (screenState === 'off')
                             roomClient.updateScreenSharing({ start: true });
@@ -705,7 +705,7 @@ const Me = (props) => {
                         })}
                         style={{ ...controls.item.style }}
                         className={classnames('fab')}
-                        size={controls.item.size}
+                        size={controls.item.size as any}
                         onClick={handleMenuOpen}
                       >
                         <MoreHorizIcon />
@@ -741,7 +741,6 @@ const Me = (props) => {
             recordingConsents={recordingConsents}
             isMe
             isMirrored={settings.mirrorOwnVideo}
-            VideoView
             advancedMode={advancedMode}
             peer={me}
             displayName={settings.displayName}
@@ -835,7 +834,7 @@ const Me = (props) => {
                       style={{ ...controls.item.style }}
                       className={classnames('fab')}
                       disabled={!me.canSendWebcam || me.webcamInProgress}
-                      size={controls.item.size}
+                      size={controls.item.size as any}
                       onClick={() => {
                         roomClient.disableExtraVideo(producer.id);
                       }}
@@ -959,16 +958,16 @@ const makeMapStateToProps = () => {
 
     return {
       me: state.me,
-      ...meProducersSelector(state),
+      ...meProducersSelector(state as never),
       settings: state.settings,
       activeSpeaker: state.me.id === state.room.activeSpeakerId,
-      hasAudioPermission: canShareAudio(state),
-      hasVideoPermission: canShareVideo(state),
-      hasScreenPermission: canShareScreen(state),
+      hasAudioPermission: canShareAudio(state as never),
+      hasVideoPermission: canShareVideo(state as never),
+      hasScreenPermission: canShareScreen(state as never),
       noiseVolume: noise,
       transports: state.transports,
       localRecordingState: state.recorder.localRecordingState.status,
-      recordingConsents: recordingConsentsPeersSelector(state),
+      recordingConsents: recordingConsentsPeersSelector(state as never),
     };
   };
 
@@ -989,9 +988,9 @@ export default withRoomContext(
         prev.transports === next.transports &&
         prev.recorder.localRecordingState.status ===
           next.recorder.localRecordingState.status &&
-        recordingConsentsPeersSelector(prev) ===
-          recordingConsentsPeersSelector(next)
+        recordingConsentsPeersSelector(prev as never) ===
+          recordingConsentsPeersSelector(next as never)
       );
     },
-  })(withStyles(styles, { withTheme: true })(Me))
+  })(withStyles(styles as any, { withTheme: true })(Me))
 );

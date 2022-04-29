@@ -246,7 +246,7 @@ const mapStateToProps = (state, { id }) => {
 
   return {
     peer: state.peers[id],
-    ...getPeerConsumers(state, id),
+    ...(getPeerConsumers as any)(state, id),
     windowConsumer: state.room.windowConsumer,
     fullScreenConsumer: state.room.fullScreenConsumer,
   };
@@ -261,5 +261,5 @@ export default withRoomContext(
         prev.room.activeSpeakerId === next.room.activeSpeakerId
       );
     },
-  })(withStyles(styles, { withTheme: true })(SpeakerPeer))
+  })(withStyles(styles as any, { withTheme: true })(SpeakerPeer)) as any
 );
