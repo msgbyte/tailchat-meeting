@@ -486,7 +486,9 @@ export class RoomClient {
   _startKeyListener() {
     // Add keydown event listener on document
     document.addEventListener('keydown', (event) => {
-      if (event.repeat) return;
+      if (event.repeat) {
+        return;
+      }
       const key = String.fromCharCode(event.which);
 
       const source: any = event.target;
@@ -561,12 +563,7 @@ export class RoomClient {
 
           case ' ': {
             // Push To Talk start
-            if (this._micProducer) {
-              if (this._micProducer.paused) {
-                this.unmuteMic();
-              }
-            }
-
+            pushToTalk();
             break;
           }
           case 'M': {
@@ -632,9 +629,10 @@ export class RoomClient {
         }
       }
     });
-    document.addEventListener(
-      'keyup',
-      (event) => {
+
+    // 按下空格键静音
+    const pushToTalk = () => {
+      const keyUplistener = (event) => {
         const key = String.fromCharCode(event.which);
 
         const source: any = event.target;
@@ -644,26 +642,28 @@ export class RoomClient {
         if (exclude.indexOf(source.tagName.toLowerCase()) === -1) {
           logger.debug('keyUp() [key:"%s"]', key);
 
-          switch (key) {
-            case ' ': {
-              // Push To Talk stop
-              if (this._micProducer) {
-                if (!this._micProducer.paused) {
-                  this.muteMic();
-                }
-              }
+          if (key === ' ') {
+            if (this._micProducer) {
+              if (!this._micProducer.paused) {
+                this.muteMic();
 
-              break;
-            }
-            default: {
-              break;
+                // 清理事件等待下一次添加
+                document.removeEventListener('keyup', keyUplistener, true);
+              }
             }
           }
         }
         event.preventDefault();
-      },
-      true
-    );
+      };
+
+      // 按下发言
+      if (this._micProducer && this._micProducer.paused) {
+        this.unmuteMic();
+
+        // 弹起空格键静音
+        document.addEventListener('keyup', keyUplistener, true);
+      }
+    };
   }
 
   _startDevicesListener() {
@@ -1527,8 +1527,11 @@ export class RoomClient {
         });
 
         this.connectLocalHark(track);
-        if (muted) this.muteMic();
-        else this.unmuteMic();
+        if (muted) {
+          this.muteMic();
+        } else {
+          this.unmuteMic();
+        }
       } else if (this._micProducer) {
         ({ track } = this._micProducer);
 
