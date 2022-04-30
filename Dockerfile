@@ -15,5 +15,5 @@ EXPOSE 80 443
 EXPOSE 40000-49999/udp
 
 CMD concurrently --names "server,app" \
-    "cd server && pnpm build && start dev" \
+    "cd server && pnpm build && pnpm start" \
     "cd app && pnpm build"
