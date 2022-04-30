@@ -189,9 +189,9 @@ async function run() {
 
       res.status(500).send(
         `<h1>Internal Server Error</h1>
-				<p>If you report this error, please also report this 
+				<p>If you report this error, please also report this
 				<i>tracking ID</i> which makes it possible to locate your session
-				in the logs which are available to the system administrator: 
+				in the logs which are available to the system administrator:
 				<b>${trackingId}</b></p>`
       );
       logger.error(
