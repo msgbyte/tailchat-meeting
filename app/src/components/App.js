@@ -26,7 +26,7 @@ const App = (props) =>
 	if (!room.joined)
 	{
 		return (
-			<JoinDialog roomId={id} />
+			<JoinDialog />
 		);
 	}
 	else

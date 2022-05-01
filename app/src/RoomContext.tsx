@@ -1,15 +1,18 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import type { RoomClient } from './RoomClient';
 
-const RoomContext = React.createContext(undefined);
+const RoomContext = React.createContext<RoomClient>(undefined);
 
 export default RoomContext;
 
 export function withRoomContext(Component: React.ComponentType) {
-  return (
-    props
-  ) => (
+  return (props) => (
     <RoomContext.Consumer>
       {(roomClient) => <Component {...props} roomClient={roomClient} />}
     </RoomContext.Consumer>
   );
+}
+
+export function useRoomClient() {
+  return useContext(RoomContext);
 }

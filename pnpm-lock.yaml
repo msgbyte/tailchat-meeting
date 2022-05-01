@@ -37,9 +37,12 @@ importers:
       '@types/lodash-es': ^4.17.6
       '@types/node': ^14.14.37
       '@types/prop-types': ^15.7.5
+      '@types/qs': ^6.9.7
       '@types/react': ^17.0.3
       '@types/react-dom': ^17.0.3
       '@types/react-redux': ^7.1.24
+      '@types/react-router': ^5.1.18
+      '@types/react-router-dom': ^5.3.3
       '@typescript-eslint/eslint-plugin': ^4.20.0
       '@typescript-eslint/parser': ^4.20.0
       ahooks: ^3.3.10
@@ -85,6 +88,7 @@ importers:
       notistack: ^0.9.5
       path-browserify: ^1.0.1
       prop-types: ^15.7.2
+      qs: ^6.10.3
       random-string: ^0.2.0
       react: ^16.10.2
       react-cookie-consent: ^2.5.0
@@ -152,6 +156,7 @@ importers:
       notistack: 0.9.17_1a1c59fe9141dd661131ff50854ba252
       path-browserify: 1.0.1
       prop-types: 15.8.1
+      qs: 6.10.3
       random-string: 0.2.0
       react: 16.14.0
       react-cookie-consent: 2.5.0_react@16.14.0
@@ -182,7 +187,10 @@ importers:
       '@types/convict-format-with-validator': 6.0.2
       '@types/lodash-es': 4.17.6
       '@types/prop-types': 15.7.5
+      '@types/qs': 6.9.7
       '@types/react-redux': 7.1.24
+      '@types/react-router': 5.1.18
+      '@types/react-router-dom': 5.3.3
       '@typescript-eslint/eslint-plugin': 4.33.0_0c49e12669280545a7ea3f36dba6eb0a
       '@typescript-eslint/parser': 4.33.0_eslint@7.32.0+typescript@4.6.3
       babel-eslint: 10.1.0_eslint@7.32.0
@@ -2911,6 +2919,10 @@ packages:
       '@types/node': 16.11.28
     dev: true
 
+  /@types/history/4.7.11:
+    resolution: {integrity: sha512-qjDJRrmvBMiTx+jyLxvLfJU7UznFuokDv4f3WRuriHKERccVpFU+8XMQUAbDzoiJCsmexxRExQeMwwCdamSKDA==}
+    dev: true
+
   /@types/hoist-non-react-statics/3.3.1:
     resolution: {integrity: sha512-iMIqiko6ooLrTh1joXodJK5X9xeEALT1kM5G3ZLhD3hszxBdIEd5C75U834D9mLcINgD4OyZf5uQXjkuYydWvA==}
     dependencies:
@@ -3057,6 +3069,21 @@ packages:
       '@types/react': 17.0.44
       hoist-non-react-statics: 3.3.2
       redux: 4.2.0
+
+  /@types/react-router-dom/5.3.3:
+    resolution: {integrity: sha512-kpqnYK4wcdm5UaWI3fLcELopqLrHgLqNsdpHauzlQktfkHL3npOSwtj1Uz9oKBAzs7lFtVkV8j83voAz2D8fhw==}
+    dependencies:
+      '@types/history': 4.7.11
+      '@types/react': 17.0.44
+      '@types/react-router': 5.1.18
+    dev: true
+
+  /@types/react-router/5.1.18:
+    resolution: {integrity: sha512-YYknwy0D0iOwKQgz9v8nOzt2J6l4gouBmDnWqUUznltOTaon+r8US8ky8HvN0tXvc38U9m6z/t2RsVsnd1zM0g==}
+    dependencies:
+      '@types/history': 4.7.11
+      '@types/react': 17.0.44
+    dev: true
 
   /@types/react-transition-group/4.4.4:
     resolution: {integrity: sha512-7gAPz7anVK5xzbeQW9wFBDg7G++aPLAFY0QaSMOou9rJZpbuI58WAuJrgu+qR92l61grlnCUe7AFX8KGahAgug==}
