@@ -96,7 +96,7 @@ export const setFileSharingSupported = (supported) => ({
   payload: { supported },
 });
 
-export const toggleConsumerWindow = (consumerId) => ({
+export const toggleConsumerWindow = (consumerId?: string) => ({
   type: 'TOGGLE_WINDOW_CONSUMER',
   payload: { consumerId },
 });

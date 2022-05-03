@@ -193,7 +193,7 @@ class Room extends React.PureComponent<RoomProps> {
 
         <FullScreenView advancedMode={advancedMode} />
 
-        <VideoWindow advancedMode={advancedMode} />
+        <VideoWindow />
 
         <AudioPeers />
 
