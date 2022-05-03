@@ -3,12 +3,12 @@ import JoinDialog from './JoinDialog';
 import LoadingView from './Loader/LoadingView';
 import { LazyPreload } from './Loader/LazyPreload';
 import { useAppSelector } from '../store/selectors';
-import { useHistory } from 'react-router';
+import { useParams } from 'react-router';
 
 const Room = LazyPreload(() => import(/* webpackChunkName: "room" */ './Room'));
 
 const App = () => {
-  const history = useHistory();
+  const { id } = useParams<{ id: string }>();
   const joined = useAppSelector((state) => state.room.joined);
 
   useEffect(() => {
@@ -16,7 +16,7 @@ const App = () => {
   }, []);
 
   if (!joined) {
-    return <JoinDialog />;
+    return <JoinDialog defaultRoomId={id} />;
   } else {
     return (
       <Suspense fallback={<LoadingView />}>

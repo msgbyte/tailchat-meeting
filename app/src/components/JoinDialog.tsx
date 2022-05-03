@@ -149,7 +149,9 @@ const DialogActions = withStyles((theme) => ({
   },
 }))(MuiDialogActions);
 
-const JoinDialog: React.FC = React.memo(() => {
+const JoinDialog: React.FC<{
+  defaultRoomId?: string;
+}> = React.memo((props) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
   let displayName = useAppSelector((state) => state.settings.displayName);
@@ -173,7 +175,9 @@ const JoinDialog: React.FC = React.memo(() => {
   }, []);
 
   const [roomId, setRoomId] = useState<string>(
-    search.get('roomId') || randomString({ length: 9, type: 'numeric' })
+    props.defaultRoomId ||
+      search.get('roomId') ||
+      randomString({ length: 9, type: 'numeric' })
   );
   const from = search.get('from') ?? '';
   useEffect(() => {
