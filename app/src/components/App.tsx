@@ -1,25 +1,21 @@
 import React, { useEffect, Suspense } from 'react';
-import { useParams } from 'react-router';
-import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
 import JoinDialog from './JoinDialog';
 import LoadingView from './Loader/LoadingView';
 import { LazyPreload } from './Loader/LazyPreload';
+import { useAppSelector } from '../store/selectors';
+import { useHistory } from 'react-router';
 
 const Room = LazyPreload(() => import(/* webpackChunkName: "room" */ './Room'));
 
-const App = (props) => {
-  const { room } = props;
-
-  const id = useParams().id.toLowerCase();
+const App = () => {
+  const history = useHistory();
+  const joined = useAppSelector((state) => state.room.joined);
 
   useEffect(() => {
     Room.preload();
-
-    return;
   }, []);
 
-  if (!room.joined) {
+  if (!joined) {
     return <JoinDialog />;
   } else {
     return (
@@ -30,16 +26,4 @@ const App = (props) => {
   }
 };
 
-App.propTypes = {
-  room: PropTypes.object.isRequired,
-};
-
-const mapStateToProps = (state) => ({
-  room: state.room,
-});
-
-export default connect(mapStateToProps, null, null, {
-  areStatesEqual: (next, prev) => {
-    return prev.room === next.room;
-  },
-})(App);
+export default App;

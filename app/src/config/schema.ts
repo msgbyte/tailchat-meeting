@@ -399,8 +399,8 @@ export const configSchema = {
 
   logo: {
     doc: 'If not null, it shows the logo loaded from the specified URL, otherwise it shows the title.',
-    format: 'url',
-    default: 'images/logo.tailchat.svg',
+    format: 'String',
+    default: '/images/logo.tailchat.svg',
     nullable: true,
   },
   title: {

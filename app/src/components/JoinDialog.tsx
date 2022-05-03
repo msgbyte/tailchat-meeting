@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Logger from '../Logger';
 import { withStyles } from '@material-ui/core/styles';
 import { useRoomClient } from '../RoomContext';
+import randomString from 'crypto-random-string';
 import classnames from 'classnames';
 import isElectron from 'is-electron';
 import * as settingsActions from '../store/actions/settingsActions';
@@ -29,11 +30,8 @@ import MuiDialogActions from '@material-ui/core/DialogActions';
 import BlockIcon from '@material-ui/icons/Block';
 import MicIcon from '@material-ui/icons/Mic';
 import VideocamIcon from '@material-ui/icons/Videocam';
-import MeetingRoomIcon from '@material-ui/icons/MeetingRoom';
 import WorkOutlineIcon from '@material-ui/icons/WorkOutline';
 import VpnKeyIcon from '@material-ui/icons/VpnKey';
-import randomString from 'random-string';
-import { useHistory, useLocation } from 'react-router-dom';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import { config } from '../config';
@@ -44,6 +42,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import qs from 'qs';
 import { useAppDispatch, useAppSelector } from '../store/selectors';
 import { isValidStr } from '../utils';
+import { RoomIdInput } from './RoomIdInput';
+import { useHistory } from 'react-router';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -150,8 +150,6 @@ const DialogActions = withStyles((theme) => ({
 }))(MuiDialogActions);
 
 const JoinDialog: React.FC = React.memo(() => {
-  const location = useLocation();
-  const history = useHistory();
   const intl = useIntl();
   const dispatch = useAppDispatch();
   let displayName = useAppSelector((state) => state.settings.displayName);
@@ -163,38 +161,30 @@ const JoinDialog: React.FC = React.memo(() => {
   const room = useAppSelector((state) => state.room);
   const roomClient = useRoomClient();
   const classes = useStyles();
+  const history = useHistory();
 
   displayName = displayName.trimLeft();
 
   const [authType, setAuthType] = useState(loggedIn ? 'auth' : 'guest');
 
-  const search = useMemo(() => qs.parse(location.search), []);
+  const search = useMemo(() => {
+    const urlParser = new URL(window.location.href);
+    return urlParser.searchParams;
+  }, []);
 
-  const [roomId, setRoomId] = useState(
-    decodeURIComponent(location.pathname.slice(1)) ||
-      randomString({ length: 8 }).toLowerCase()
+  const [roomId, setRoomId] = useState<string>(
+    search.get('roomId') || randomString({ length: 9, type: 'numeric' })
   );
-  const from = String(search.from ?? '');
+  const from = search.get('from') ?? '';
   useEffect(() => {
-    if (isValidStr(search.displayName)) {
-      changeDisplayName(search.displayName);
+    const displayName = search.get('displayName');
+    if (isValidStr(displayName)) {
+      changeDisplayName(displayName);
     }
-  }, [search.displayName]);
+  }, []);
 
   const { data: roomStatus } = useRequest(() => getRoomStatus(roomId), {
-    pollingInterval: 3000,
-  });
-
-  useEffect(() => {
-    history.replace({
-      ...history.location,
-      pathname: encodeURIComponent(roomId) || '/',
-    });
-    window.history.replaceState({}, null, encodeURIComponent(roomId) || '/');
-  }, [roomId]);
-
-  useEffect(() => {
-    location.pathname === '/' && history.push(encodeURIComponent(roomId));
+    pollingInterval: 5000,
   });
 
   /* const _askForPerms = () =>
@@ -238,13 +228,15 @@ const JoinDialog: React.FC = React.memo(() => {
 
     // _askForPerms();
 
-    const encodedRoomId = encodeURIComponent(roomId);
-
-    roomClient.join({
-      roomId: encodedRoomId,
-      joinVideo: mediaPerms.video,
-      joinAudio: mediaPerms.audio,
-    });
+    roomClient
+      .join({
+        roomId,
+        joinVideo: mediaPerms.video,
+        joinAudio: mediaPerms.audio,
+      })
+      .then(() => {
+        history.push(`/room/${roomId}`);
+      });
   };
 
   const handleFocus = (event) => event.target.select();
@@ -354,7 +346,7 @@ const JoinDialog: React.FC = React.memo(() => {
                               {locale.split(/[-_]/)[0]}
                             </Button>
                             <Menu {...bindMenu(popupState)}>
-                              {localesList.map((item, index) => (
+                              {(localesList ?? []).map((item, index) => (
                                 <MenuItem
                                   selected={item.locale.includes(locale)}
                                   key={index}
@@ -429,7 +421,8 @@ const JoinDialog: React.FC = React.memo(() => {
         <DialogContent>
           <hr />
           {/* ROOM NAME */}
-          <TextField
+          <RoomIdInput disabled={!!from} value={roomId} onChange={setRoomId} />
+          {/* <TextField
             autoFocus
             id="roomId"
             label={intl.formatMessage({
@@ -459,7 +452,7 @@ const JoinDialog: React.FC = React.memo(() => {
               }
             }}
             fullWidth
-          />
+          /> */}
           {/* /ROOM NAME */}
 
           {/* AUTH TOGGLE BUTTONS */}
@@ -655,8 +648,8 @@ const JoinDialog: React.FC = React.memo(() => {
                   variant="contained"
                   color="primary"
                   id="joinButton"
-                  disabled={displayName === ''}
-                  fullWidth
+                  disabled={displayName === '' || roomId.length !== 9}
+                  fullWidth={true}
                 >
                   <FormattedMessage id="label.join" defaultMessage="Join" />
                 </Button>

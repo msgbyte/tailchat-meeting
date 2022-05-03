@@ -1,4 +1,4 @@
-import randomString from 'random-string';
+import randomString from 'crypto-random-string';
 import * as notificationActions from './notificationActions';
 
 // This returns a redux-thunk action (a function).

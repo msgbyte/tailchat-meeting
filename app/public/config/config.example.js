@@ -244,7 +244,7 @@ var config = {
 	// It sets the maximum number of participants in one room that can join unmuted.
 	// The next participant will join automatically muted.
 	// Set it to 0 to auto mute all.
-	// Set it to negative (-1) to never automatically auto mute but use it with caution, 
+	// Set it to negative (-1) to never automatically auto mute but use it with caution,
 	// full mesh audio strongly decrease room capacity!
 	autoMuteThreshold : 4,
 
@@ -265,11 +265,11 @@ var config = {
 	notificationPosition : 'right',
 
 	// It sets the notifications sounds.
-	// Valid keys are: 'parkedPeer', 'parkedPeers', 'raisedHand', 
+	// Valid keys are: 'parkedPeer', 'parkedPeers', 'raisedHand',
 	// 'chatMessage', 'sendFile', 'newPeer' and 'default'.
 	// Not defining a key is equivalent to using the default notification sound.
-	// Setting 'play' to null disables the sound notification.		
-	// 
+	// Setting 'play' to null disables the sound notification.
+	//
 	notificationSounds : {
 		'chatMessage' : {
 			'play' : '/sounds/notify-chat.mp3'
@@ -299,7 +299,7 @@ var config = {
 	lockLastN : false,
 
 	// If not null, it shows the logo loaded from the specified URL, otherwise it shows the title.
-	logo : 'images/logo.tailchat.svg',
+	logo : '/images/logo.tailchat.svg',
 
 	// The title to show if the logo is not specified.
 	title : 'tailchat',

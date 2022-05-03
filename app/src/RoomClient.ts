@@ -182,9 +182,6 @@ export class RoomClient {
   // Whether we force TCP
   _forceTcp: any;
 
-  // URL basepath
-  _basePath: any;
-
   // Use displayName
   _displayName: any;
 
@@ -285,7 +282,6 @@ export class RoomClient {
       forceTcp,
       displayName,
       muted,
-      basePath,
     } = {} as any
   ) {
     if (!peerId) throw new Error('Missing peerId');
@@ -310,9 +306,6 @@ export class RoomClient {
 
     // Whether we force TCP
     this._forceTcp = forceTcp;
-
-    // URL basepath
-    this._basePath = basePath;
 
     // Use displayName
     this._displayName = null;

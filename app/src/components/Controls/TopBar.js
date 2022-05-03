@@ -49,7 +49,7 @@ import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 import PauseCircleOutlineIcon from '@material-ui/icons/PauseCircleOutline';
 import PauseCircleFilledIcon from '@material-ui/icons/PauseCircleFilled';
 import StopIcon from '@material-ui/icons/Stop';
-import randomString from 'random-string';
+import randomString from 'crypto-random-string';
 import { recorder } from './../../BrowserRecorder';
 
 import Logger from '../../Logger';

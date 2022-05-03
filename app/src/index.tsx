@@ -8,7 +8,7 @@ import { createIntl } from 'react-intl';
 import { IntlProvider } from 'react-intl-redux';
 
 import { Route, HashRouter, BrowserRouter, Switch } from 'react-router-dom';
-import randomString from 'random-string';
+import randomString from 'crypto-random-string';
 import Logger from './Logger';
 import debug from 'debug';
 import { RoomClient } from './RoomClient';
@@ -70,7 +70,7 @@ const logger = new Logger();
 // TODO
 const theme = createTheme(config.theme as any);
 
-let Router;
+let Router: any;
 
 if (isElectron()) Router = HashRouter;
 else Router = BrowserRouter;
@@ -84,7 +84,6 @@ domready(() => {
 function run() {
   logger.debug('run() [environment:%s]', process.env.NODE_ENV);
 
-  const peerId = randomString({ length: 8 }).toLowerCase();
   const urlParser = new URL(window.location.href);
   const parameters = urlParser.searchParams;
 
@@ -95,12 +94,6 @@ function run() {
   const muted = parameters.get('muted') === 'true';
   const headless = parameters.get('headless');
   const showConfigDocumentationPath = parameters.get('config') === 'true';
-
-  const { pathname } = window.location;
-
-  let basePath = pathname.substring(0, pathname.lastIndexOf('/'));
-
-  if (!basePath) basePath = '/';
 
   // Get current device.
   const device = deviceInfo();
@@ -179,6 +172,8 @@ function run() {
     return;
   }
 
+  // 生成随机的唯一标识
+  const peerId = randomString({ length: 8 }).toLowerCase();
   store.dispatch(
     meActions.setMe({
       peerId,
@@ -195,7 +190,6 @@ function run() {
     forceTcp,
     displayName,
     muted,
-    basePath,
   });
 
   // @ts-ignore
@@ -208,7 +202,7 @@ function run() {
           <PersistGate loading={<LoadingView />} persistor={persistor}>
             <RoomContext.Provider value={roomClient}>
               <SnackbarProvider>
-                <Router basename={basePath}>
+                <Router basename={'/'}>
                   <Suspense fallback={<LoadingView />}>
                     <React.Fragment>
                       <Switch>
@@ -218,7 +212,7 @@ function run() {
                           path="/login_dialog"
                           component={LoginDialog}
                         />
-                        <Route path="/:id" component={App} />
+                        <Route path="/room/:id" component={App} />
                       </Switch>
                     </React.Fragment>
                   </Suspense>
