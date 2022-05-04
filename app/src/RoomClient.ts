@@ -183,7 +183,7 @@ export class RoomClient {
   _forceTcp: any;
 
   // Use displayName
-  _displayName: any;
+  private _displayName: any;
 
   _tracker: any;
 
@@ -214,7 +214,7 @@ export class RoomClient {
   _signalingSocket: any;
 
   // The room ID
-  _roomId: any;
+  private _roomId: any;
 
   // mediasoup-client Device instance.
   // @type {mediasoupClient.Device}
@@ -271,6 +271,14 @@ export class RoomClient {
   _turnServers: any;
 
   _sendRestartIce: any;
+
+  get roomId() {
+    return this._roomId;
+  }
+
+  get displayName() {
+    return this._displayName;
+  }
 
   constructor(
     {
@@ -473,7 +481,7 @@ export class RoomClient {
     store.dispatch(roomActions.setRoomState('closed'));
 
     // @ts-ignore
-    window.location.href = `/${this._roomId}`;
+    window.location.href = `/room/${this._roomId}`;
   }
 
   _startKeyListener() {

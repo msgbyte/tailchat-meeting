@@ -10,10 +10,11 @@ import {
   recordingInProgressPeersSelector,
   recordingConsentsPeersSelector,
   useAppSelector,
+  useAppDispatch,
 } from '../../store/selectors';
 import { permissions } from '../../permissions';
 import * as appPropTypes from '../appPropTypes';
-import { withRoomContext } from '../../RoomContext';
+import { useRoomClient, withRoomContext } from '../../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
 import * as roomActions from '../../store/actions/roomActions';
 import * as toolareaActions from '../../store/actions/toolareaActions';
@@ -46,6 +47,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import HelpIcon from '@material-ui/icons/Help';
 import InfoIcon from '@material-ui/icons/Info';
+import ShareIcon from '@material-ui/icons/Share';
 import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 import PauseCircleOutlineIcon from '@material-ui/icons/PauseCircleOutline';
 import PauseCircleFilledIcon from '@material-ui/icons/PauseCircleFilled';
@@ -56,6 +58,15 @@ import Logger from '../../Logger';
 import { config } from '../../config';
 import type { AppState } from '../../store/reducers/rootReducer';
 import { makeStyles } from '@material-ui/core/styles';
+import Card from '@material-ui/core/Card';
+import CardActions from '@material-ui/core/CardActions';
+import CardContent from '@material-ui/core/CardContent';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableRow from '@material-ui/core/TableRow';
+import copy from 'copy-to-clipboard';
+import * as requestActions from '../../store/actions/requestActions';
 
 const logger = new Logger('Recorder');
 
@@ -137,6 +148,13 @@ const useStyles = makeStyles((theme) => ({
   moreAction: {
     margin: theme.spacing(0.5, 0, 0.5, 1.5),
   },
+  shareCard: {
+    minWidth: 275,
+  },
+  shareCardActions: {
+    padding: 16,
+    justifyContent: 'end',
+  },
 }));
 
 const PulsingBadge = withStyles((theme) => ({
@@ -184,7 +202,7 @@ const TopBar: React.FC = (props: any) => {
   const intl = useIntl();
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
-  const [currentMenu, setCurrentMenu] = useState(null);
+  const [currentMenu, setCurrentMenu] = useState<string | null>(null);
   const [recordingNotificationsId, setRecordingNotificationsId] =
     useState(null);
 
@@ -200,7 +218,7 @@ const TopBar: React.FC = (props: any) => {
     setMobileMoreAnchorEl(null);
   };
 
-  const handleMenuOpen = (event, menu) => {
+  const handleMenuOpen = (event: React.SyntheticEvent, menu: string) => {
     setAnchorEl(event.currentTarget);
     setCurrentMenu(menu);
   };
@@ -212,8 +230,6 @@ const TopBar: React.FC = (props: any) => {
   };
 
   const {
-    roomClient,
-    room,
     peersLength,
     lobbyPeers,
     permanentTopBar,
@@ -252,7 +268,11 @@ const TopBar: React.FC = (props: any) => {
     consumers,
     recordingConsents,
   } = props;
+  const roomClient = useRoomClient();
+  const room = useAppSelector((state) => state.room);
   const classes = useStyles();
+  const dispatch = useAppDispatch();
+  const displayName = useAppSelector((state) => state.settings.displayName);
 
   const producers = useAppSelector((state) => state.producers);
 
@@ -300,6 +320,40 @@ const TopBar: React.FC = (props: any) => {
     roomClient,
     room,
   ]);
+
+  const handleCopyJoinLink = () => {
+    copy(
+      [
+        intl.formatMessage(
+          {
+            id: 'room.inviteText',
+            defaultMessage: '{displayName} invite you join meeting',
+          },
+          {
+            displayName,
+          }
+        ),
+        `${intl.formatMessage({
+          id: 'label.meetingNum',
+          defaultMessage: 'Meeting Num',
+        })}: ${roomClient.roomId}`,
+        `${intl.formatMessage({
+          id: 'label.joinLink',
+          defaultMessage: 'Join Link',
+        })}: ${window.location.origin}${window.location.pathname}`,
+      ].join('\n')
+    );
+
+    dispatch(
+      requestActions.notify({
+        text: intl.formatMessage({
+          id: 'room.hasCopied',
+          defaultMessage: 'Has copied to clipboard',
+        }),
+      })
+    );
+    handleMenuClose();
+  };
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -369,6 +423,7 @@ const TopBar: React.FC = (props: any) => {
         )}
       >
         <Toolbar>
+          {/* Left */}
           <PulsingBadge
             color="secondary"
             badgeContent={unread}
@@ -392,7 +447,10 @@ const TopBar: React.FC = (props: any) => {
               {config.title}
             </Typography>
           )}
+
           <div className={classes.grow} />
+
+          {/* Right */}
           <div className={classes.sectionDesktop}>
             {recordingInProgress && (
               <IconButton
@@ -408,6 +466,7 @@ const TopBar: React.FC = (props: any) => {
               </IconButton>
             )}
             <div className={classes.divider} />
+            {/* 更多 */}
             <Tooltip
               title={intl.formatMessage({
                 id: 'label.moreActions',
@@ -427,6 +486,29 @@ const TopBar: React.FC = (props: any) => {
                 <MoreIcon />
               </IconButton>
             </Tooltip>
+
+            {/* 分享会议 */}
+            <Tooltip
+              title={intl.formatMessage({
+                id: 'label.shareMeeting',
+                defaultMessage: 'Share Meeting',
+              })}
+            >
+              <IconButton
+                aria-owns={
+                  isMenuOpen && currentMenu === 'shareMeeting'
+                    ? 'material-appbar'
+                    : undefined
+                }
+                aria-haspopup
+                onClick={(event) => handleMenuOpen(event, 'shareMeeting')}
+                color="inherit"
+              >
+                <ShareIcon />
+              </IconButton>
+            </Tooltip>
+
+            {/* 全屏 */}
             {fullscreenEnabled && (
               <Tooltip title={fullscreenTooltip}>
                 <IconButton
@@ -442,6 +524,8 @@ const TopBar: React.FC = (props: any) => {
                 </IconButton>
               </Tooltip>
             )}
+
+            {/* 参会人 */}
             <Tooltip
               title={intl.formatMessage({
                 id: 'tooltip.participants',
@@ -461,6 +545,8 @@ const TopBar: React.FC = (props: any) => {
                 </Badge>
               </IconButton>
             </Tooltip>
+
+            {/* 设置 */}
             <Tooltip
               title={intl.formatMessage({
                 id: 'tooltip.settings',
@@ -479,6 +565,8 @@ const TopBar: React.FC = (props: any) => {
                 <SettingsIcon />
               </IconButton>
             </Tooltip>
+
+            {/* 锁定房间 */}
             <Tooltip title={lockTooltip}>
               <span className={classes.disabledButton}>
                 <IconButton
@@ -501,6 +589,8 @@ const TopBar: React.FC = (props: any) => {
                 </IconButton>
               </span>
             </Tooltip>
+
+            {/* 显示大厅 */}
             {lobbyPeers.length > 0 && (
               <Tooltip
                 title={intl.formatMessage({
@@ -817,6 +907,47 @@ const TopBar: React.FC = (props: any) => {
               </p>
             </MenuItem>
           </Paper>
+        )}
+
+        {currentMenu === 'shareMeeting' && (
+          <Card className={classes.shareCard}>
+            <CardContent>
+              <Table aria-label="meeting info">
+                <TableBody>
+                  <TableRow>
+                    <TableCell>
+                      <FormattedMessage
+                        id="label.meetingNum"
+                        defaultMessage="Meeting Num"
+                      />
+                    </TableCell>
+                    <TableCell>{roomClient.roomId}</TableCell>
+                  </TableRow>
+
+                  <TableRow>
+                    <TableCell>
+                      <FormattedMessage
+                        id="label.joinLink"
+                        defaultMessage="Join Link"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      {window.location.origin}
+                      {window.location.pathname}
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </CardContent>
+            <CardActions className={classes.shareCardActions}>
+              <Button size="small" onClick={handleCopyJoinLink}>
+                <FormattedMessage
+                  id="label.copyLink"
+                  defaultMessage="Copy Link"
+                />
+              </Button>
+            </CardActions>
+          </Card>
         )}
 
         {currentMenu === 'localeMenu' && (
