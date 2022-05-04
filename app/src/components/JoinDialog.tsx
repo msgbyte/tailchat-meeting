@@ -239,7 +239,10 @@ const JoinDialog: React.FC<{
         joinAudio: mediaPerms.audio,
       })
       .then(() => {
-        history.push(`/room/${roomId}`);
+        history.push({
+          pathname: `/room/${roomId}`,
+          search: history.location.search,
+        });
       });
   };
 
