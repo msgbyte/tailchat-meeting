@@ -1,4 +1,14 @@
-const initialState = {};
+export interface ProducerInfo {
+  id: any;
+  deviceLabel?: any;
+  source: string;
+  paused: boolean;
+  track: any;
+  rtpParameters: any;
+  codec: any;
+}
+
+const initialState: Record<string, ProducerInfo> = {};
 
 const producers = (state = initialState, action) => {
   switch (action.type) {

@@ -6,7 +6,7 @@ import classnames from 'classnames';
 import FullScreen from '../FullScreen';
 import FullScreenIcon from '@material-ui/icons/Fullscreen';
 import FullScreenExitIcon from '@material-ui/icons/FullscreenExit';
-import { ClassNameMap } from '@material-ui/core/styles/withStyles';
+import type { ClassNameMap } from '@material-ui/core/styles/withStyles';
 
 const styles = (theme) => ({
   root: {

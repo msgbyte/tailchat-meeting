@@ -1,5 +1,5 @@
 import InputAdornment from '@material-ui/core/InputAdornment';
-import { InputBaseComponentProps } from '@material-ui/core/InputBase';
+import type { InputBaseComponentProps } from '@material-ui/core/InputBase';
 import TextField from '@material-ui/core/TextField';
 import React from 'react';
 import NumberFormat from 'react-number-format';

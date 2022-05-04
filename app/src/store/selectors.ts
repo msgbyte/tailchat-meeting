@@ -1,6 +1,6 @@
-import { createSelector } from 'reselect';
+import { createSelector } from '@reduxjs/toolkit';
 import { useSelector, useDispatch } from 'react-redux';
-import { AppState } from './reducers/rootReducer';
+import type { AppState } from './reducers/rootReducer';
 
 export function useAppSelector<T>(
   selector: (state: AppState) => T,
@@ -10,21 +10,22 @@ export function useAppSelector<T>(
 }
 export const useAppDispatch = useDispatch;
 
-const meRolesSelect = (state) => state.me.roles;
-const userRolesSelect = (state) => state.room.userRoles;
-const roomPermissionsSelect = (state) => state.room.roomPermissions;
-const roomAllowWhenRoleMissing = (state) => state.room.allowWhenRoleMissing;
-const producersSelect = (state) => state.producers;
-const consumersSelect = (state) => state.consumers;
-const spotlightsSelector = (state) => state.room.spotlights;
-const peersSelector = (state) => state.peers;
-const meSelector = (state) => state.me;
-const recorderSelect = (state) => state.recorder;
-const lobbyPeersSelector = (state) => state.lobbyPeers;
-const getPeerConsumers = (state, id) =>
+const meRolesSelect = (state: AppState) => state.me.roles;
+const userRolesSelect = (state: AppState) => state.room.userRoles;
+const roomPermissionsSelect = (state: AppState) => state.room.roomPermissions;
+const roomAllowWhenRoleMissing = (state: AppState) =>
+  state.room.allowWhenRoleMissing;
+const producersSelect = (state: AppState) => state.producers;
+const consumersSelect = (state: AppState) => state.consumers;
+const spotlightsSelector = (state: AppState) => state.room.spotlights;
+const peersSelector = (state: AppState) => state.peers;
+const meSelector = (state: AppState) => state.me;
+const recorderSelect = (state: AppState) => state.recorder;
+const lobbyPeersSelector = (state: AppState) => state.lobbyPeers;
+const getPeerConsumers = (state: AppState, id: string) =>
   state.peers[id] ? state.peers[id].consumers : null;
-const isHiddenSelect = (state) => state.room.hideSelfView;
-const getAllConsumers = (state) => state.consumers;
+const isHiddenSelect = (state: AppState) => state.room.hideSelfView;
+const getAllConsumers = (state: AppState) => state.consumers;
 const peersKeySelector = createSelector(peersSelector, (peers) =>
   Object.keys(peers)
 );
@@ -41,55 +42,45 @@ export const lobbyPeersKeySelector = createSelector(
 export const micProducersSelector = createSelector(
   producersSelect,
   (producers) =>
-    Object.values(producers).filter(
-      (producer: any) => producer.source === 'mic'
-    )
+    Object.values(producers).filter((producer) => producer.source === 'mic')
 );
 
 export const webcamProducersSelector = createSelector(
   producersSelect,
   (producers) =>
-    Object.values(producers).filter(
-      (producer: any) => producer.source === 'webcam'
-    )
+    Object.values(producers).filter((producer) => producer.source === 'webcam')
 );
 
 export const screenProducersSelector = createSelector(
   producersSelect,
   (producers) =>
-    Object.values(producers).filter(
-      (producer: any) => producer.source === 'screen'
-    )
+    Object.values(producers).filter((producer) => producer.source === 'screen')
 );
 
 export const extraVideoProducersSelector = createSelector(
   producersSelect,
   (producers) =>
     Object.values(producers).filter(
-      (producer: any) => producer.source === 'extravideo'
+      (producer) => producer.source === 'extravideo'
     )
 );
 
 export const micProducerSelector = createSelector(
   producersSelect,
   (producers) =>
-    Object.values(producers).find((producer: any) => producer.source === 'mic')
+    Object.values(producers).find((producer) => producer.source === 'mic')
 );
 
 export const webcamProducerSelector = createSelector(
   producersSelect,
   (producers) =>
-    Object.values(producers).find(
-      (producer: any) => producer.source === 'webcam'
-    )
+    Object.values(producers).find((producer) => producer.source === 'webcam')
 );
 
 export const screenProducerSelector = createSelector(
   producersSelect,
   (producers) =>
-    Object.values(producers).find(
-      (producer: any) => producer.source === 'screen'
-    )
+    Object.values(producers).find((producer) => producer.source === 'screen')
 );
 
 export const micConsumerSelector = createSelector(
@@ -224,8 +215,9 @@ export const passivePeersSelector = createSelector(
       )
 );
 
-export const raisedHandsSelector = createSelector(peersValueSelector, (peers) =>
-  peers.reduce((a: any, b: any) => a + (b.raisedHand ? 1 : 0), 0)
+export const raisedHandsSelector = createSelector(
+  peersValueSelector,
+  (peers): number => peers.reduce((a, b) => a + (b.raisedHand ? 1 : 0), 0)
 );
 
 export const videoBoxesSelector = createSelector(
@@ -376,8 +368,9 @@ export const recordingInProgressSelector = createSelector(
           (e.localRecordingState === 'start' ||
             e.localRecordingState === 'resume')
       ) === -1
-    )
+    ) {
       return false;
+    }
   }
 );
 

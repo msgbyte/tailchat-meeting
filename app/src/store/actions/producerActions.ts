@@ -1,4 +1,6 @@
-export const addProducer = (producer) => ({
+import type { ProducerInfo } from '../reducers/producers';
+
+export const addProducer = (producer: ProducerInfo) => ({
   type: 'ADD_PRODUCER',
   payload: { producer },
 });

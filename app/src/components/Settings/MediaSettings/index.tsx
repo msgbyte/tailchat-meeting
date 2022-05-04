@@ -29,7 +29,7 @@ import Videocam from '@material-ui/icons/Videocam';
 import Switch from '@material-ui/core/Switch';
 import ImageUploader from 'react-images-upload';
 import Resizer from 'react-image-file-resizer';
-import { AppState } from '../../../store/reducers/rootReducer';
+import type { AppState } from '../../../store/reducers/rootReducer';
 import { config } from '../../../config';
 import { VirtualBackgroundItems } from './VirtualBackgroundItems';
 
