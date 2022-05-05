@@ -21,6 +21,12 @@
         "options": {
           "parser": "less"
         }
+      },
+      {
+        "files": "*.json",
+        "options": {
+          "parser": "json"
+        }
       }
     ]
   }

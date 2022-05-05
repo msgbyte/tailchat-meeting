@@ -6,17 +6,23 @@ import Logger from './lib/logger/Logger';
 import express from 'express';
 import { Room } from './lib/Room';
 import { Peer } from './lib/Peer';
+import * as mediasoup from 'mediasoup';
+import { AwaitQueue } from 'awaitqueue';
+import base64 from 'base-64';
+import fs from 'fs';
+import http from 'http';
+import https from 'https';
+import bcrypt from 'bcryptjs';
+import { constants } from 'node:crypto';
+import cors from 'cors';
+
+console.log('AwaitQueue', AwaitQueue);
 
 const userRoles = require('./lib/access/roles');
 const { loginHelper, logoutHelper } = require('./lib/helpers/httpHelper');
 const { config, configError } = require('./lib/config/config');
 const interactiveServer = require('./lib/interactive/Server');
 const promExporter = require('./lib/stats/promExporter');
-
-const bcrypt = require('bcrypt');
-const fs = require('fs');
-const http = require('http');
-const https = require('https');
 
 let spdy;
 if (Number(process.versions.node.split('.')[0]) < 15) {
@@ -27,9 +33,6 @@ if (Number(process.versions.node.split('.')[0]) < 15) {
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const compression = require('compression');
-const mediasoup = require('mediasoup');
-const AwaitQueue = require('awaitqueue');
-const base64 = require('base-64');
 const helmet = require('helmet');
 // auth
 const passport = require('passport');
@@ -118,6 +121,7 @@ const app = express();
 app.use(helmet.hsts());
 const sharedCookieParser = cookieParser();
 
+app.use(cors()); // 允许跨域
 app.use(sharedCookieParser);
 app.use(bodyParser.json({ limit: '5mb' }));
 app.use(bodyParser.urlencoded({ limit: '5mb', extended: true }));
@@ -507,10 +511,12 @@ async function setupAuth() {
         if (authStrategy == 'saml' || authStrategy == 'local')
           state = req.session.authState;
         else {
-          if (req.method === 'GET')
-            state = JSON.parse(base64.decode(req.query.state));
-          if (req.method === 'POST')
+          if (req.method === 'GET') {
+            state = JSON.parse(base64.decode(String(req.query.state)));
+          }
+          if (req.method === 'POST') {
             state = JSON.parse(base64.decode(req.body.state));
+          }
         }
 
         if (!state || !state.peerId || !state.roomId) {
@@ -643,7 +649,13 @@ async function runHttpsServer() {
       logger.info(
         'Found node.js version >= 15 disabling spdy / http2 and using node.js/https module'
       );
-      mainListener = https.createServer(tls, app);
+      mainListener = https.createServer(
+        {
+          ...tls,
+          secureOptions: constants.SSL_OP_ALL,
+        },
+        app
+      );
     } else {
       /* eslint-disable no-undef */
       mainListener = spdy.createServer(tls, app);

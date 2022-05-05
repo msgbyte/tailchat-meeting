@@ -1,16 +1,16 @@
 import Logger from './logger/Logger';
+import { AwaitQueue } from 'awaitqueue';
+import axios from 'axios';
+import utils from 'util';
+import jwt from 'jsonwebtoken';
+import { v4 as uuidv4 } from 'uuid';
 
-const utils = require('util');
 const EventEmitter = require('events').EventEmitter;
-const AwaitQueue = require('awaitqueue');
-const axios = require('axios');
 const Lobby = require('./Lobby');
 const {
   SocketTimeoutError,
   NotFoundInMediasoupError,
 } = require('./helpers/errors');
-const { v4: uuidv4 } = require('uuid');
-const jwt = require('jsonwebtoken');
 const userRoles = require('./access/roles');
 
 import { BYPASS_ROOM_LOCK, BYPASS_LOBBY } from './access/access';
@@ -336,6 +336,10 @@ export class Room extends EventEmitter {
       const decoded = jwt.verify(token, this._uuid);
 
       logger.info('verifyPeer() [decoded:"%o"]', decoded);
+
+      if (typeof decoded === 'string') {
+        throw new Error();
+      }
 
       return decoded.id === id;
     } catch (err) {
