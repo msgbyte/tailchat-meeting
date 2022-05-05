@@ -1,6 +1,6 @@
 import React, { useEffect, Suspense } from 'react';
 import JoinDialog from './JoinDialog';
-import LoadingView from './Loader/LoadingView';
+import { LoadingView } from './Loader/LoadingView';
 import { LazyPreload } from './Loader/LazyPreload';
 import { useAppSelector } from '../store/selectors';
 import { useParams } from 'react-router';

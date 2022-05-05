@@ -3,10 +3,8 @@ import React, { Suspense } from 'react';
 import { render } from 'react-dom';
 import { Provider } from 'react-redux';
 import isElectron from 'is-electron';
-
 import { createIntl } from 'react-intl';
 import { IntlProvider } from 'react-intl-redux';
-
 import { Route, HashRouter, BrowserRouter, Switch } from 'react-router-dom';
 import randomString from 'crypto-random-string';
 import Logger from './Logger';
@@ -20,7 +18,7 @@ import ConfigDocumentation from './components/ConfigDocumentation';
 import ConfigError from './components/ConfigError';
 import JoinDialog from './components/JoinDialog';
 import LoginDialog from './components/AccessControl/LoginDialog';
-import LoadingView from './components/Loader/LoadingView';
+import { LoadingView } from './components/Loader/LoadingView';
 import { MuiThemeProvider, createTheme } from '@material-ui/core/styles';
 import { PersistGate } from 'redux-persist/lib/integration/react';
 import { persistor, store } from './store/store';
