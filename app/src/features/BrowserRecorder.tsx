@@ -2,9 +2,9 @@ import Logger from './Logger';
 import streamSaver from 'streamsaver';
 import { WritableStream } from 'web-streams-polyfill/ponyfill';
 import { openDB, deleteDB } from 'idb';
-import { store } from './store/store';
-import * as requestActions from './store/actions/requestActions';
-import * as recorderActions from './store/actions/recorderActions';
+import { store } from '../store/store';
+import * as requestActions from '../store/actions/requestActions';
+import * as recorderActions from '../store/actions/recorderActions';
 
 /**
  * 浏览器录制

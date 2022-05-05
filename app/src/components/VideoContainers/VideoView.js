@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
 import EditableInput from '../Controls/EditableInput';
-import Logger from '../../Logger';
+import Logger from '../../features/Logger';
 import { yellow, orange, red } from '@material-ui/core/colors';
 import SignalCellularOffIcon from '@material-ui/icons/SignalCellularOff';
 import SignalCellular0BarIcon from '@material-ui/icons/SignalCellular0Bar';

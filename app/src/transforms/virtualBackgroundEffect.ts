@@ -1,6 +1,6 @@
 import { SelfieSegmentation, Results } from '@mediapipe/selfie_segmentation';
 import { once } from 'lodash-es';
-import Logger from '../Logger';
+import Logger from '../features/Logger';
 
 /* eslint-disable */
 

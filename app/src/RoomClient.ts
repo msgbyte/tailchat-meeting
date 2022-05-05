@@ -1,4 +1,4 @@
-import Logger from './Logger';
+import Logger from './features/Logger';
 import hark from 'hark';
 import { getSignalingUrl } from './urlFactory';
 import { SocketTimeoutError } from './utils';
@@ -16,7 +16,7 @@ import * as consumerActions from './store/actions/consumerActions';
 import * as producerActions from './store/actions/producerActions';
 import * as notificationActions from './store/actions/notificationActions';
 import * as transportActions from './store/actions/transportActions';
-import Spotlights from './Spotlights';
+import Spotlights from './features/Spotlights';
 import { permissions } from './permissions';
 import * as locales from './intl/locales';
 import { createIntl } from 'react-intl';
@@ -2447,7 +2447,7 @@ export class RoomClient {
     ({ default: ScreenShare } = await import(
       /* webpackPrefetch: true */
       /* webpackChunkName: "screensharing" */
-      './ScreenShare'
+      './features/ScreenShare'
     ));
 
     mediasoupClient = await import(

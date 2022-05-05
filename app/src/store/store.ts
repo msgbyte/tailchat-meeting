@@ -8,7 +8,7 @@ import storage from 'redux-persist/lib/storage';
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
 import { diff } from 'deep-object-diff';
 import { AppState, rootReducer } from './reducers/rootReducer';
-import Logger from '../Logger';
+import Logger from '../features/Logger';
 import { config } from '../config';
 import { configureStore } from '@reduxjs/toolkit';
 

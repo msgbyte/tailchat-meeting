@@ -7,7 +7,7 @@ import { createIntl } from 'react-intl';
 import { IntlProvider } from 'react-intl-redux';
 import { Route, HashRouter, BrowserRouter, Switch } from 'react-router-dom';
 import randomString from 'crypto-random-string';
-import Logger from './Logger';
+import Logger from './features/Logger';
 import debug from 'debug';
 import { RoomClient } from './RoomClient';
 import RoomContext from './RoomContext';
@@ -26,7 +26,7 @@ import { SnackbarProvider } from 'notistack';
 import * as serviceWorker from './serviceWorker';
 import { LazyPreload } from './components/Loader/LazyPreload';
 import { detectDevice } from 'mediasoup-client';
-import { recorder } from './BrowserRecorder';
+import { recorder } from './features/BrowserRecorder';
 
 import './index.css';
 

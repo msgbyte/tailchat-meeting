@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import Logger from '../Logger';
+import Logger from '../features/Logger';
 import { withStyles } from '@material-ui/core/styles';
 import { useRoomClient } from '../RoomContext';
 import randomString from 'crypto-random-string';
