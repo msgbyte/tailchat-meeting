@@ -1,7 +1,7 @@
 import Logger from './logger/Logger';
+import { userRoles } from './access/roles';
 
 const EventEmitter = require('events').EventEmitter;
-const userRoles = require('./access/roles');
 
 const logger = new Logger('Peer');
 

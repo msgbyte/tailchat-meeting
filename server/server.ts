@@ -15,10 +15,8 @@ import https from 'https';
 import bcrypt from 'bcryptjs';
 import { constants } from 'node:crypto';
 import cors from 'cors';
+import { userRoles } from './lib/access/roles';
 
-console.log('AwaitQueue', AwaitQueue);
-
-const userRoles = require('./lib/access/roles');
 const { loginHelper, logoutHelper } = require('./lib/helpers/httpHelper');
 const { config, configError } = require('./lib/config/config');
 const interactiveServer = require('./lib/interactive/Server');
@@ -744,7 +742,9 @@ async function runWebSocketServer() {
           return;
         } else if (token && room.verifyPeer({ id: peerId, token })) {
           // Returning user, remove if old peer exists
-          if (peer) peer.close();
+          if (peer) {
+            peer.close();
+          }
 
           returning = true;
         }

@@ -4,6 +4,7 @@ import axios from 'axios';
 import utils from 'util';
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
+import { userRoles } from './access/roles';
 
 const EventEmitter = require('events').EventEmitter;
 const Lobby = require('./Lobby');
@@ -11,7 +12,6 @@ const {
   SocketTimeoutError,
   NotFoundInMediasoupError,
 } = require('./helpers/errors');
-const userRoles = require('./access/roles');
 
 import { BYPASS_ROOM_LOCK, BYPASS_LOBBY } from './access/access';
 import { Peer } from './Peer';
