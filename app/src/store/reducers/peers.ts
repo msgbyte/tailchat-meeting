@@ -15,7 +15,7 @@ interface PeerInfo extends BasePeerInfo {
   consumers: ConsumerType[];
 }
 
-const peer = (state = {}, action) => {
+const peer = (state: PeerInfo, action) => {
   switch (action.type) {
     case 'ADD_PEER':
       return action.payload.peer;

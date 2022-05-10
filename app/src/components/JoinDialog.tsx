@@ -39,7 +39,6 @@ import { getHost } from '../urlFactory';
 import { useRequest } from 'ahooks';
 import { getRoomStatus } from '../api/room';
 import { makeStyles } from '@material-ui/core/styles';
-import qs from 'qs';
 import { useAppDispatch, useAppSelector } from '../store/selectors';
 import { isValidStr } from '../utils';
 import { RoomIdInput } from './RoomIdInput';

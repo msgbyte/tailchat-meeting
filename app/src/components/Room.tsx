@@ -22,7 +22,7 @@ import AudioPeers from './PeerAudio/AudioPeers';
 import FullScreenView from './VideoContainers/FullScreenView';
 import VideoWindow from './VideoWindow/VideoWindow';
 import LockDialog from './AccessControl/LockDialog/LockDialog';
-import Settings from './Settings/Settings';
+import { Settings } from './Settings/Settings';
 import TopBar from './Controls/TopBar';
 import WakeLock from 'react-wakelock-react16';
 import ExtraVideo from './Controls/ExtraVideo';
@@ -32,6 +32,7 @@ import { About } from './Controls/About';
 import RolesManager from './Controls/RolesManager';
 import LeaveDialog from './LeaveDialog';
 import { config } from '../config';
+import type { AppState } from '../store/reducers/rootReducer';
 
 const TIMEOUT = config.hideTimeout || 5000;
 
@@ -81,7 +82,7 @@ const styles = (theme) => ({
 });
 
 interface RoomProps {
-  room: any;
+  room: AppState['room'];
   browser: any;
   advancedMode: any;
   showNotifications: any;
@@ -280,7 +281,7 @@ class Room extends React.PureComponent<RoomProps> {
   theme: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: AppState) => ({
   room: state.room,
   browser: state.me.browser,
   advancedMode: state.settings.advancedMode,

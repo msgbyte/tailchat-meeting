@@ -1,5 +1,7 @@
 import { config } from '../../config';
 
+export type ViewModeType = 'auto' | 'democratic' | 'filmstrip';
+
 const initialState = {
   name: '',
   // new/connecting/connected/disconnected/closed,

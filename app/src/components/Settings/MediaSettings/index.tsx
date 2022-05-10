@@ -1,10 +1,8 @@
 import React from 'react';
-import { connect, useDispatch } from 'react-redux';
-import * as appPropTypes from '../../appPropTypes';
-import { withStyles } from '@material-ui/core/styles';
-import { withRoomContext } from '../../../RoomContext';
+import { useDispatch } from 'react-redux';
+import { makeStyles, withStyles } from '@material-ui/core/styles';
+import { useRoomClient } from '../../../RoomContext';
 import * as settingsActions from '../../../store/actions/settingsActions';
-import PropTypes from 'prop-types';
 import { useIntl, FormattedMessage } from 'react-intl';
 import classnames from 'classnames';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -29,9 +27,9 @@ import Videocam from '@material-ui/icons/Videocam';
 import Switch from '@material-ui/core/Switch';
 import ImageUploader from 'react-images-upload';
 import Resizer from 'react-image-file-resizer';
-import type { AppState } from '../../../store/reducers/rootReducer';
 import { config } from '../../../config';
 import { VirtualBackgroundItems } from './VirtualBackgroundItems';
+import { useAppSelector } from '../../../store/selectors';
 
 const insertableStreamsSupported = Boolean(
   // @ts-ignore
@@ -63,7 +61,7 @@ const NoiseSlider = withStyles({
   },
 })(Slider);
 
-const styles = (theme) => ({
+const useStyles = makeStyles((theme) => ({
   setting: {
     padding: theme.spacing(2),
   },
@@ -95,35 +93,40 @@ const styles = (theme) => ({
   tabsHeader: {
     minHeight: '72px',
   },
-});
+}));
 
 const tabs = ['videoSettings', 'audioSettings'];
 
-interface MediaSettingsProps extends Pick<AppState, 'settings'> {
-  [key: string]: any;
-}
-
-const MediaSettings: React.FC<MediaSettingsProps> = ({
-  setAudioPreset,
-  setEchoCancellation,
-  setAutoGainControl,
-  setNoiseSuppression,
-  setVoiceActivatedUnmute,
-  setSampleRate,
-  setChannelCount,
-  setSampleSize,
-  setOpusDtx,
-  setOpusFec,
-  setOpusPtime,
-  setEnableOpusDetails,
-  roomClient,
-  me,
-  volume,
-  settings,
-  classes,
-}) => {
+export const MediaSettings: React.FC = React.memo(({}) => {
+  const classes = useStyles();
   const intl = useIntl();
   const dispatch = useDispatch();
+  const me = useAppSelector((state) => state.me);
+  const volume = useAppSelector((state) => state.peerVolumes[state.me.id]);
+  const settings = useAppSelector((state) => state.settings);
+  const roomClient = useRoomClient();
+  const setAudioPreset = (audioPreset) =>
+    dispatch(settingsActions.setAudioPreset(audioPreset));
+  const setEchoCancellation = (echoCancellation) =>
+    dispatch(settingsActions.setEchoCancellation(echoCancellation));
+  const setAutoGainControl = (autoGainControl) =>
+    dispatch(settingsActions.setAutoGainControl(autoGainControl));
+  const setNoiseSuppression = (noiseSuppression) =>
+    dispatch(settingsActions.setNoiseSuppression(noiseSuppression));
+  const setVoiceActivatedUnmute = (voiceActivatedUnmute) =>
+    dispatch(settingsActions.setVoiceActivatedUnmute(voiceActivatedUnmute));
+  const setSampleRate = (sampleRate) =>
+    dispatch(settingsActions.setSampleRate(sampleRate));
+  const setChannelCount = (channelCount) =>
+    dispatch(settingsActions.setChannelCount(channelCount));
+  const setSampleSize = (sampleSize) =>
+    dispatch(settingsActions.setSampleSize(sampleSize));
+  const setOpusDtx = (opusDtx) => dispatch(settingsActions.setOpusDtx(opusDtx));
+  const setOpusFec = (opusFec) => dispatch(settingsActions.setOpusFec(opusFec));
+  const setOpusPtime = (opusPtime) =>
+    dispatch(settingsActions.setOpusPtime(opusPtime));
+  const setEnableOpusDetails = (enableOpusDetails) =>
+    dispatch(settingsActions.setEnableOpusDetails(enableOpusDetails));
 
   const [audioSettingsOpen, setAudioSettingsOpen] = React.useState(false);
   const [videoSettingsOpen, setVideoSettingsOpen] = React.useState(false);
@@ -205,9 +208,9 @@ const MediaSettings: React.FC<MediaSettingsProps> = ({
 
   let audioOutputDevices;
 
-  if (me.audioOutputDevices)
+  if (me.audioOutputDevices) {
     audioOutputDevices = Object.values(me.audioOutputDevices);
-  else audioOutputDevices = [];
+  } else audioOutputDevices = [];
 
   return (
     <React.Fragment>
@@ -287,7 +290,6 @@ const MediaSettings: React.FC<MediaSettingsProps> = ({
                 defaultMessage: 'Camera',
               })}
               autoWidth
-              className={classes.selectEmpty}
               disabled={webcams.length === 0 || me.webcamInProgress}
             >
               {webcams.map((webcam, index) => {
@@ -367,7 +369,6 @@ const MediaSettings: React.FC<MediaSettingsProps> = ({
                   }}
                   name="Video resolution"
                   autoWidth
-                  className={classes.selectEmpty}
                 >
                   {resolutions.map((resolution, index) => {
                     return (
@@ -396,7 +397,6 @@ const MediaSettings: React.FC<MediaSettingsProps> = ({
                   }}
                   name="Frame rate"
                   autoWidth
-                  className={classes.selectEmpty}
                 >
                   {[1, 5, 10, 15, 20, 25, 30, 60].map((frameRate) => {
                     return (
@@ -424,7 +424,6 @@ const MediaSettings: React.FC<MediaSettingsProps> = ({
                   }}
                   name="Frame rate"
                   autoWidth
-                  className={classes.selectEmpty}
                 >
                   {[1, 5, 10, 15, 20, 25, 30].map((screenSharingFrameRate) => {
                     return (
@@ -455,7 +454,6 @@ const MediaSettings: React.FC<MediaSettingsProps> = ({
                   }}
                   name="Video recordings preferred mime type"
                   autoWidth
-                  className={classes.selectEmpty}
                 >
                   {settings.recorderSupportedMimeTypes.map(
                     (mimetype, index) => {
@@ -497,7 +495,6 @@ const MediaSettings: React.FC<MediaSettingsProps> = ({
                 defaultMessage: 'Audio device',
               })}
               autoWidth
-              className={classes.selectEmpty}
               disabled={audioDevices.length === 0 || me.audioInProgress}
             >
               {audioDevices.map((audio, index) => {
@@ -534,7 +531,6 @@ const MediaSettings: React.FC<MediaSettingsProps> = ({
                   defaultMessage: 'Audio output device',
                 })}
                 autoWidth
-                className={classes.selectEmpty}
                 disabled={
                   audioOutputDevices.length === 0 || me.audioOutputInProgress
                 }
@@ -611,7 +607,6 @@ const MediaSettings: React.FC<MediaSettingsProps> = ({
                 }}
                 name="Audio preset"
                 autoWidth
-                className={classes.selectEmpty}
               >
                 {Object.keys(settings.audioPresets).map((value) => {
                   return (
@@ -734,7 +729,7 @@ const MediaSettings: React.FC<MediaSettingsProps> = ({
                     :
                   </Typography>
                   <NoiseSlider
-                    className={classnames(classes.slider, classes.setting)}
+                    className={classnames(classes.setting)}
                     key={'noise-threshold-slider'}
                     min={-100}
                     value={settings.noiseThreshold}
@@ -763,7 +758,6 @@ const MediaSettings: React.FC<MediaSettingsProps> = ({
                       }}
                       name="Sample rate"
                       autoWidth
-                      className={classes.selectEmpty}
                     >
                       {[8000, 16000, 24000, 44100, 48000].map((sampleRate) => {
                         return (
@@ -794,7 +788,6 @@ const MediaSettings: React.FC<MediaSettingsProps> = ({
                       }}
                       name="Channel count"
                       autoWidth
-                      className={classes.selectEmpty}
                     >
                       {[1, 2].map((channelCount) => {
                         return (
@@ -826,7 +819,6 @@ const MediaSettings: React.FC<MediaSettingsProps> = ({
                       }}
                       name="Sample size"
                       autoWidth
-                      className={classes.selectEmpty}
                     >
                       {[8, 16, 24, 32].map((sampleSize) => {
                         return (
@@ -901,7 +893,6 @@ const MediaSettings: React.FC<MediaSettingsProps> = ({
                       }}
                       name="Opus frame size"
                       autoWidth
-                      className={classes.selectEmpty}
                     >
                       {[3, 5, 10, 20, 30, 40, 50, 60].map((opusPtime) => {
                         return (
@@ -952,60 +943,5 @@ const MediaSettings: React.FC<MediaSettingsProps> = ({
       )}
     </React.Fragment>
   );
-};
+});
 MediaSettings.displayName = 'MediaSettings';
-
-MediaSettings.propTypes = {
-  roomClient: PropTypes.any.isRequired,
-  setAudioPreset: PropTypes.func.isRequired,
-  setEchoCancellation: PropTypes.func.isRequired,
-  setAutoGainControl: PropTypes.func.isRequired,
-  setNoiseSuppression: PropTypes.func.isRequired,
-  setVoiceActivatedUnmute: PropTypes.func.isRequired,
-  setSampleRate: PropTypes.func.isRequired,
-  setChannelCount: PropTypes.func.isRequired,
-  setSampleSize: PropTypes.func.isRequired,
-  setOpusDtx: PropTypes.func.isRequired,
-  setOpusFec: PropTypes.func.isRequired,
-  setOpusPtime: PropTypes.func.isRequired,
-  setEnableOpusDetails: PropTypes.func.isRequired,
-  me: appPropTypes.Me.isRequired,
-  volume: PropTypes.number,
-  // settings: PropTypes.object.isRequired,
-  classes: PropTypes.object.isRequired,
-};
-
-const mapStateToProps = (state) => {
-  return {
-    me: state.me,
-    volume: state.peerVolumes[state.me.id],
-    settings: state.settings,
-  };
-};
-
-const mapDispatchToProps = {
-  setAudioPreset: settingsActions.setAudioPreset,
-  setEchoCancellation: settingsActions.setEchoCancellation,
-  setAutoGainControl: settingsActions.setAutoGainControl,
-  setNoiseSuppression: settingsActions.setNoiseSuppression,
-  setVoiceActivatedUnmute: settingsActions.setVoiceActivatedUnmute,
-  setSampleRate: settingsActions.setSampleRate,
-  setChannelCount: settingsActions.setChannelCount,
-  setSampleSize: settingsActions.setSampleSize,
-  setOpusDtx: settingsActions.setOpusDtx,
-  setOpusFec: settingsActions.setOpusFec,
-  setOpusPtime: settingsActions.setOpusPtime,
-  setEnableOpusDetails: settingsActions.setEnableOpusDetails,
-};
-
-export default withRoomContext(
-  connect(mapStateToProps, mapDispatchToProps, null, {
-    areStatesEqual: (next, prev) => {
-      return (
-        prev.me === next.me &&
-        prev.settings === next.settings &&
-        prev.peerVolumes[prev.me.id] === next[next.me.id]
-      );
-    },
-  })(withStyles(styles)(MediaSettings))
-);

@@ -326,8 +326,8 @@ export const configSchema = {
 
   defaultLayout: {
     doc: 'The default layout.',
-    format: ['democratic', 'filmstrip'],
-    default: 'democratic',
+    format: ['auto', 'democratic', 'filmstrip'],
+    default: 'auto',
   },
 
   buttonControlBar: {

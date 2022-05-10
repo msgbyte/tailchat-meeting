@@ -8,6 +8,7 @@ const initialState = {
   canShareScreen: false,
   canShareFiles: false,
   audioDevices: null,
+  audioOutputDevices: undefined,
   webcamDevices: null,
   webcamInProgress: false,
   audioInProgress: false,
@@ -19,6 +20,7 @@ const initialState = {
   loggedIn: false,
   isSpeaking: false,
   isAutoMuted: true,
+  audioOutputInProgress: undefined,
 };
 
 const me = (state = initialState, action) => {
