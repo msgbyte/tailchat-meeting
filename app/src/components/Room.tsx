@@ -33,6 +33,7 @@ import RolesManager from './Controls/RolesManager';
 import LeaveDialog from './LeaveDialog';
 import { config } from '../config';
 import type { AppState } from '../store/reducers/rootReducer';
+import { AutoMeetingView } from './MeetingViews/Auto';
 
 const TIMEOUT = config.hideTimeout || 5000;
 
@@ -168,6 +169,7 @@ class Room extends React.PureComponent<RoomProps> {
     } = this.props;
 
     const View = {
+      auto: AutoMeetingView,
       filmstrip: Filmstrip,
       democratic: Democratic,
     }[room.mode];
@@ -176,6 +178,8 @@ class Room extends React.PureComponent<RoomProps> {
 
     return (
       <div className={classes.root}>
+        <div id="test">{room.mode}</div>
+
         {!isElectron() && (
           <CookieConsent
             buttonText={

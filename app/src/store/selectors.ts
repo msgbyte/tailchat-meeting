@@ -107,6 +107,15 @@ export const screenConsumerSelector = createSelector(
     )
 );
 
+/**
+ * 判断是否有人正在共享内容(共享屏幕或其他)
+ */
+export const someoneSharingSelector = createSelector(
+  consumersSelect,
+  (consumers) =>
+    Object.values(consumers).some((consumer) => consumer.source === 'screen')
+);
+
 export const spotlightScreenConsumerSelector = createSelector(
   spotlightsSelector,
   consumersSelect,

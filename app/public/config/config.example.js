@@ -249,10 +249,10 @@ var config = {
 	autoMuteThreshold : 4,
 
 	// The page background image URL
-	background : 'images/background.jpg',
+	background : '/images/background.jpg',
 
 	// The default layout.
-	defaultLayout : 'democratic',
+	defaultLayout : 'auto',
 
 	// If true, the media control buttons will be shown in separate control bar, not in the ME container.
 	buttonControlBar : false,

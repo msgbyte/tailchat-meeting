@@ -320,7 +320,7 @@ export const configSchema = {
   background: {
     doc: 'The page background image URL',
     format: 'String',
-    default: 'images/background.jpg',
+    default: '/images/background.jpg',
     nullable: true,
   },
 

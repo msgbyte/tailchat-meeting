@@ -124,8 +124,8 @@ export const SpeakerPeer: React.FC<{
     height,
   ]);
 
-  const isShareing = Boolean(screenConsumer);
-  const showWebcamView = !isShareing || videoVisible;
+  const isSharing = Boolean(screenConsumer);
+  const showWebcamView = !isSharing || videoVisible;
 
   return (
     <div className={classnames(classes.root)}>
@@ -181,7 +181,7 @@ export const SpeakerPeer: React.FC<{
       {showWebcamView && (
         <div
           className={classnames(classes.viewRoot, 'webcam', {
-            [classes.webcamThumbnail]: isShareing,
+            [classes.webcamThumbnail]: isSharing,
           })}
         >
           <div className={classnames(classes.viewContainer)} style={style}>
