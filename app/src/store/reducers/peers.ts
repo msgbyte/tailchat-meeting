@@ -1,6 +1,21 @@
-const initialState: Record<string, any> = {};
+import type { ConsumerType } from './consumers';
 
-const peer = (state = initialState, action) => {
+interface BasePeerInfo {
+  id: string;
+  displayName: string;
+  picture: string;
+  roles: string[];
+  raisedHand: boolean;
+  raisedHandTimestamp: number;
+  localRecordingState: any;
+  recordingStateHistory: any;
+}
+
+interface PeerInfo extends BasePeerInfo {
+  consumers: ConsumerType[];
+}
+
+const peer = (state = {}, action) => {
   switch (action.type) {
     case 'ADD_PEER':
       return action.payload.peer;
@@ -102,6 +117,8 @@ const peer = (state = initialState, action) => {
       return state;
   }
 };
+
+const initialState: Record<string, PeerInfo> = {};
 
 const peers = (state = initialState, action) => {
   switch (action.type) {

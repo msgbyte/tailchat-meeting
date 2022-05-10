@@ -261,37 +261,42 @@ export const meProducersSelector = createSelector(
   }
 );
 
+export const peerConsumerSelector = createSelector(
+  getPeerConsumers,
+  getAllConsumers,
+  (consumers, allConsumers) => {
+    if (!consumers) return null;
+
+    const consumersArray = consumers.map(
+      (consumerId) => allConsumers[consumerId]
+    );
+    const micConsumer = consumersArray.find(
+      (consumer) => consumer.source === 'mic'
+    );
+    const webcamConsumer = consumersArray.find(
+      (consumer) => consumer.source === 'webcam'
+    );
+    const screenConsumer = consumersArray.find(
+      (consumer) => consumer.source === 'screen'
+    );
+    const extraVideoConsumers = consumersArray.filter(
+      (consumer) => consumer.source === 'extravideo'
+    );
+
+    return {
+      micConsumer,
+      webcamConsumer,
+      screenConsumer,
+      extraVideoConsumers,
+    };
+  }
+);
+
+/**
+ * @deprecated use `peerConsumerSelector` direct
+ */
 export const makePeerConsumerSelector = () => {
-  return createSelector(
-    getPeerConsumers,
-    getAllConsumers,
-    (consumers, allConsumers) => {
-      if (!consumers) return null;
-
-      const consumersArray = consumers.map(
-        (consumerId) => allConsumers[consumerId]
-      );
-      const micConsumer = consumersArray.find(
-        (consumer) => consumer.source === 'mic'
-      );
-      const webcamConsumer = consumersArray.find(
-        (consumer) => consumer.source === 'webcam'
-      );
-      const screenConsumer = consumersArray.find(
-        (consumer) => consumer.source === 'screen'
-      );
-      const extraVideoConsumers = consumersArray.filter(
-        (consumer) => consumer.source === 'extravideo'
-      );
-
-      return {
-        micConsumer,
-        webcamConsumer,
-        screenConsumer,
-        extraVideoConsumers,
-      };
-    }
-  );
+  return peerConsumerSelector;
 };
 
 // Very important that the Components that use this

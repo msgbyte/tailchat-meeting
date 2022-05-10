@@ -1,4 +1,4 @@
-const initialState = {};
+const initialState: Record<string, number> = {};
 
 const peerVolumes = (state = initialState, action) => {
   switch (action.type) {

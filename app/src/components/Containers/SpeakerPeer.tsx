@@ -1,8 +1,5 @@
 import React, { useEffect } from 'react';
-import {
-  makePeerConsumerSelector,
-  useAppSelector,
-} from '../../store/selectors';
+import { peerConsumerSelector, useAppSelector } from '../../store/selectors';
 import classnames from 'classnames';
 import { useRoomClient } from '../../RoomContext';
 import { makeStyles } from '@material-ui/core/styles';
@@ -73,7 +70,7 @@ export const SpeakerPeer: React.FC<{
   const roomClient = useRoomClient();
 
   const { micConsumer, webcamConsumer, screenConsumer } = useAppSelector(
-    (state) => makePeerConsumerSelector()(state, id)
+    (state) => peerConsumerSelector(state, id)
   );
   const peer = useAppSelector((state) => state.peers[id]);
   const windowConsumer = useAppSelector((state) => state.room.windowConsumer);

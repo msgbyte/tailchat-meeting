@@ -29,6 +29,7 @@ import { config } from './config';
 import { store } from './store/store';
 import { virtualBackgroundEffect } from './transforms/virtualBackgroundEffect';
 import type * as MediasoupClient from 'mediasoup-client';
+import type { ConsumerType } from './store/reducers/consumers';
 
 type Priority = 'high' | 'medium' | 'low' | 'very-low';
 
@@ -3147,7 +3148,7 @@ export class RoomClient {
                 consumer.rtpParameters.encodings[0].scalabilityMode
               );
 
-            const consumerStoreObject = {
+            const consumerStoreObject: ConsumerType = {
               id: consumer.id,
               peerId: peerId,
               kind: kind,

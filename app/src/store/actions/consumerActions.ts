@@ -1,4 +1,6 @@
-export const addConsumer = (consumer, peerId) => ({
+import type { ConsumerType } from '../reducers/consumers';
+
+export const addConsumer = (consumer: ConsumerType, peerId: string) => ({
   type: 'ADD_CONSUMER',
   payload: { consumer, peerId },
 });

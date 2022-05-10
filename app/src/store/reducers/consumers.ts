@@ -1,4 +1,28 @@
-const initialState = {};
+export interface ConsumerType {
+  id: string;
+  peerId: string;
+  kind: any;
+  type: any;
+  locallyPaused: boolean;
+  remotelyPaused: boolean;
+  rtpParameters: any;
+  source: any;
+  width: number;
+  height: number;
+  resolutionScalings: any;
+  spatialLayers: any;
+  temporalLayers: any;
+  preferredSpatialLayer: number;
+  preferredTemporalLayer: number;
+  priority: number;
+  codec: string;
+  track: any;
+  score: any;
+  audioGain: any;
+  opusConfig: any;
+}
+
+const initialState: Record<string, ConsumerType> = {};
 
 const consumers = (state = initialState, action) => {
   switch (action.type) {
