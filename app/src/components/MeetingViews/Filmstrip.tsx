@@ -7,7 +7,7 @@ import { videoBoxesSelector } from '../../store/selectors';
 import { withRoomContext } from '../../RoomContext';
 import Me from '../Containers/Me';
 import Peer from '../Containers/Peer';
-import SpeakerPeer from '../Containers/SpeakerPeer';
+import { SpeakerPeer } from '../Containers/SpeakerPeer';
 import Grid from '@material-ui/core/Grid';
 
 const PADDING_V = 64;
@@ -168,13 +168,7 @@ class Filmstrip extends React.PureComponent<FilmstripProps, FilmstripState> {
 
     if (speaker) {
       let speakerWidth = availableWidth;
-
       let speakerHeight = speakerWidth / aspectRatio;
-
-      if (this.isSharingCamera(this.getActivePeerId())) {
-        speakerWidth /= 2;
-        speakerHeight = speakerWidth / aspectRatio;
-      }
 
       if (speakerHeight > availableSpeakerHeight) {
         speakerHeight = availableSpeakerHeight;
@@ -286,7 +280,7 @@ class Filmstrip extends React.PureComponent<FilmstripProps, FilmstripState> {
         </div>
 
         <div className={classes.filmStrip} ref={this.filmStripContainer}>
-          <Grid container justifyContent="center" spacing={0}>
+          <Grid container justifyContent="center" spacing={1}>
             <Grid item>
               <div
                 className={classnames(classes.filmItem, {

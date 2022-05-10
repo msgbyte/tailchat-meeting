@@ -148,8 +148,8 @@ class Democratic extends React.PureComponent<DemocraticProps> {
     } = this.props;
 
     const style = {
-      width: this.state.peerWidth ?? 0,
-      height: this.state.peerHeight ?? 0,
+      width: this.state.peerWidth,
+      height: this.state.peerHeight,
     };
 
     return (

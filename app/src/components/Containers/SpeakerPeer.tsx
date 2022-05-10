@@ -1,17 +1,20 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
-import { makePeerConsumerSelector } from '../../store/selectors';
-import PropTypes from 'prop-types';
+import {
+  makePeerConsumerSelector,
+  useAppSelector,
+} from '../../store/selectors';
 import classnames from 'classnames';
-import * as appPropTypes from '../appPropTypes';
-import { withRoomContext } from '../../RoomContext';
-import { withStyles } from '@material-ui/core/styles';
+import { useRoomClient } from '../../RoomContext';
+import { makeStyles } from '@material-ui/core/styles';
 import { FormattedMessage } from 'react-intl';
 import VideoView from '../VideoContainers/VideoView';
 import Volume from './Volume';
 
-const styles = (theme) => ({
+const useStyles = makeStyles((theme) => ({
   root: {
+    position: 'relative',
+  },
+  viewRoot: {
     flex: '0 0 auto',
     boxShadow: 'var(--peer-shadow)',
     border: 'var(--peer-border)',
@@ -28,14 +31,16 @@ const styles = (theme) => ({
       order: 1,
     },
   },
+
   viewContainer: {
     position: 'relative',
-    '&.webcam': {
-      order: 2,
-    },
-    '&.screen': {
-      order: 1,
-    },
+  },
+  webcamThumbnail: {
+    position: 'absolute',
+    bottom: 10,
+    right: 10,
+    transform: 'scale(0.25)',
+    transformOrigin: '100% 100%',
   },
   videoInfo: {
     position: 'absolute',
@@ -56,22 +61,27 @@ const styles = (theme) => ({
       color: 'rgba(255, 255, 255, 0.55)',
     },
   },
-});
+}));
 
-const SpeakerPeer = (props) => {
-  const {
-    roomClient,
-    advancedMode,
-    peer,
-    micConsumer,
-    webcamConsumer,
-    screenConsumer,
-    windowConsumer,
-    fullScreenConsumer,
-    spacing,
-    style,
-    classes,
-  } = props;
+export const SpeakerPeer: React.FC<{
+  id: string;
+  advancedMode: boolean;
+  style: React.CSSProperties;
+}> = React.memo((props) => {
+  const { id, advancedMode, style } = props;
+
+  const roomClient = useRoomClient();
+
+  const { micConsumer, webcamConsumer, screenConsumer } = useAppSelector(
+    (state) => makePeerConsumerSelector()(state, id)
+  );
+  const peer = useAppSelector((state) => state.peers[id]);
+  const windowConsumer = useAppSelector((state) => state.room.windowConsumer);
+  const fullScreenConsumer = useAppSelector(
+    (state) => state.room.fullScreenConsumer
+  );
+
+  const classes = useStyles();
 
   const width = style.width;
 
@@ -86,10 +96,6 @@ const SpeakerPeer = (props) => {
     Boolean(screenConsumer) &&
     !screenConsumer.locallyPaused &&
     !screenConsumer.remotelyPaused;
-
-  const spacingStyle = {
-    margin: spacing,
-  };
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -121,62 +127,13 @@ const SpeakerPeer = (props) => {
     height,
   ]);
 
+  const isShareing = Boolean(screenConsumer);
+  const showWebcamView = !isShareing || videoVisible;
+
   return (
-    <React.Fragment>
-      <div className={classnames(classes.root, 'webcam')} style={spacingStyle}>
-        <div className={classnames(classes.viewContainer)} style={style}>
-          {!videoVisible && (
-            <div className={classes.videoInfo}>
-              <p>
-                <FormattedMessage
-                  id="room.videoPaused"
-                  defaultMessage="This video is paused"
-                />
-              </p>
-            </div>
-          )}
-
-          <VideoView
-            advancedMode={advancedMode}
-            peer={peer}
-            displayName={peer.displayName}
-            showPeerInfo
-            consumerSpatialLayers={
-              webcamConsumer ? webcamConsumer.spatialLayers : null
-            }
-            consumerTemporalLayers={
-              webcamConsumer ? webcamConsumer.temporalLayers : null
-            }
-            consumerCurrentSpatialLayer={
-              webcamConsumer ? webcamConsumer.currentSpatialLayer : null
-            }
-            consumerCurrentTemporalLayer={
-              webcamConsumer ? webcamConsumer.currentTemporalLayer : null
-            }
-            consumerPreferredSpatialLayer={
-              webcamConsumer ? webcamConsumer.preferredSpatialLayer : null
-            }
-            consumerPreferredTemporalLayer={
-              webcamConsumer ? webcamConsumer.preferredTemporalLayer : null
-            }
-            videoMultiLayer={webcamConsumer && webcamConsumer.type !== 'simple'}
-            videoTrack={webcamConsumer && webcamConsumer.track}
-            videoVisible={videoVisible}
-            audioCodec={micConsumer && micConsumer.codec}
-            videoCodec={webcamConsumer && webcamConsumer.codec}
-            audioScore={micConsumer ? micConsumer.score : null}
-            videoScore={webcamConsumer ? webcamConsumer.score : null}
-            width={width}
-            height={height}
-            opusConfig={micConsumer && micConsumer.opusConfig}
-          >
-            <Volume id={peer.id} />
-          </VideoView>
-        </div>
-      </div>
-
+    <div className={classnames(classes.root)}>
       {screenConsumer && (
-        <div className={classnames(classes.root, 'screen')}>
+        <div className={classnames(classes.viewRoot, 'screen')}>
           {!screenVisible && (
             <div className={classes.videoInfo} style={style}>
               <p>
@@ -223,43 +180,67 @@ const SpeakerPeer = (props) => {
           )}
         </div>
       )}
-    </React.Fragment>
+
+      {showWebcamView && (
+        <div
+          className={classnames(classes.viewRoot, 'webcam', {
+            [classes.webcamThumbnail]: isShareing,
+          })}
+        >
+          <div className={classnames(classes.viewContainer)} style={style}>
+            {!videoVisible && (
+              <div className={classes.videoInfo}>
+                <p>
+                  <FormattedMessage
+                    id="room.videoPaused"
+                    defaultMessage="This video is paused"
+                  />
+                </p>
+              </div>
+            )}
+
+            <VideoView
+              advancedMode={advancedMode}
+              peer={peer}
+              displayName={peer.displayName}
+              showPeerInfo
+              consumerSpatialLayers={
+                webcamConsumer ? webcamConsumer.spatialLayers : null
+              }
+              consumerTemporalLayers={
+                webcamConsumer ? webcamConsumer.temporalLayers : null
+              }
+              consumerCurrentSpatialLayer={
+                webcamConsumer ? webcamConsumer.currentSpatialLayer : null
+              }
+              consumerCurrentTemporalLayer={
+                webcamConsumer ? webcamConsumer.currentTemporalLayer : null
+              }
+              consumerPreferredSpatialLayer={
+                webcamConsumer ? webcamConsumer.preferredSpatialLayer : null
+              }
+              consumerPreferredTemporalLayer={
+                webcamConsumer ? webcamConsumer.preferredTemporalLayer : null
+              }
+              videoMultiLayer={
+                webcamConsumer && webcamConsumer.type !== 'simple'
+              }
+              videoTrack={webcamConsumer && webcamConsumer.track}
+              videoVisible={videoVisible}
+              audioCodec={micConsumer && micConsumer.codec}
+              videoCodec={webcamConsumer && webcamConsumer.codec}
+              audioScore={micConsumer ? micConsumer.score : null}
+              videoScore={webcamConsumer ? webcamConsumer.score : null}
+              width={width}
+              height={height}
+              opusConfig={micConsumer && micConsumer.opusConfig}
+            >
+              <Volume id={peer.id} />
+            </VideoView>
+          </div>
+        </div>
+      )}
+    </div>
   );
-};
-
-SpeakerPeer.propTypes = {
-  roomClient: PropTypes.any.isRequired,
-  advancedMode: PropTypes.bool,
-  peer: appPropTypes.Peer,
-  micConsumer: appPropTypes.Consumer,
-  webcamConsumer: appPropTypes.Consumer,
-  screenConsumer: appPropTypes.Consumer,
-  windowConsumer: PropTypes.string,
-  fullScreenConsumer: PropTypes.string,
-  spacing: PropTypes.number,
-  style: PropTypes.object,
-  classes: PropTypes.object.isRequired,
-};
-
-const mapStateToProps = (state, { id }) => {
-  const getPeerConsumers = makePeerConsumerSelector();
-
-  return {
-    peer: state.peers[id],
-    ...(getPeerConsumers as any)(state, id),
-    windowConsumer: state.room.windowConsumer,
-    fullScreenConsumer: state.room.fullScreenConsumer,
-  };
-};
-
-export default withRoomContext(
-  connect(mapStateToProps, null, null, {
-    areStatesEqual: (next, prev) => {
-      return (
-        prev.peers === next.peers &&
-        prev.consumers === next.consumers &&
-        prev.room.activeSpeakerId === next.room.activeSpeakerId
-      );
-    },
-  })(withStyles(styles as any, { withTheme: true })(SpeakerPeer)) as any
-);
+});
+SpeakerPeer.displayName = 'SpeakerPeer';

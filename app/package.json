@@ -54,7 +54,7 @@
 		"marked": "^0.8.0",
 		"material-ui-popup-state": "^1.8.0",
 		"mediasoup-client": "^3.6.47",
-		"notistack": "^0.9.5",
+		"notistack": "^1.0.10",
 		"path-browserify": "^1.0.1",
 		"prop-types": "^15.7.2",
 		"react": "^16.10.2",
@@ -126,7 +126,7 @@
 		"eslint-plugin-react-hooks": "^4.2.0",
 		"eslint-webpack-plugin": "^2.5.3",
 		"foreman": "^3.0.1",
-		"react-scripts": "^4.0.3",
+		"react-scripts": "4.0.3",
 		"redux-mock-store": "^1.5.3",
 		"ts-node": "^10.5.0"
 	}
