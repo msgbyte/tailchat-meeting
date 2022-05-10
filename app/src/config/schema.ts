@@ -411,7 +411,7 @@ export const configSchema = {
   supportUrl: {
     doc: 'The service & Support URL; if `null`, it will be not displayed on the about dialogs.',
     format: 'url',
-    default: 'https://support.example.com',
+    default: 'https://tailchat.msgbyte.com/',
     nullable: true,
   },
   privacyUrl: {
@@ -425,9 +425,9 @@ export const configSchema = {
     doc: '虚拟背景图片列表',
     format: Array,
     default: [
-      'images/virtual-background/1.jpg',
-      'images/virtual-background/2.jpg',
-      'images/virtual-background/3.jpg',
+      '/images/virtual-background/1.jpg',
+      '/images/virtual-background/2.jpg',
+      '/images/virtual-background/3.jpg',
     ],
   },
 

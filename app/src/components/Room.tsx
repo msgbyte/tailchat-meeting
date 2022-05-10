@@ -28,7 +28,7 @@ import WakeLock from 'react-wakelock-react16';
 import ExtraVideo from './Controls/ExtraVideo';
 import ButtonControlBar from './Controls/ButtonControlBar';
 import Help from './Controls/Help';
-import About from './Controls/About';
+import { About } from './Controls/About';
 import RolesManager from './Controls/RolesManager';
 import LeaveDialog from './LeaveDialog';
 import { config } from '../config';

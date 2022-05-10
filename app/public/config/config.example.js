@@ -305,7 +305,7 @@ var config = {
 	title : 'tailchat',
 
 	// The service & Support URL; if `null`, it will be not displayed on the about dialogs.
-	supportUrl : 'https://support.example.com',
+	supportUrl : 'https://tailchat.msgbyte.com/',
 
 	// The privacy and data protection external URL or local HTML path.
 	privacyUrl : 'privacy/privacy.html',
