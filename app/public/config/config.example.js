@@ -13,7 +13,7 @@ var config = {
 	loginEnabled : false,
 
 	// The development server listening port.
-	developmentPort : 3443,
+	developmentPort : 4433,
 
 	// The production server listening port.
 	productionPort : 443,

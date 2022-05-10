@@ -628,8 +628,7 @@ const JoinDialog: React.FC<{
                 </FormControl>
               </Grid>
 
-              {/* Status */}
-
+              {/* 在线状态 */}
               {roomStatus && (
                 <Grid item>
                   <Box pb={1}>

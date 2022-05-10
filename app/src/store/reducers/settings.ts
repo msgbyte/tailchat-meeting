@@ -29,7 +29,7 @@ const initialState = {
   buttonControlBar: config.buttonControlBar,
   drawerOverlayed: config.drawerOverlayed,
   aspectRatio: config.aspectRatio,
-  mediaPerms: { audio: true, video: true },
+  mediaPerms: { audio: false, video: false },
   localPicture: null,
   audioPreset: config.audioPreset,
   audioPresets: config.audioPresets,
