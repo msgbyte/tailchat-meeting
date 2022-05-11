@@ -21,7 +21,7 @@ const initialState = {
   windowConsumer: null, // ConsumerID
   toolbarsVisible: true,
   mode: config.defaultLayout,
-  selectedPeers: [],
+  selectedPeers: [] as string[],
   spotlights: [],
   rolesManagerPeer: null, // peerId
   settingsOpen: false,

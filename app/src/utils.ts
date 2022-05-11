@@ -38,3 +38,29 @@ export class SocketTimeoutError extends Error {
 export function isValidStr(str: unknown): str is string {
   return typeof str == 'string' && str !== '';
 }
+
+/**
+ * 根据容器宽高计算可用空间大小
+ * @param containerWidth 容器宽度
+ * @param containerHeight 容器高度
+ * @param aspectRatio 纵横比
+ * @returns
+ */
+export function calcBoxSizeWithContainer(
+  containerWidth: number,
+  containerHeight: number,
+  aspectRatio: number
+) {
+  let width = containerWidth;
+  let height = width / aspectRatio;
+
+  if (height > containerHeight) {
+    // 需要缩放
+    const scale = containerHeight / height;
+
+    width *= scale;
+    height *= scale;
+  }
+
+  return { width, height };
+}

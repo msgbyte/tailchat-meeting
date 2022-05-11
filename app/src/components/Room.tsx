@@ -178,8 +178,6 @@ class Room extends React.PureComponent<RoomProps> {
 
     return (
       <div className={classes.root}>
-        <div id="test">{room.mode}</div>
-
         {!isElectron() && (
           <CookieConsent
             buttonText={
