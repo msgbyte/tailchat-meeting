@@ -483,7 +483,8 @@ let configError = '';
 let configLoaded = false;
 
 // Load config from file
-for (const format of ['json', 'json5', 'yaml', 'yml', 'toml']) { // eslint-disable-line no-restricted-syntax
+for (const format of ['json', 'json5', 'yaml', 'yml', 'toml']) {
+  // eslint-disable-line no-restricted-syntax
   const filepath = path.normalize(`${__dirname}/../../config/config.${format}`);
 
   if (fs.existsSync(filepath)) {

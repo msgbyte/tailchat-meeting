@@ -88,7 +88,7 @@ let statusLogger = null;
 if ('StatusLogger' in config) statusLogger = new config.StatusLogger();
 
 // mediasoup Workers Map.
-const mediasoupWorkers = new Map();
+const mediasoupWorkers = new Map<number, mediasoup.types.Worker>();
 
 // Map of Room instances indexed by roomId.
 const rooms = new Map<string, Room>();
@@ -565,6 +565,18 @@ async function setupAuth() {
 }
 
 async function setupRoute() {
+  /**
+   * 健康状态查询
+   */
+  app.get('/api/health', async (req, res) => {
+    const usages = await Promise.all(
+      Array.from(mediasoupWorkers.values()).map((worker) =>
+        worker.getResourceUsage()
+      )
+    );
+    res.json({ usages });
+  });
+
   // 房间状态
   app.get('/api/room-status', (req, res) => {
     const roomId = (req.query as any).roomId;
