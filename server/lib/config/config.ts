@@ -160,18 +160,18 @@ const configSchema = convict({
   cookieName: {
     doc: 'Session cookie name.',
     format: String,
-    default: 'edumeet.sid',
+    default: 'tailchat-meeting.sid',
   },
   tls: {
     cert: {
       doc: 'SSL certificate path.',
       format: String,
-      default: './certs/edumeet-demo-cert.pem',
+      default: './certs/tailchat-meeting-demo-cert.pem',
     },
     key: {
       doc: 'SSL key path.',
       format: String,
-      default: './certs/edumeet-demo-key.pem',
+      default: './certs/tailchat-meeting-demo-key.pem',
     },
   },
   listeningHost: {

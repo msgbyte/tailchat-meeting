@@ -10,8 +10,7 @@ COPY ./package.json ./pnpm-lock.yaml ./pnpm-workspace.yaml ./LICENSE ./.npmrc ./
 
 RUN pnpm install
 
-# Web PORTS
-EXPOSE 80 443
+# PORTS for mediasoup
 EXPOSE 40000-49999/udp
 
 CMD concurrently --names "server,app" \

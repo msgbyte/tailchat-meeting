@@ -2,9 +2,9 @@ redisOptions:
   host: redis
   port: 6379
 
-listeningPort: 3443
+listeningPort: 13001
 listeningRedirectPort: 0
-httpOnly: false
+httpOnly: true
 trustProxy: ''
 
 prometheus:

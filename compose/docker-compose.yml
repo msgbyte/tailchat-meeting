@@ -17,39 +17,38 @@ services:
     restart: unless-stopped
     user: "${CURRENT_USER}"
     volumes:
-    - ${PWD}/..:/tailchat-meeting
-    - ${PWD}/config/tailchat-meeting-server-config.js:/tailchat-meeting/server/config/config.js:ro
-    - ${PWD}/config/tailchat-meeting-server-config.yaml:/tailchat-meeting/server/config/config.yaml:ro
-    - ${PWD}/config/tailchat-meeting-app-config.js:/tailchat-meeting/app/public/config/config.js:ro
-    #- ${PWD}/../app/public/config/config.example.js:/tailchat-meeting/app/public/config/config.js:ro
-    network_mode: "host"
-    extra_hosts:
-      redis: 172.22.0.2
+    - ${PWD}/config/server-config.js:/tailchat-meeting/server/config/config.js:ro
+    - ${PWD}/config/server-config.yaml:/tailchat-meeting/server/config/config.yaml:ro
+    - ${PWD}/config/app-config.js:/tailchat-meeting/app/public/config/config.js:ro
+    ports:
+      - 13001:13001
     depends_on:
-    - redis
+      - redis
+    networks:
+      - tailchat-meeting
 
   redis:
     image: redis
     container_name: tailchat-meeting_redis
     restart: unless-stopped
     networks:
-      tailchat-meeting:
-        ipv4_address: 172.22.0.2
+      - tailchat-meeting
 
-  nginx:
-    image: nginx
-    container_name: edumeet_nginx
-    restart: unless-stopped
-    ports:
-    - 8443:443
-    volumes:
-    - ${PWD}/../server/certs/mediasoup-demo.localhost.cert.pem:/etc/nginx/cert.pem:ro
-    - ${PWD}/../server/certs/mediasoup-demo.localhost.key.pem:/etc/nginx/key.pem:ro
-    - ${PWD}/config/nginx.conf:/etc/nginx/conf.d/default.conf:ro
-    extra_hosts:
-      tailchat-meeting: 172.22.0.1
-    depends_on:
-    - tailchat-meeting
+  # Use caddy in outside
+  # nginx:
+  #   image: nginx
+  #   container_name: edumeet_nginx
+  #   restart: unless-stopped
+  #   ports:
+  #   - 8443:443
+  #   volumes:
+  #   - ${PWD}/../server/certs/mediasoup-demo.localhost.cert.pem:/etc/nginx/cert.pem:ro
+  #   - ${PWD}/../server/certs/mediasoup-demo.localhost.key.pem:/etc/nginx/key.pem:ro
+  #   - ${PWD}/config/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+  #   extra_hosts:
+  #     tailchat-meeting: 172.22.0.1
+  #   depends_on:
+  #   - tailchat-meeting
 
   prometheus:
     image: prom/prometheus:v2.26.0
