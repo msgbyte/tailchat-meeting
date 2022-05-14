@@ -20,82 +20,91 @@ import { formatDocs } from '../config';
 
 const configDocs = formatDocs();
 
-const styles = () =>
-	({
-		table : {
-			minWidth : 700
-		},
-		pre : {
-			fontSize : '0.8rem'
-		},
-		cell : {
-			maxWidth : '25vw',
-			overflow : 'auto'
-		}
-	});
+const styles = () => ({
+  table: {
+    minWidth: 700,
+  },
+  pre: {
+    fontSize: '0.8rem',
+  },
+  cell: {
+    maxWidth: '25vw',
+    overflow: 'auto',
+  },
+});
 
-const ConfigDocumentation = ({
-	classes
-}: {
-	classes : any;
-}) =>
-{
-	return (
-		<Card className={classes.root}>
-			<CardContent>
-				<Typography className={classes.title} variant='h5' component='h2'>
-					<FormattedMessage
-						id='configDocumentation.title'
-						defaultMessage='Edumeet configuration'
-					/>
-				</Typography>
-				<Typography variant='body2' component='div'>
-					<TableContainer component={Paper}>
-						<Table className={classes.table} size='small' aria-label='Configuration'>
-							<TableHead>
-								<TableRow>
-									<TableCell>Property</TableCell>
-									<TableCell align='left'>Description</TableCell>
-									<TableCell align='left'>Format</TableCell>
-									<TableCell align='left'>Default value</TableCell>
-								</TableRow>
-							</TableHead>
-							<TableBody>
-								{Object.entries(configDocs).map(([ name, value ] : [ string, any ]) =>
-								{
-									return (
-										<TableRow key={name}>
-											<TableCell component='th' scope='row' className={classes.cell}>{name}</TableCell>
-											<TableCell className={classes.cell}>{value.doc}</TableCell>
-											<TableCell className={classes.cell}>
-												<pre>{value.format}</pre>
-											</TableCell>
-											<TableCell className={classes.cell}>
-												<pre className={classes.pre}>{value.default}</pre>
-											</TableCell>
-										</TableRow>
-									);
-								})}
-							</TableBody>
-						</Table>
-					</TableContainer>
-				</Typography>
-			</CardContent>
-			<CardActions>
-				<Button size='small' onClick={(e) =>
-				{
-					e.preventDefault();
-					window.location.href = '/';
-				}}
-				>Home</Button>
-			</CardActions>
-		</Card>
-	);
+const ConfigDocumentation = ({ classes }: { classes: any }) => {
+  return (
+    <Card className={classes.root}>
+      <CardContent>
+        <Typography className={classes.title} variant="h5" component="h2">
+          <FormattedMessage
+            id="configDocumentation.title"
+            defaultMessage="Tailchat meeting configuration"
+          />
+        </Typography>
+        <Typography variant="body2" component="div">
+          <TableContainer component={Paper}>
+            <Table
+              className={classes.table}
+              size="small"
+              aria-label="Configuration"
+            >
+              <TableHead>
+                <TableRow>
+                  <TableCell>Property</TableCell>
+                  <TableCell align="left">Description</TableCell>
+                  <TableCell align="left">Format</TableCell>
+                  <TableCell align="left">Default value</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {Object.entries(configDocs).map(
+                  ([name, value]: [string, any]) => {
+                    return (
+                      <TableRow key={name}>
+                        <TableCell
+                          component="th"
+                          scope="row"
+                          className={classes.cell}
+                        >
+                          {name}
+                        </TableCell>
+                        <TableCell className={classes.cell}>
+                          {value.doc}
+                        </TableCell>
+                        <TableCell className={classes.cell}>
+                          <pre>{value.format}</pre>
+                        </TableCell>
+                        <TableCell className={classes.cell}>
+                          <pre className={classes.pre}>{value.default}</pre>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  }
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Typography>
+      </CardContent>
+      <CardActions>
+        <Button
+          size="small"
+          onClick={(e) => {
+            e.preventDefault();
+            window.location.href = '/';
+          }}
+        >
+          Home
+        </Button>
+      </CardActions>
+    </Card>
+  );
 };
 
-ConfigDocumentation.propTypes =
-{
-	classes : PropTypes.object.isRequired
+ConfigDocumentation.propTypes = {
+  classes: PropTypes.object.isRequired,
 };
 
 export default withStyles(styles)(ConfigDocumentation);

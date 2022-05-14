@@ -14,6 +14,19 @@
 	"license": "MIT",
 	"homepage": "./",
 	"main": "src/electron-starter.js",
+	"scripts": {
+		"analyze": "source-map-explorer build/static/js/*",
+		"start": "cross-env HTTPS=true PORT=4443 react-scripts start",
+		"build": "react-scripts build && rm -rf ../server/public && DEST='../server/dist/public' && rm -rf $DEST && mkdir -p $DEST && mv -T build/ $DEST",
+		"test": "react-scripts test",
+		"eject": "react-scripts eject",
+		"electron": "electron --no-sandbox .",
+		"dev": "nf start -p 3000",
+		"i18n:extract": "formatjs extract",
+		"lint": "eslint ./ --ext .js,.jsx,.ts,.tsx; exit 0",
+		"lint-fix": "eslint ./ --fix --ext .js,.jsx,.ts,.tsx; exit 0",
+		"gen-config-docs": "node --loader ts-node/esm src/config.ts && eslint -c .eslintrc.json public/config/config.example.js --fix"
+	},
 	"dependencies": {
 		"@material-ui/core": "^4.11.3",
 		"@material-ui/icons": "^4.11.2",
@@ -81,19 +94,6 @@
 		"web-streams-polyfill": "^3.0.2",
 		"webtorrent": "^1.8.16"
 	},
-	"scripts": {
-		"analyze": "source-map-explorer build/static/js/*",
-		"start": "cross-env HTTPS=true PORT=4443 react-scripts start",
-		"build": "react-scripts build && rm -rf ../server/public && DEST='../server/dist/public' && rm -rf $DEST && mkdir -p $DEST && mv -T build/ $DEST",
-		"test": "react-scripts test",
-		"eject": "react-scripts eject",
-		"electron": "electron --no-sandbox .",
-		"dev": "nf start -p 3000",
-		"i18n:extract": "formatjs extract",
-		"lint": "eslint ./ --ext .js,.jsx,.ts,.tsx; exit 0",
-		"lint-fix": "eslint ./ --fix --ext .js,.jsx,.ts,.tsx; exit 0",
-		"gen-config-docs": "node --loader ts-node/esm src/config.ts && eslint -c .eslintrc.json public/config/config.example.js --fix"
-	},
 	"browserslist": [
 		">0.2%",
 		"not dead",
@@ -106,6 +106,7 @@
 		"@types/convict": "^6.0.1",
 		"@types/convict-format-with-validator": "^6.0.2",
 		"@types/domready": "^1.0.0",
+		"@types/draft-js": "^0.11.9",
 		"@types/lodash-es": "^4.17.6",
 		"@types/prop-types": "^15.7.5",
 		"@types/qs": "^6.9.7",

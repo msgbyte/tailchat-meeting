@@ -1,6 +1,6 @@
 {
-  "configDocumentation.title": "Edumeet configuration",
-  "configError.bodyText": "The Edumeet configuration contains errors:",
+  "configDocumentation.title": "Tailchat meeting configuration",
+  "configError.bodyText": "The Tailchat meeting configuration contains errors:",
   "configError.link": "See the configuration documentation",
   "configError.title": "Configuration error",
   "device.activateAudio": "Activate audio",

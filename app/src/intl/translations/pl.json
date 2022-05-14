@@ -1,6 +1,6 @@
 {
-    "configDocumentation.title": "Konfiguracja Edumeet",
-    "configError.bodyText": "Konfiguracja Edumeet zawiera błędy",
+    "configDocumentation.title": "Konfiguracja Tailchat meeting",
+    "configError.bodyText": "Konfiguracja Tailchat meeting zawiera błędy",
     "configError.link": "Zobacz dokumentację konfiguracji",
     "configError.title": "Błąd konfiguracji",
     "device.activateAudio": "Aktywuj mikrofon",

@@ -289,7 +289,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Edumeet server CPU",
+      "title": "Tailchat meeting server CPU",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -392,7 +392,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Edumeet server Memory",
+      "title": "Tailchat meeting server Memory",
       "tooltip": {
         "shared": true,
         "sort": 0,

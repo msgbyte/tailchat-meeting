@@ -51,7 +51,7 @@ function formatJson(data: string) {
 
 function dumpDocsMarkdown() {
   let data = `# ![edumeet logo](/app/public/images/logo.edumeet.svg) App Configuration properties list:
- 
+
  | Name | Description | Format | Default value |
  | :--- | :---------- | :----- | :------------ |
  `;
@@ -65,9 +65,9 @@ function dumpDocsMarkdown() {
   });
 
   data += `
- 
+
  ---
- 
+
  *Document generated with:* \`yarn gen-config-docs\` *from:* [config.ts](src/config.ts).
  `;
 
@@ -76,13 +76,13 @@ function dumpDocsMarkdown() {
 
 function dumpExampleConfigJs() {
   let data = `/**
-  * Edumeet App Configuration
+  * Tailchat meeting App Configuration
   *
   * The configuration documentation is available also:
   * - in the app/README.md file in the source tree
   * - visiting the /?config=true page in a running instance
   */
- 
+
  // eslint-disable-next-line
  var config = {
  `;
@@ -99,7 +99,7 @@ function dumpExampleConfigJs() {
   });
 
   data += `};
- 
+
  // Generated with: \`yarn gen-config-docs\` from app/src/config.ts
  `;
 
@@ -131,6 +131,7 @@ try {
   configConvict.validate({ allowed: 'strict' });
   config = configConvict.getProperties();
 } catch (error: any) {
+  console.error(error);
   configError = error.message;
 }
 

@@ -1,6 +1,6 @@
 {
-    "configDocumentation.title": "Edumeet 配置",
-    "configError.bodyText": "Edumeet 配置包含错误:",
+    "configDocumentation.title": "Tailchat meeting 配置",
+    "configError.bodyText": "Tailchat meeting 配置包含错误:",
     "configError.link": "请参阅配置文档",
     "configError.title": "配置错误",
     "device.activateAudio": "激活音频",

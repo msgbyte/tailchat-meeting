@@ -10,66 +10,64 @@ import Grid from '@material-ui/core/Grid';
 import ErrorIcon from '@material-ui/icons/Error';
 import Button from '@material-ui/core/Button';
 
-const styles = () =>
-	({
-		error : {
-			color : 'red'
-		}
-	});
+const styles = () => ({
+  error: {
+    color: 'red',
+  },
+});
 
 const ConfigError = ({
-	classes,
-	configError
+  classes,
+  configError,
 }: {
-	classes : any;
-	configError : string;
-}) =>
-{
-	return (
-		<Dialog
-			open
-			scroll={'body'}
-			classes={{
-				paper : classes.dialogPaper
-			}}
-		>
-			<DialogTitle id='form-dialog-title'>
-				<ErrorIcon className={classes.errorAvatar} color='error'/>
-				<FormattedMessage
-					id='configError.title'
-					defaultMessage='Configuration error'
-				/>
-			</DialogTitle>
-			<DialogContent dividers>
-				<FormattedMessage
-					id='configError.bodyText'
-					defaultMessage='The Edumeet configuration contains errors:'
-				/>
-				<Grid container spacing={2} alignItems='center'>
-					<Grid item>
-						<p className={classes.error}>{configError}</p>
-					</Grid>
-					<Button size='small' onClick={(e) =>
-					{
-						e.preventDefault();
-						window.location.href = '/?config=true';
-					}}
-					>
-						<FormattedMessage
-							id='configError.link'
-							defaultMessage='See the configuration documentation'
-						/>
-					</Button>
-				</Grid>
-			</DialogContent>
-		</Dialog>
-	);
+  classes: any;
+  configError: string;
+}) => {
+  return (
+    <Dialog
+      open
+      scroll={'body'}
+      classes={{
+        paper: classes.dialogPaper,
+      }}
+    >
+      <DialogTitle id="form-dialog-title">
+        <ErrorIcon className={classes.errorAvatar} color="error" />
+        <FormattedMessage
+          id="configError.title"
+          defaultMessage="Configuration error"
+        />
+      </DialogTitle>
+      <DialogContent dividers>
+        <FormattedMessage
+          id="configError.bodyText"
+          defaultMessage="The Tailchat meeting configuration contains errors:"
+        />
+        <Grid container spacing={2} alignItems="center">
+          <Grid item>
+            <p className={classes.error}>{configError}</p>
+          </Grid>
+          <Button
+            size="small"
+            onClick={(e) => {
+              e.preventDefault();
+              window.location.href = '/?config=true';
+            }}
+          >
+            <FormattedMessage
+              id="configError.link"
+              defaultMessage="See the configuration documentation"
+            />
+          </Button>
+        </Grid>
+      </DialogContent>
+    </Dialog>
+  );
 };
 
-ConfigError.propTypes =
-{
-	classes     : PropTypes.object.isRequired,
-	configError : PropTypes.string.isRequired
+ConfigError.propTypes = {
+  classes: PropTypes.object.isRequired,
+  configError: PropTypes.string.isRequired,
 };
 
 export default withStyles(styles)(ConfigError);
