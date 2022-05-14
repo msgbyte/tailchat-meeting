@@ -1,17 +1,10 @@
 {
-	"name": "edumeet",
+	"name": "tailchat-meeting",
 	"version": "3.5.3",
 	"private": true,
-	"description": "edumeet meeting service",
-	"author": "Håvar Aambø Fosstveit <h@fosstveit.net>",
-	"contributors": [
-		"Stefan Otto",
-		"Mészáros Mihály",
-		"Roman Drozd",
-		"Rémai Gábor László",
-		"Piotr Pawałowski"
-	],
-	"license": "MIT",
+	"description": "tailchat meeting service",
+	"author": "moonrailgun <moonrailgun@gmail.com>",
+	"license": "GPL-3.0",
 	"homepage": "./",
 	"main": "src/electron-starter.js",
 	"scripts": {

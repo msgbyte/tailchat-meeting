@@ -3,15 +3,8 @@
 	"version": "3.5.3",
 	"private": true,
 	"description": "tailchat meeting server",
-	"author": "Håvar Aambø Fosstveit <h@fosstveit.net>",
-	"contributors": [
-		"Stefan Otto",
-		"Mészáros Mihály",
-		"Roman Drozd",
-		"Rémai Gábor László",
-		"Piotr Pawałowski"
-	],
-	"license": "MIT",
+	"author": "moonrailgun <moonrailgun@gmail.com>",
+	"license": "GPL-3.0",
 	"main": "lib/index.js",
 	"scripts": {
 		"start": "DEBUG=tailchat-meeting-server:* node dist/server.js",

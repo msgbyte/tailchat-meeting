@@ -13,6 +13,9 @@ RUN pnpm install
 # PORTS for mediasoup
 EXPOSE 40000-49999/udp
 
-CMD concurrently --names "server,app" \
-    "cd server && pnpm build && pnpm start" \
-    "cd app && pnpm build"
+CMD bash
+
+# RUN cd app && pnpm build
+# RUN cd server && pnpm build
+
+# CMD pnpm start

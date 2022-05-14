@@ -3,10 +3,10 @@ version: '2.2'
 networks:
   tailchat-meeting:
     driver: bridge
-    ipam:
-      driver: default
-      config:
-      - subnet: 172.22.0.0/24
+    # ipam:
+    #   driver: default
+    #   config:
+    #   - subnet: 172.22.0.0/24
 
 services:
 
@@ -67,8 +67,8 @@ services:
     #- cadvisor:cadvisor
     - node-exporter:node-exporter
     - tailchat-meeting:tailchat-meeting
-    extra_hosts:
-      tailchat-meeting: 172.22.0.1
+    # extra_hosts:
+    #   tailchat-meeting: 172.22.0.1
 
   node-exporter:
     image: prom/node-exporter:v1.1.2
