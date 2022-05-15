@@ -2,5 +2,5 @@
 var config =
 {
 	developmentPort : 8443,
-	productionPort  : 13001
+	productionPort  : 0 // disable append port
 };

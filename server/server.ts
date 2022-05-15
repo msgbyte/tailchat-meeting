@@ -96,24 +96,6 @@ const rooms = new Map<string, Room>();
 // Map of Peer instances indexed by peerId.
 const peers = new Map<string, Peer>();
 
-// TLS server configuration.
-const tls = {
-  cert: fs.readFileSync(config.tls.cert),
-  key: fs.readFileSync(config.tls.key),
-  secureOptions: 'tlsv12',
-  ciphers: [
-    'ECDHE-ECDSA-AES128-GCM-SHA256',
-    'ECDHE-RSA-AES128-GCM-SHA256',
-    'ECDHE-ECDSA-AES256-GCM-SHA384',
-    'ECDHE-RSA-AES256-GCM-SHA384',
-    'ECDHE-ECDSA-CHACHA20-POLY1305',
-    'ECDHE-RSA-CHACHA20-POLY1305',
-    'DHE-RSA-AES128-GCM-SHA256',
-    'DHE-RSA-AES256-GCM-SHA384',
-  ].join(':'),
-  honorCipherOrder: true,
-};
-
 const app = express();
 
 app.use(helmet.hsts());
@@ -651,6 +633,24 @@ async function runHttpsServer() {
     // http
     mainListener = http.createServer(app);
   } else {
+    // TLS server configuration.
+    const tls = {
+      cert: fs.readFileSync(config.tls.cert),
+      key: fs.readFileSync(config.tls.key),
+      secureOptions: 'tlsv12',
+      ciphers: [
+        'ECDHE-ECDSA-AES128-GCM-SHA256',
+        'ECDHE-RSA-AES128-GCM-SHA256',
+        'ECDHE-ECDSA-AES256-GCM-SHA384',
+        'ECDHE-RSA-AES256-GCM-SHA384',
+        'ECDHE-ECDSA-CHACHA20-POLY1305',
+        'ECDHE-RSA-CHACHA20-POLY1305',
+        'DHE-RSA-AES128-GCM-SHA256',
+        'DHE-RSA-AES256-GCM-SHA384',
+      ].join(':'),
+      honorCipherOrder: true,
+    };
+
     // https
     // spdy is not working anymore with node.js > 15 and express 5
     // is not ready yet for http2

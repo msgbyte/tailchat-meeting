@@ -4,18 +4,18 @@ ENV DEBUG=tailchat-meeting*,mediasoup*
 
 RUN npm install -g nodemon concurrently
 
-COPY ./app app
-COPY ./server server
-COPY ./package.json ./pnpm-lock.yaml ./pnpm-workspace.yaml ./LICENSE ./.npmrc ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml LICENSE .npmrc .eslintrc.js ./
+COPY server server
+COPY app app
 
 RUN pnpm install
 
 # PORTS for mediasoup
 EXPOSE 40000-49999/udp
 
-CMD bash
 
-# RUN cd app && pnpm build
-# RUN cd server && pnpm build
+RUN cd app && pnpm build
+RUN cd server && pnpm build
 
-# CMD pnpm start
+CMD cd server && pnpm start
+# CMD npx http-server .

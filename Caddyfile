@@ -1,3 +1,6 @@
-meeting.moonrailgun.com
-
-reverse_proxy meeting.moonrailgun.com localhost:13001
+https://meeting.moonrailgun.com:443 {
+  encode gzip
+	reverse_proxy * http://127.0.0.1:13001 {
+    header_up Host {upstream_hostport}
+  }
+}

@@ -7,6 +7,10 @@ export function getHost() {
       ? config.developmentPort
       : config.productionPort;
 
+  if (!port) {
+    return hostname;
+  }
+
   return `${hostname}:${port}`;
 }
 
