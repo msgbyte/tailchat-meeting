@@ -80,7 +80,7 @@
 		"redux-persist-transform-filter": "0.0.20",
 		"reselect": "^4.0.0",
 		"riek": "^1.1.0",
-		"socket.io-client": "^2.4.0",
+		"socket.io-client": "^4.5.0",
 		"source-map-explorer": "^2.1.0",
 		"streamsaver": "^2.0.5",
 		"typescript": "^4.2.4",

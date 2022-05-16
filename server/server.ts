@@ -685,6 +685,7 @@ async function runHttpsServer() {
   }
 
   // https or http
+  logger.info('Listen to port', config.listeningPort);
   if (config.listeningHost) {
     mainListener.listen(config.listeningPort, config.listeningHost);
   } else {

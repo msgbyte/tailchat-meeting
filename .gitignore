@@ -6,3 +6,4 @@ node_modules
 /server/certs/
 /server/dist/
 .env
+start.sh
