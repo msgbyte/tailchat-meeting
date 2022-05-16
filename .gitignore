@@ -7,3 +7,4 @@ node_modules
 /server/dist/
 .env
 start.sh
+.parcel-cache

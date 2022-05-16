@@ -1,0 +1,29 @@
+{
+  "name": "tailchat-meeting-sdk",
+  "version": "1.0.0",
+  "description": "",
+  "source": "./src/index.ts",
+  "main": "./lib/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "parcel ./test/index.html"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "bowser": "^2.7.0",
+    "debug": "^4.3.1",
+    "hark": "^1.2.3",
+    "mediasoup-client": "^3.6.47",
+    "socket.io-client": "^4.5.0"
+  },
+  "devDependencies": {
+    "@types/debug": "^4.1.5",
+    "@types/hark": "^1.2.2",
+    "buffer": "^6.0.3",
+    "parcel": "^2.5.0",
+    "process": "^0.11.10",
+    "typescript": "^4.6.4"
+  }
+}

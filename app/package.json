@@ -83,6 +83,7 @@
 		"socket.io-client": "^4.5.0",
 		"source-map-explorer": "^2.1.0",
 		"streamsaver": "^2.0.5",
+		"tailchat-meeting-sdk": "workspace:^1.0.0",
 		"typescript": "^4.2.4",
 		"web-streams-polyfill": "^3.0.2",
 		"webtorrent": "^1.8.16"
