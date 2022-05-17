@@ -17,6 +17,7 @@ export interface TailchatMeetingClient {
     event: 'webcamProduce',
     listener: (webcamProducer: Producer) => void
   ): this;
+  on(event: 'webcamClose', listener: (webcamProducerId: string) => void): this;
 }
 
 export class TailchatMeetingClient extends EventEmitter {
@@ -76,7 +77,7 @@ export class TailchatMeetingClient extends EventEmitter {
     );
 
     if (options.video) {
-      await this.updateWebcam({ init: true, start: true });
+      this.enableWebcam();
     }
 
     if (options.audio) {
@@ -94,10 +95,46 @@ export class TailchatMeetingClient extends EventEmitter {
     return this.device.allDevices;
   }
 
+  //#region webcam 网络摄像头
+  private currentWebcamProducer?: Producer;
+  get webcamEnabled() {
+    return !!this.currentWebcamProducer;
+  }
+
+  async enableWebcam() {
+    logger.debug('enableWebcam()');
+    await this.updateWebcam({ init: true, start: true });
+  }
+
+  async disableWebcam() {
+    logger.debug('disableWebcam()');
+
+    if (!this.signaling) {
+      throw new InitClientError();
+    }
+
+    if (!this.currentWebcamProducer) {
+      return;
+    }
+
+    this.currentWebcamProducer.close();
+
+    try {
+      await this.signaling.sendRequest('closeProducer', {
+        producerId: this.currentWebcamProducer.id,
+      });
+    } catch (error) {
+      logger.error('disableWebcam() [error:"%o"]', error);
+    }
+
+    this.emit('webcamClose', this.currentWebcamProducer.id);
+    this.currentWebcamProducer = undefined;
+  }
+
   /**
    * 更新摄像头
    */
-  async updateWebcam({
+  private async updateWebcam({
     init = false,
     start = false,
     restart = false,
@@ -148,6 +185,9 @@ export class TailchatMeetingClient extends EventEmitter {
 
       if ((restart && webcamProducer) || start) {
         // TODO: 需要关掉旧的
+        if (this.currentWebcamProducer) {
+          await this.disableWebcam();
+        }
 
         const stream = await navigator.mediaDevices.getUserMedia({
           video: {
@@ -217,6 +257,7 @@ export class TailchatMeetingClient extends EventEmitter {
       }
 
       this.emit('webcamProduce', webcamProducer);
+      this.currentWebcamProducer = webcamProducer;
 
       await this.device.updateMediaDevices();
     } catch (err) {
@@ -229,4 +270,5 @@ export class TailchatMeetingClient extends EventEmitter {
       throw err;
     }
   }
+  //#endregion
 }

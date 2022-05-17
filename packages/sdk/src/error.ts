@@ -20,6 +20,6 @@ export class InitClientError extends Error {
   name = 'InitClientError';
 
   constructor(message?: string) {
-    super(message ?? 'Client init Failed, something not ready.');
+    super(message ?? 'Client init Failed, maybe not joined room.');
   }
 }

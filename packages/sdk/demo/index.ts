@@ -11,6 +11,12 @@ client.on('webcamProduce', (webcamProducer) => {
   webcamEl.autoplay = true;
 });
 
+client.on('webcamClose', () => {
+  const webcamEl = document.querySelector<HTMLVideoElement>('#webcam');
+  webcamEl.srcObject = null;
+  webcamEl.autoplay = true;
+});
+
 (async () => {
   await client.join('123456789', {
     video: true,
@@ -24,4 +30,17 @@ client.on('webcamProduce', (webcamProducer) => {
   console.log('devices', devices);
 
   console.log('client', client);
+
+  initControl();
 })();
+
+function initControl() {
+  const webcamBtnEl = document.querySelector<HTMLButtonElement>('#webcam-btn');
+  webcamBtnEl.addEventListener('click', () => {
+    if (client.webcamEnabled) {
+      client.disableWebcam();
+    } else {
+      client.enableWebcam();
+    }
+  });
+}
