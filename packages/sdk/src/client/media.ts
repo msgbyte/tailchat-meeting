@@ -1,4 +1,4 @@
-import EventEmitter from 'events';
+import EventEmitter from 'eventemitter3';
 import { Device } from 'mediasoup-client';
 import type { Consumer } from 'mediasoup-client/lib/Consumer';
 import type { Producer, ProducerOptions } from 'mediasoup-client/lib/Producer';

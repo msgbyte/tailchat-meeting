@@ -8,7 +8,7 @@ import { InitClientError } from '../error';
 import { defaultSettings, TailchatMeetingClientSettings } from './settings';
 import { getEncodings } from '../helper/encodings';
 import type { Producer } from 'mediasoup-client/lib/types';
-import EventEmitter from 'events';
+import EventEmitter from 'eventemitter3';
 
 const logger = new Logger('client');
 

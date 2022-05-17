@@ -1,4 +1,4 @@
-import EventEmitter from 'events';
+import EventEmitter from 'eventemitter3';
 import Logger from '../helper/logger';
 import type { MediaDevice } from '../types';
 
@@ -18,7 +18,7 @@ export declare interface DeviceClient {
   ): this;
 }
 
-export class DeviceClient extends EventEmitter {
+export class DeviceClient extends EventEmitter<'devicesUpdated'> {
   private devices: MediaDevice[] = [];
 
   get allDevices() {

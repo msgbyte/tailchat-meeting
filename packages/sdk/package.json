@@ -1,30 +1,33 @@
 {
   "name": "tailchat-meeting-sdk",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "",
   "source": "./src/index.ts",
   "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
   "scripts": {
-    "build": "parcel build",
+    "build": "tsc",
     "dev": "parcel ./demo/index.html",
     "release": "npm publish --registry https://registry.npmjs.com/",
     "prepare": "pnpm build"
   },
-  "files": ["src", "lib"],
+  "files": [
+    "src",
+    "lib"
+  ],
   "keywords": [],
   "author": "",
   "license": "MIT",
   "dependencies": {
     "bowser": "^2.7.0",
     "debug": "^4.3.1",
-    "events": "^3.3.0",
+    "eventemitter3": "^4.0.7",
     "hark": "^1.2.3",
     "mediasoup-client": "^3.6.47",
     "socket.io-client": "^4.5.0"
   },
   "devDependencies": {
     "@types/debug": "^4.1.5",
-    "@types/events": "^3.0.0",
     "@types/hark": "^1.2.2",
     "buffer": "^6.0.3",
     "parcel": "^2.5.0",

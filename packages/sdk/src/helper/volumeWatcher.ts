@@ -1,4 +1,4 @@
-import EventEmitter from 'events';
+import EventEmitter from 'eventemitter3';
 import type { Harker } from 'hark';
 
 export declare interface VolumeWatcher {
@@ -12,13 +12,15 @@ export declare interface VolumeWatcher {
   ): this;
 }
 
-export class VolumeWatcher extends EventEmitter {
+export class VolumeWatcher extends EventEmitter<'volumeChange'> {
   private hark: Harker;
   private lastVolume = -100;
   private lastScaledVolume = 0;
 
   constructor({ hark }: { hark: Harker }) {
     super();
+
+    this.emit('volumeChange');
 
     this.hark = hark;
 
