@@ -5,8 +5,9 @@
   "source": "./src/index.ts",
   "main": "./lib/index.js",
   "scripts": {
-    "build": "tsc",
-    "test": "parcel ./test/index.html"
+    "build": "parcel build",
+    "dev": "parcel ./demo/index.html",
+    "prepare": "pnpm build"
   },
   "keywords": [],
   "author": "",
@@ -14,12 +15,14 @@
   "dependencies": {
     "bowser": "^2.7.0",
     "debug": "^4.3.1",
+    "events": "^3.3.0",
     "hark": "^1.2.3",
     "mediasoup-client": "^3.6.47",
     "socket.io-client": "^4.5.0"
   },
   "devDependencies": {
     "@types/debug": "^4.1.5",
+    "@types/events": "^3.0.0",
     "@types/hark": "^1.2.2",
     "buffer": "^6.0.3",
     "parcel": "^2.5.0",

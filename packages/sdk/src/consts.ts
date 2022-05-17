@@ -2,7 +2,7 @@ export const PC_PROPRIETARY_CONSTRAINTS = {
   optional: [{ googDscp: true }],
 };
 
-const VIDEO_CONSTRAINS = {
+export const VIDEO_CONSTRAINS = {
   low: {
     width: 320,
   },

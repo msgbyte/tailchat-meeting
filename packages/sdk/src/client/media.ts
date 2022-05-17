@@ -93,7 +93,7 @@ export class MediaClient extends EventEmitter {
   }
 
   private handleSignaling(): void {
-    this.signaling.socket.on('notification', async (notification: any) => {
+    this.signaling.on('notification', async (notification: any) => {
       logger.debug(
         'signaling "notification" event [method:%s, data:%o]',
         notification.method,

@@ -121,7 +121,7 @@ export class SignalingClient extends EventEmitter {
     });
   }
 
-  public async sendRequest(
+  public async sendRequest<T>(
     method: string,
     data?:
       | CreateWebRtcTransport
@@ -137,7 +137,7 @@ export class SignalingClient extends EventEmitter {
       | FilesharingData
       | undefined
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ): Promise<any> {
+  ): Promise<T> {
     logger.debug('sendRequest() [method:%s, data:%o]', method, data);
 
     for (let tries = 0; tries < this.requestRetries; tries++) {
@@ -146,8 +146,12 @@ export class SignalingClient extends EventEmitter {
       } catch (error) {
         if (error instanceof SocketTimeoutError && tries < this.requestRetries)
           logger.warn('sendRequest() | timeout, retrying [attempt:%s]', tries);
-        else throw error;
+        else {
+          throw error;
+        }
       }
     }
+
+    throw new Error('sendRequest failed');
   }
 }

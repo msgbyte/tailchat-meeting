@@ -15,3 +15,11 @@ export class SocketTimeoutError extends Error {
     }
   }
 }
+
+export class InitClientError extends Error {
+  name = 'InitClientError';
+
+  constructor(message?: string) {
+    super(message ?? 'Client init Failed, something not ready.');
+  }
+}

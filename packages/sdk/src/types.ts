@@ -26,6 +26,12 @@ export interface RestartICEParams {
   restarting: boolean;
 }
 
+export interface MediaDevice {
+  deviceId: string;
+  kind: MediaDeviceKind;
+  label: string;
+}
+
 export interface Permission {
   id: number;
   label: string;
@@ -59,6 +65,7 @@ export interface UpdateWebcamParams {
   newDeviceId?: any;
   newResolution?: any;
   newFrameRate?: any;
+  selectedVideoDevice?: string;
 }
 
 export interface CreateWebRtcTransport {
@@ -134,4 +141,9 @@ export interface JoinData {
   picture: string;
   rtpCapabilities: RtpCapabilities;
   returning?: boolean;
+}
+
+export interface SimulcastProfile {
+  scaleResolutionDownBy: number;
+  maxBitRate: number;
 }

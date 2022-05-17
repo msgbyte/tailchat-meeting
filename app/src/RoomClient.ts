@@ -31,6 +31,7 @@ import { virtualBackgroundEffect } from './transforms/virtualBackgroundEffect';
 import type * as MediasoupClient from 'mediasoup-client';
 import type { ConsumerType } from './store/reducers/consumers';
 import type { IceParameters } from 'mediasoup-client/lib/types';
+import { getEncodings } from 'tailchat-meeting-sdk/lib/helper/encodings';
 
 type Priority = 'high' | 'medium' | 'low' | 'very-low';
 
@@ -4785,52 +4786,14 @@ export class RoomClient {
     store.dispatch(consumerActions.removeConsumer(consumerId, peerId));
   }
 
-  _chooseEncodings(simulcastProfiles, size) {
-    let encodings;
-
-    const sortedMap = new Map(
-      [...Object.entries(simulcastProfiles)].sort(
-        (a, b) => parseInt(b[0]) - parseInt(a[0])
-      )
-    );
-
-    for (const [key, value] of sortedMap) {
-      if (key < size) {
-        if (encodings === null) {
-          encodings = value;
-        }
-
-        break;
-      }
-
-      encodings = value;
-    }
-
-    // hack as there is a bug in mediasoup
-    if (encodings.length === 1) {
-      encodings.push({ ...encodings[0] });
-    }
-
-    return encodings;
-  }
-
   _getEncodings(width, height, screenSharing = false) {
-    // If VP9 is the only available video codec then use SVC.
-    const firstVideoCodec = this._mediasoupDevice.rtpCapabilities.codecs.find(
-      (c) => c.kind === 'video'
+    return getEncodings(
+      this._mediasoupDevice.rtpCapabilities,
+      config.simulcastProfiles,
+      width,
+      height,
+      screenSharing
     );
-
-    let encodings;
-
-    const size = width > height ? width : height;
-
-    if (firstVideoCodec.mimeType.toLowerCase() === 'video/vp9')
-      encodings = screenSharing ? VIDEO_SVC_ENCODINGS : VIDEO_KSVC_ENCODINGS;
-    else if (config.simulcastProfiles)
-      encodings = this._chooseEncodings(config.simulcastProfiles, size);
-    else encodings = this._chooseEncodings(VIDEO_SIMULCAST_PROFILES, size);
-
-    return encodings;
   }
 
   setHideNoVideoParticipants(hideNoVideoParticipants) {

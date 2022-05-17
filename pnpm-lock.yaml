@@ -220,10 +220,12 @@ importers:
   packages/sdk:
     specifiers:
       '@types/debug': ^4.1.5
+      '@types/events': ^3.0.0
       '@types/hark': ^1.2.2
       bowser: ^2.7.0
       buffer: ^6.0.3
       debug: ^4.3.1
+      events: ^3.3.0
       hark: ^1.2.3
       mediasoup-client: ^3.6.47
       parcel: ^2.5.0
@@ -233,11 +235,13 @@ importers:
     dependencies:
       bowser: 2.11.0
       debug: 4.3.4
+      events: 3.3.0
       hark: 1.2.3
       mediasoup-client: 3.6.51
       socket.io-client: 4.5.0
     devDependencies:
       '@types/debug': 4.1.7
+      '@types/events': 3.0.0
       '@types/hark': 1.2.2
       buffer: 6.0.3
       parcel: 2.5.0
@@ -3761,7 +3765,6 @@ packages:
 
   /@types/events/3.0.0:
     resolution: {integrity: sha512-EaObqwIvayI5a8dCzhFrjKzVwKLxjoG9T6Ppd5CEo07LRKfQ8Yokw54r5+Wq7FaBQ+yXRvQAYPrHwya1/UFt9g==}
-    dev: false
 
   /@types/express-serve-static-core/4.17.28:
     resolution: {integrity: sha512-P1BJAEAW3E2DJUlkgq4tOL3RyMunoWXqbSCygWo5ZIWTjUgN1YnaXWW4VWl/oc8vs/XoYibEGBKP0uZyF4AHig==}

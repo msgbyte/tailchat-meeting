@@ -1,13 +1,8 @@
 import EventEmitter from 'events';
 import Logger from '../helper/logger';
+import type { MediaDevice } from '../types';
 
 const logger = new Logger('DeviceClient');
-
-export interface MediaDevice {
-  deviceId: string;
-  kind: MediaDeviceKind;
-  label: string;
-}
 
 export interface DevicesUpdated {
   devices: MediaDeviceInfo[];
@@ -25,6 +20,10 @@ export declare interface DeviceClient {
 
 export class DeviceClient extends EventEmitter {
   private devices: MediaDevice[] = [];
+
+  get allDevices() {
+    return this.devices;
+  }
 
   public async updateMediaDevices(): Promise<void> {
     logger.debug('updateMediaDevices()');
