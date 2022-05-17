@@ -399,6 +399,11 @@ export class MediaClient extends EventEmitter {
 
     producer.observer.once('close', () => {
       this.producers.delete(producer.id);
+
+      if (kind === 'audio') {
+        (producer.appData.hark as hark.Harker).stop();
+        producer.appData.volumeWatcher = null;
+      }
     });
 
     producer.once('transportclose', () => {

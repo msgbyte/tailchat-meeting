@@ -13,6 +13,36 @@ export interface TailchatMeetingClientSettings {
    */
   simulcast: boolean;
   simulcastProfiles: Record<string, SimulcastProfile[]>;
+  /**
+   * 自动增益控制
+   */
+  autoGainControl: boolean;
+  /**
+   * 回声消除
+   */
+  echoCancellation: boolean;
+
+  /**
+   * 噪音抑制
+   */
+  noiseSuppression: boolean;
+  /**
+   * 音频采样率
+   */
+  sampleRate: 48000 | 44100;
+  /**
+   * 音频频道数
+   */
+  channelCount: number;
+  /**
+   * 采样大小
+   */
+  sampleSize: number;
+  opusStereo: boolean;
+  opusDtx: boolean;
+  opusFec: boolean;
+  opusPtime: number;
+  opusMaxPlaybackRate: number;
 }
 
 export const defaultSettings: TailchatMeetingClientSettings = {
@@ -80,4 +110,15 @@ export const defaultSettings: TailchatMeetingClientSettings = {
       },
     ],
   },
+  autoGainControl: true,
+  echoCancellation: true,
+  noiseSuppression: true,
+  sampleRate: 48000,
+  channelCount: 1,
+  sampleSize: 16,
+  opusStereo: false,
+  opusDtx: true,
+  opusFec: true,
+  opusPtime: 20,
+  opusMaxPlaybackRate: 48000,
 };

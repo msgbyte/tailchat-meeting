@@ -18,6 +18,8 @@ export interface TailchatMeetingClient {
     listener: (webcamProducer: Producer) => void
   ): this;
   on(event: 'webcamClose', listener: (webcamProducerId: string) => void): this;
+  on(event: 'micProduce', listener: (micProducer: Producer) => void): this;
+  on(event: 'micClose', listener: (micProducerId: string) => void): this;
 }
 
 export class TailchatMeetingClient extends EventEmitter {
@@ -81,8 +83,24 @@ export class TailchatMeetingClient extends EventEmitter {
     }
 
     if (options.audio) {
-      // TODO
+      this.enableMic();
     }
+
+    console.log('roomInfo:', {
+      authenticated,
+      roles,
+      peers,
+      tracker,
+      roomPermissions,
+      userRoles,
+      allowWhenRoleMissing,
+      chatHistory,
+      fileHistory,
+      lastNHistory,
+      locked,
+      lobbyPeers,
+      accessCode,
+    });
   }
 
   /**
@@ -109,7 +127,7 @@ export class TailchatMeetingClient extends EventEmitter {
   async disableWebcam() {
     logger.debug('disableWebcam()');
 
-    if (!this.signaling) {
+    if (!this.media) {
       throw new InitClientError();
     }
 
@@ -117,17 +135,7 @@ export class TailchatMeetingClient extends EventEmitter {
       return;
     }
 
-    this.currentWebcamProducer.close();
-
-    try {
-      await this.signaling.sendRequest('closeProducer', {
-        producerId: this.currentWebcamProducer.id,
-      });
-    } catch (error) {
-      logger.error('disableWebcam() [error:"%o"]', error);
-    }
-
-    this.emit('webcamClose', this.currentWebcamProducer.id);
+    this.media.changeProducer(this.currentWebcamProducer.id, 'close');
     this.currentWebcamProducer = undefined;
   }
 
@@ -268,6 +276,150 @@ export class TailchatMeetingClient extends EventEmitter {
       }
 
       throw err;
+    }
+  }
+  //#endregion
+
+  //#region mic 麦克风
+  private currentMicProducer?: Producer;
+  get micEnabled() {
+    return !!this.currentMicProducer;
+  }
+
+  async enableMic() {
+    await this.updateMic({ start: true });
+  }
+
+  async disableMic() {
+    if (!this.media) {
+      throw new InitClientError();
+    }
+
+    if (!this.currentMicProducer) {
+      return;
+    }
+
+    this.media.changeProducer(this.currentMicProducer.id, 'close');
+    this.currentMicProducer = undefined;
+  }
+
+  async updateMic({
+    start = false,
+    restart = true,
+    newDeviceId = null,
+    selectedAudioDevice = '',
+  } = {}) {
+    logger.debug(
+      'updateMic() [start:"%s", restart:"%s", newDeviceId:"%s"]',
+      start,
+      restart,
+      newDeviceId
+    );
+
+    if (!this.media) {
+      throw new InitClientError();
+    }
+
+    let track: MediaStreamTrack | null | undefined;
+    let micProducer: Producer | null | undefined;
+
+    try {
+      await this.device.updateMediaDevices();
+
+      if (!this.media.mediaCapabilities.canSendMic) {
+        throw new Error('cannot produce audio');
+      }
+
+      if (newDeviceId && !restart) {
+        throw new Error('changing device requires restart');
+      }
+
+      await this.device.updateMediaDevices();
+
+      const deviceId = this.device.getDeviceId(
+        selectedAudioDevice,
+        'audioinput'
+      );
+
+      if (!deviceId) {
+        logger.warn('no audio devices');
+      }
+
+      const {
+        autoGainControl,
+        echoCancellation,
+        noiseSuppression,
+        sampleRate,
+        channelCount,
+        sampleSize,
+        opusStereo,
+        opusDtx,
+        opusFec,
+        opusPtime,
+        opusMaxPlaybackRate,
+      } = this.settings;
+
+      micProducer = this.media
+        .getProducers()
+        .find((producer) => producer.appData.source === 'mic');
+
+      if ((restart && micProducer) || start) {
+        if (micProducer) {
+          await this.disableMic();
+        }
+
+        if (!track) {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            audio: {
+              deviceId: { ideal: deviceId },
+              sampleRate,
+              channelCount,
+              autoGainControl,
+              echoCancellation,
+              noiseSuppression,
+              sampleSize,
+            },
+          });
+
+          [track] = stream.getAudioTracks();
+        }
+
+        if (!track) throw new Error('no mic track');
+
+        micProducer = await this.media.produce({
+          track,
+          codecOptions: {
+            opusStereo: opusStereo,
+            opusFec: opusFec,
+            opusDtx: opusDtx,
+            opusMaxPlaybackRate: opusMaxPlaybackRate,
+            opusPtime: opusPtime,
+          },
+          appData: { source: 'mic' },
+        });
+      } else if (micProducer) {
+        ({ track } = micProducer);
+
+        await track?.applyConstraints({
+          sampleRate,
+          channelCount,
+          autoGainControl,
+          echoCancellation,
+          noiseSuppression,
+          sampleSize,
+        });
+      }
+
+      this.emit('micProduce', micProducer);
+      this.currentMicProducer = micProducer;
+
+      await this.device.updateMediaDevices();
+    } catch (err) {
+      logger.error('updateMic() [error:"%o"]', err);
+
+      if (track) {
+        track.stop();
+      }
     }
   }
   //#endregion
