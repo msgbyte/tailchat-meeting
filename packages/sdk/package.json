@@ -7,8 +7,10 @@
   "scripts": {
     "build": "parcel build",
     "dev": "parcel ./demo/index.html",
+    "release": "npm publish --registry https://registry.npmjs.com/",
     "prepare": "pnpm build"
   },
+  "files": ["src", "lib"],
   "keywords": [],
   "author": "",
   "license": "MIT",

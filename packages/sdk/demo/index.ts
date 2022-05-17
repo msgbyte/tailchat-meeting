@@ -1,7 +1,7 @@
 import { TailchatMeetingClient } from '../src/index';
 
 const client = new TailchatMeetingClient(
-  'wss://light.moonrailgun.com:4433',
+  process.env.TAILCHAT_MEETING_URL,
   Math.random().toString()
 );
 
