@@ -42,7 +42,7 @@ export interface Permission {
 export interface JoinResponse {
   authenticated: boolean;
   roles: number[];
-  peers: any[];
+  peers: Peer[];
   /**
    * For webtorrent
    */
@@ -54,7 +54,7 @@ export interface JoinResponse {
   fileHistory: any[];
   lastNHistory: string[];
   locked: boolean;
-  lobbyPeers: any[];
+  lobbyPeers: LobbyPeer[];
   accessCode: string;
 }
 
@@ -146,4 +146,29 @@ export interface JoinData {
 export interface SimulcastProfile {
   scaleResolutionDownBy: number;
   maxBitRate: number;
+}
+
+export interface Peer {
+  id: string;
+  displayName?: string;
+  picture?: string;
+  videoInProgress?: boolean;
+  stopVideoInProgress?: boolean;
+  audioInProgress?: boolean;
+  stopAudioInProgress?: boolean;
+  screenInProgress?: boolean;
+  stopScreenSharingInProgress?: boolean;
+  kickInProgress?: boolean;
+  modifyRolesInProgress?: boolean;
+  raisedHandInProgress?: boolean;
+  raisedHand?: boolean;
+  raisedHandTimestamp?: Date;
+  roles: number[]; // Role IDs
+}
+
+export interface LobbyPeer {
+  id: string;
+  displayName?: string;
+  picture?: string;
+  promotionInProgress?: boolean;
 }

@@ -48,8 +48,6 @@ export class TailchatMeetingClient extends EventEmitter {
     this.signaling = new SignalingClient();
     this.signaling.connect({ url: signalingUrl });
     this.media = new MediaClient(this.signaling);
-    this.room = new RoomClient(this.signaling);
-
     await this.media.createTransports();
 
     const {
@@ -71,6 +69,12 @@ export class TailchatMeetingClient extends EventEmitter {
       picture: options.picture,
       rtpCapabilities: this.media.rtpCapabilities,
       // returning: options.returning, //TODO: 不知道什么用，暂时保留
+    });
+
+    this.room = new RoomClient(this.signaling);
+    this.room.init({
+      peers,
+      lobbyPeers,
     });
 
     logger.debug(
