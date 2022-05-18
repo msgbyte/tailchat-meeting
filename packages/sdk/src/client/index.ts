@@ -1,6 +1,6 @@
 import type { JoinOptions, MediaDevice, UpdateWebcamParams } from '../types';
 import { SignalingClient } from './signaling';
-import Logger from '../helper/logger';
+import { Logger } from '../helper/logger';
 import { MediaClient } from './media';
 import { DeviceClient } from './device';
 import { getVideoConstrains } from '../consts';
@@ -9,6 +9,7 @@ import { defaultSettings, TailchatMeetingClientSettings } from './settings';
 import { getEncodings } from '../helper/encodings';
 import type { Producer } from 'mediasoup-client/lib/types';
 import EventEmitter from 'eventemitter3';
+import { RoomClient } from './room';
 
 const logger = new Logger('client');
 
@@ -25,6 +26,7 @@ export interface TailchatMeetingClient {
 export class TailchatMeetingClient extends EventEmitter {
   signaling?: SignalingClient;
   media?: MediaClient;
+  room?: RoomClient;
   device = new DeviceClient();
 
   settings: TailchatMeetingClientSettings = { ...defaultSettings };
@@ -46,6 +48,7 @@ export class TailchatMeetingClient extends EventEmitter {
     this.signaling = new SignalingClient();
     this.signaling.connect({ url: signalingUrl });
     this.media = new MediaClient(this.signaling);
+    this.room = new RoomClient(this.signaling);
 
     await this.media.createTransports();
 

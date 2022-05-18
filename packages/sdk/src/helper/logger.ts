@@ -2,7 +2,7 @@ import debug from 'debug';
 
 const APP_NAME = 'tailchat-meeting-sdk';
 
-export default class Logger {
+export class Logger {
   private _debug;
   private _warn;
   private _error;

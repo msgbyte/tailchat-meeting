@@ -4,7 +4,7 @@ import type { Consumer } from 'mediasoup-client/lib/Consumer';
 import type { Producer, ProducerOptions } from 'mediasoup-client/lib/Producer';
 import type { Transport } from 'mediasoup-client/lib/Transport';
 import type { RtpCapabilities } from 'mediasoup-client/lib/RtpParameters';
-import Logger from '../helper/logger';
+import { Logger } from '../helper/logger';
 import hark from 'hark';
 import { VolumeWatcher } from '../helper/volumeWatcher';
 import type { SignalingClient } from './signaling';

@@ -1,7 +1,7 @@
 import io, { Socket } from 'socket.io-client';
 import EventEmitter from 'eventemitter3';
 import { SocketTimeoutError } from '../error';
-import Logger from '../helper/logger';
+import { Logger } from '../helper/logger';
 import type {
   ChatMessageData,
   ConnectWebRtcTransport,

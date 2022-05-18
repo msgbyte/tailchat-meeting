@@ -1,5 +1,5 @@
 import EventEmitter from 'eventemitter3';
-import Logger from '../helper/logger';
+import { Logger } from '../helper/logger';
 import type { MediaDevice } from '../types';
 
 const logger = new Logger('DeviceClient');
