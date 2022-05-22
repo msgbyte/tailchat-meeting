@@ -16,6 +16,7 @@ import bcrypt from 'bcryptjs';
 import { constants } from 'node:crypto';
 import cors from 'cors';
 import { userRoles } from './lib/access/roles';
+import { Server as SocketIOServer } from 'socket.io';
 
 const { loginHelper, logoutHelper } = require('./lib/helpers/httpHelper');
 const { config, configError } = require('./lib/config/config');
@@ -565,8 +566,11 @@ async function setupRoute() {
 
     const room = rooms.get(roomId);
     if (!room) {
-      res.status(404);
-      res.send(`Room Not Found: ${roomId}`);
+      res.json({
+        count: 0,
+        joined: 0,
+        msg: 'Room not existed',
+      });
       return;
     }
 
@@ -714,7 +718,12 @@ function isPathAlreadyTaken(actualUrl) {
  * Create a WebSocketServer to allow WebSocket connections from browsers.
  */
 async function runWebSocketServer() {
-  io = require('socket.io')(mainListener, { cookie: false });
+  io = new SocketIOServer(mainListener, {
+    cookie: false,
+    cors: {
+      origin: 'localhost',
+    },
+  });
 
   io.use(sharedSession(session, sharedCookieParser, {}));
 
