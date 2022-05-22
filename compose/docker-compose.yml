@@ -1,12 +1,12 @@
-version: '2.2'
+version: '3.3'
 
-networks:
-  tailchat-meeting:
-    driver: bridge
-    # ipam:
-    #   driver: default
-    #   config:
-    #   - subnet: 172.22.0.0/24
+# networks:
+#   tailchat-meeting:
+#     driver: bridge
+#     # ipam:
+#     #   driver: default
+#     #   config:
+#     #   - subnet: 172.64.0.0/24
 
 services:
 
@@ -14,6 +14,8 @@ services:
     build: ../
     image: tailchat-meeting
     container_name: tailchat-meeting
+    env_file:
+      - docker-compose.env
     restart: unless-stopped
     user: "${CURRENT_USER}"
     volumes:
@@ -24,15 +26,67 @@ services:
       - 13001:13001
     depends_on:
       - redis
-    networks:
-      - tailchat-meeting
+    network_mode: "host"
+    extra_hosts:
+      - "redis:127.0.0.1"
 
   redis:
     image: redis
     container_name: tailchat-meeting_redis
     restart: unless-stopped
-    networks:
-      - tailchat-meeting
+    network_mode: "host"
+
+  # prometheus:
+  #   image: prom/prometheus:v2.26.0
+  #   user: root
+  #   container_name: tailchat-meeting_prometheus
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+  #     - ./data/prometheus:/prometheus
+  #   command:
+  #     - '--config.file=/etc/prometheus/prometheus.yml'
+  #     - '--storage.tsdb.path=/prometheus'
+  #   ports:
+  #     - 9090:9090
+  #   links:
+  #   #- cadvisor:cadvisor
+  #     - node-exporter:node-exporter
+  #     - tailchat-meeting:tailchat-meeting
+  #   depends_on:
+  #     - node-exporter
+  #     - tailchat-meeting
+  #   networks:
+  #     - tailchat-meeting
+
+  # node-exporter:
+  #   image: prom/node-exporter:v1.1.2
+  #   container_name: tailchat-meeting_exporter
+  #   restart: unless-stopped
+  #   networks:
+  #     - tailchat-meeting
+
+  # grafana:
+  #   image: grafana/grafana:7.5.3
+  #   user: root
+  #   container_name: tailchat-meeting_grafana
+  #   restart: unless-stopped
+  #   links:
+  #     - prometheus:prometheus
+  #   ports:
+  #     - 9091:3000
+  #   volumes:
+  #     - ./config/grafana-prometheus-datasource.yml:/etc/grafana/provisioning/datasources/prometheus.yml
+  #     - ./config/grafana-dashboards.yml:/etc/grafana/provisioning/dashboards/all.yml
+  #     - ./config/grafana-dashboards:/var/lib/grafana/dashboards
+  #     - ./data/grafana:/var/lib/grafana
+  #   environment:
+  #     - GF_SECURITY_ADMIN_USER=admin
+  #     - GF_SECURITY_ADMIN_PASSWORD=admin
+  #     - GF_USERS_ALLOW_SIGN_UP=false
+  #   networks:
+  #     - tailchat-meeting
+
 
   # Use caddy in outside
   # nginx:
@@ -50,36 +104,6 @@ services:
   #   depends_on:
   #   - tailchat-meeting
 
-  prometheus:
-    image: prom/prometheus:v2.26.0
-    user: root
-    container_name: tailchat-meeting_prometheus
-    restart: unless-stopped
-    volumes:
-      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
-      - ./data/prometheus:/prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-    ports:
-      - 9090:9090
-    links:
-    #- cadvisor:cadvisor
-      - node-exporter:node-exporter
-      - tailchat-meeting:tailchat-meeting
-    depends_on:
-      - node-exporter
-      - tailchat-meeting
-    networks:
-      - tailchat-meeting
-
-  node-exporter:
-    image: prom/node-exporter:v1.1.2
-    container_name: tailchat-meeting_exporter
-    restart: unless-stopped
-    networks:
-      - tailchat-meeting
-
   #cadvisor:
   #  image: google/cadvisor:latest
   #  container_name: tailchat-meeting_cadvisor
@@ -91,24 +115,3 @@ services:
   #  - /var/lib/docker/:/var/lib/docker:ro
   #  expose:
   #  - 8080
-
-  grafana:
-    image: grafana/grafana:7.5.3
-    user: root
-    container_name: tailchat-meeting_grafana
-    restart: unless-stopped
-    links:
-      - prometheus:prometheus
-    ports:
-      - 9091:3000
-    volumes:
-      - ./config/grafana-prometheus-datasource.yml:/etc/grafana/provisioning/datasources/prometheus.yml
-      - ./config/grafana-dashboards.yml:/etc/grafana/provisioning/dashboards/all.yml
-      - ./config/grafana-dashboards:/var/lib/grafana/dashboards
-      - ./data/grafana:/var/lib/grafana
-    environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
-      - GF_USERS_ALLOW_SIGN_UP=false
-    networks:
-      - tailchat-meeting
