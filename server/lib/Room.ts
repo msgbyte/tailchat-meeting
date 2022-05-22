@@ -5,6 +5,7 @@ import utils from 'util';
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 import { userRoles } from './access/roles';
+import * as mediasoup from 'mediasoup';
 
 const EventEmitter = require('events').EventEmitter;
 const Lobby = require('./Lobby');
@@ -167,13 +168,24 @@ export class Room extends EventEmitter {
    * @param {Map [mediasoup.Worker.pid,mediasoup.Worker]} map of mediasoupWorkers.
    * @param {String} roomId - Id of the Room instance.
    */
-  static async create({ mediasoupWorkers, roomId, peers }): Promise<Room> {
+  static async create({
+    mediasoupWorkers,
+    roomId,
+    peers,
+  }: {
+    mediasoupWorkers: Map<
+      mediasoup.types.Worker['pid'],
+      mediasoup.types.Worker
+    >;
+    roomId: string;
+    peers: any;
+  }): Promise<Room> {
     logger.info('create() [roomId:"%s"]', roomId);
 
     // Router media codecs.
     const mediaCodecs = config.mediasoup.router.mediaCodecs;
 
-    const mediasoupRouters = new Map();
+    const mediasoupRouters = new Map<string, mediasoup.types.Router>();
 
     const audioLevelObservers = new Map();
 
@@ -203,6 +215,8 @@ export class Room extends EventEmitter {
       peers,
     });
   }
+
+  _mediasoupRouters: Map<string, mediasoup.types.Router>;
 
   constructor({
     roomId,

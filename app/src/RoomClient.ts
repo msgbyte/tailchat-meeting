@@ -30,8 +30,15 @@ import { store } from './store/store';
 import { virtualBackgroundEffect } from './transforms/virtualBackgroundEffect';
 import type * as MediasoupClient from 'mediasoup-client';
 import type { ConsumerType } from './store/reducers/consumers';
+import type { IceParameters } from 'mediasoup-client/lib/types';
+import { getEncodings } from 'tailchat-meeting-sdk/lib/helper/encodings';
 
 type Priority = 'high' | 'medium' | 'low' | 'very-low';
+
+interface RestartICEParams {
+  timer: any;
+  restarting: boolean;
+}
 
 let createTorrent;
 
@@ -267,11 +274,11 @@ export class RoomClient {
 
   _maxSpotlights: any;
 
-  _recvRestartIce: any;
+  _recvRestartIce: RestartICEParams;
 
   _turnServers: any;
 
-  _sendRestartIce: any;
+  _sendRestartIce: RestartICEParams;
 
   get roomId() {
     return this._roomId;
@@ -786,7 +793,7 @@ export class RoomClient {
     );
   }
 
-  _soundNotification(type = 'default') {
+  private _soundNotification(type = 'default') {
     const { notificationSounds } = store.getState().settings;
 
     if (notificationSounds) {
@@ -882,12 +889,12 @@ export class RoomClient {
     }
   }
 
-  async sendRequest(method, data?) {
+  async sendRequest<T>(method, data?): Promise<T> {
     logger.debug('sendRequest() [method:"%s", data:"%o"]', method, data);
 
     for (let tries = 0; tries < config.requestRetries; tries++) {
       try {
-        return await this._sendRequest(method, data);
+        return (await this._sendRequest(method, data)) as T;
       } catch (error) {
         if (
           error instanceof SocketTimeoutError &&
@@ -2238,7 +2245,11 @@ export class RoomClient {
     }
   }
 
-  async restartIce(transport, ice, delay) {
+  async restartIce(
+    transport: MediasoupClient.types.Transport,
+    ice: RestartICEParams,
+    delay: number
+  ) {
     logger.debug(
       'restartIce() [transport:%o ice:%o delay:%d]',
       transport,
@@ -2266,9 +2277,12 @@ export class RoomClient {
         }
         ice.restarting = true;
 
-        const iceParameters = await this.sendRequest('restartIce', {
-          transportId: transport.id,
-        });
+        const iceParameters: IceParameters = await this.sendRequest(
+          'restartIce',
+          {
+            transportId: transport.id,
+          }
+        );
 
         await transport.restartIce({ iceParameters });
         ice.restarting = false;
@@ -3510,7 +3524,15 @@ export class RoomClient {
     });
   }
 
-  async _joinRoom({ joinVideo, joinAudio, returning }) {
+  async _joinRoom({
+    joinVideo,
+    joinAudio,
+    returning,
+  }: {
+    joinVideo: boolean;
+    joinAudio: boolean;
+    returning: boolean;
+  }) {
     logger.debug('_joinRoom()');
 
     const { displayName, enableOpusDetails } = store.getState().settings;
@@ -4764,52 +4786,14 @@ export class RoomClient {
     store.dispatch(consumerActions.removeConsumer(consumerId, peerId));
   }
 
-  _chooseEncodings(simulcastProfiles, size) {
-    let encodings;
-
-    const sortedMap = new Map(
-      [...Object.entries(simulcastProfiles)].sort(
-        (a, b) => parseInt(b[0]) - parseInt(a[0])
-      )
-    );
-
-    for (const [key, value] of sortedMap) {
-      if (key < size) {
-        if (encodings === null) {
-          encodings = value;
-        }
-
-        break;
-      }
-
-      encodings = value;
-    }
-
-    // hack as there is a bug in mediasoup
-    if (encodings.length === 1) {
-      encodings.push({ ...encodings[0] });
-    }
-
-    return encodings;
-  }
-
   _getEncodings(width, height, screenSharing = false) {
-    // If VP9 is the only available video codec then use SVC.
-    const firstVideoCodec = this._mediasoupDevice.rtpCapabilities.codecs.find(
-      (c) => c.kind === 'video'
+    return getEncodings(
+      this._mediasoupDevice.rtpCapabilities,
+      config.simulcastProfiles,
+      width,
+      height,
+      screenSharing
     );
-
-    let encodings;
-
-    const size = width > height ? width : height;
-
-    if (firstVideoCodec.mimeType.toLowerCase() === 'video/vp9')
-      encodings = screenSharing ? VIDEO_SVC_ENCODINGS : VIDEO_KSVC_ENCODINGS;
-    else if (config.simulcastProfiles)
-      encodings = this._chooseEncodings(config.simulcastProfiles, size);
-    else encodings = this._chooseEncodings(VIDEO_SIMULCAST_PROFILES, size);
-
-    return encodings;
   }
 
   setHideNoVideoParticipants(hideNoVideoParticipants) {
