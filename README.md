@@ -5,15 +5,21 @@ Tailchat 视频会议
 
 > 不在原项目的fork上进行开发是因为会进行很多深度的改造，并适配**Tailchat**，因此并不准备回归到原项目.
 
+## start with docker
 
-<!-- ### Quick Start
-
-- 请确保已安装docker
-
+#### 构建镜像
 ```bash
-# 编译docker镜像
-sh build-docker.sh
-``` -->
+cd compose
+docker-compose build
+```
+
+#### 配置与启动
+```bash
+cd compose
+cp docker-compose.env.example docker-compose.env
+vim docker-compose.env # 修改环境变量至实际情况，具体环境变量内容见注释
+docker-compose up -d
+```
 
 ### 安装优化
 
