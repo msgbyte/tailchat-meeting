@@ -24,14 +24,14 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
-import { TailchatMeetingClient } from '../../src/index';
+import { TailchatMeetingClient, Peer } from '../../src/index';
 
-const meetingUrl = process.env.TAILCHAT_MEETING_URL;
+const meetingUrl = process.env.TAILCHAT_MEETING_URL ?? '';
 console.log('meetingUrl', meetingUrl);
 
 const client = ref<TailchatMeetingClient | null>(null);
 const volume = ref({});
-const peers = ref([]);
+const peers = ref<Peer[]>([]);
 const enabledWebcam = computed(() => client.value?.webcamEnabled ?? false);
 const enabledMic = computed(() => client.value?.micEnabled ?? false);
 
@@ -45,17 +45,24 @@ onMounted(() => {
   );
 
   _client.on('webcamProduce', (webcamProducer) => {
-    webcamEl.value.srcObject = new MediaStream([webcamProducer.track]);
+    if (webcamEl.value && webcamProducer.track) {
+      webcamEl.value.srcObject = new MediaStream([webcamProducer.track]);
+    }
   });
 
   _client.on('webcamClose', () => {
-    webcamEl.value.srcObject = null;
+    if (webcamEl.value) {
+      webcamEl.value.srcObject = null;
+    }
   });
 
   _client.on('micProduce', (micProducer) => {
-    (micProducer.appData as any).volumeWatcher.on('volumeChange', (data) => {
-      volume.value = data;
-    });
+    (micProducer.appData as any).volumeWatcher.on(
+      'volumeChange',
+      (data: any) => {
+        volume.value = data;
+      }
+    );
   });
 
   _client.on('micClose', () => {
@@ -68,26 +75,41 @@ onMounted(() => {
 
 async function joinRoom() {
   (async () => {
-    await client.value.join('123456789', {
-      video: true,
-      audio: true,
-      displayName: 'foo',
-      picture: '',
-    });
+    if (!client.value) {
+      console.error('client is not found');
+      return;
+    }
 
-    const devices = await client.value.getAvailableMediaDevices();
-    console.log('devices', devices);
+    try {
+      await client.value.join('123456789', {
+        video: true,
+        audio: true,
+        displayName: 'foo',
+        picture: '',
+      });
 
-    console.log('client.value', client.value);
+      const devices = await client.value.getAvailableMediaDevices();
+      console.log('devices', devices);
 
-    peers.value = client.value.room.peers;
-    client.value.room.on('peersUpdated', (_peers) => {
-      peers.value = _peers;
-    });
+      console.log('client.value', client.value);
+
+      if (client.value.room) {
+        peers.value = client.value.room.peers;
+        client.value.room.on('peersUpdated', (_peers) => {
+          peers.value = _peers;
+        });
+      }
+    } catch (err) {
+      console.error(err);
+    }
   })();
 }
 
 function switchWebcam() {
+  if (!client.value) {
+    return;
+  }
+
   if (client.value.webcamEnabled) {
     client.value.disableWebcam();
   } else {
@@ -96,6 +118,10 @@ function switchWebcam() {
 }
 
 function switchMic() {
+  if (!client.value) {
+    return;
+  }
+
   if (client.value.micEnabled) {
     client.value.disableMic();
   } else {
