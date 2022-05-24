@@ -9,6 +9,25 @@ version: '3.3'
 #     #   - subnet: 172.64.0.0/24
 
 services:
+  swag:
+    image: linuxserver/letsencrypt
+    container_name: swag
+    cap_add:
+      - NET_ADMIN
+    env_file:
+      - docker-compose.env
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - VALIDATION=http
+    volumes:
+      - ./config/nginx.conf:/config/nginx/site-confs/default:ro
+    ports:
+      - 443:443
+    restart: unless-stopped
+    network_mode: "host"
+    extra_hosts:
+      - "tailchat-meeting:127.0.0.1"
 
   tailchat-meeting:
     build: ../
@@ -86,23 +105,6 @@ services:
   #     - GF_USERS_ALLOW_SIGN_UP=false
   #   networks:
   #     - tailchat-meeting
-
-
-  # Use caddy in outside
-  # nginx:
-  #   image: nginx
-  #   container_name: edumeet_nginx
-  #   restart: unless-stopped
-  #   ports:
-  #   - 8443:443
-  #   volumes:
-  #   - ${PWD}/../server/certs/mediasoup-demo.localhost.cert.pem:/etc/nginx/cert.pem:ro
-  #   - ${PWD}/../server/certs/mediasoup-demo.localhost.key.pem:/etc/nginx/key.pem:ro
-  #   - ${PWD}/config/nginx.conf:/etc/nginx/conf.d/default.conf:ro
-  #   extra_hosts:
-  #     tailchat-meeting: 172.22.0.1
-  #   depends_on:
-  #   - tailchat-meeting
 
   #cadvisor:
   #  image: google/cadvisor:latest
