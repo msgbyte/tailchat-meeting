@@ -102,9 +102,9 @@ export class SignalingClient extends EventEmitter {
     });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private sendRequestOnWire(
     socketMessage: SocketOutboundRequest
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> {
     return new Promise((resolve, reject) => {
       if (!this.socket) {
