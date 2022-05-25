@@ -17,9 +17,11 @@ docker-compose build
 ```bash
 cd compose
 cp docker-compose.env.example docker-compose.env
-vim docker-compose.env # 修改环境变量至实际情况，具体环境变量内容见注释
+vim docker-compose.env # 修改环境变量至实际情况，具体环境变量内容见注释(需要配置域名以自动申请https证书。rtc服务依赖https协议)
 docker-compose up -d
 ```
+
+访问服务器地址即可，docker-compose 配置的 nginx 已经默认绑定443端口
 
 ### 安装优化
 
