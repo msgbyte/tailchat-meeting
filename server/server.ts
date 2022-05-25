@@ -721,7 +721,7 @@ async function runWebSocketServer() {
   io = new SocketIOServer(mainListener, {
     cookie: false,
     cors: {
-      origin: 'localhost',
+      origin: '*',
     },
   });
 
