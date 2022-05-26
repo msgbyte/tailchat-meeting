@@ -89,6 +89,7 @@ function run() {
   const produce = parameters.get('produce') !== 'false';
   const forceTcp = parameters.get('forceTcp') === 'true';
   const displayName = parameters.get('displayName');
+  const avatarUrl = parameters.get('avatarUrl');
   const muted = parameters.get('muted') === 'true';
   const headless = parameters.get('headless');
   const showConfigDocumentationPath = parameters.get('config') === 'true';
@@ -178,6 +179,9 @@ function run() {
       loginEnabled: config.loginEnabled,
     })
   );
+  if (avatarUrl) {
+    store.dispatch(meActions.setPicture(avatarUrl));
+  }
 
   const roomClient = new RoomClient({
     peerId,

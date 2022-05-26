@@ -909,7 +909,7 @@ export class RoomClient {
     }
   }
 
-  async changeDisplayName(displayName) {
+  async changeDisplayName(displayName: string) {
     displayName = displayName.trim();
 
     if (!displayName)
@@ -959,7 +959,7 @@ export class RoomClient {
     store.dispatch(meActions.setDisplayNameInProgress(false));
   }
 
-  async changePicture(picture) {
+  async changePicture(picture: string) {
     logger.debug('changePicture() [picture: "%s"]', picture);
 
     try {
