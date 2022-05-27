@@ -172,3 +172,8 @@ export interface LobbyPeer {
   picture?: string;
   promotionInProgress?: boolean;
 }
+
+export interface Volume {
+  volume: number;
+  scaledVolume: number;
+}

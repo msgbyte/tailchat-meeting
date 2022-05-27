@@ -1,13 +1,14 @@
 import EventEmitter from 'eventemitter3';
 import type { Harker } from 'hark';
+import type { Volume } from '../types';
 
-export declare interface VolumeWatcher {
+export interface VolumeWatcher {
   // eslint-disable-next-line no-unused-vars
   on(
     event: 'volumeChange',
     listener: (
       // eslint-disable-next-line no-unused-vars
-      { volume, scaledVolume }: { volume: number; scaledVolume: number }
+      { volume, scaledVolume }: Volume
     ) => void
   ): this;
 }
