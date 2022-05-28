@@ -58,6 +58,11 @@ export class MediaClient extends EventEmitter {
     this.handleSignaling();
   }
 
+  public close() {
+    this.sendTransport?.close();
+    this.recvTransport?.close();
+  }
+
   public getConsumer(consumerId: string): Consumer | undefined {
     return this.consumers.get(consumerId);
   }

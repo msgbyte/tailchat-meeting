@@ -1,6 +1,6 @@
 {
   "name": "tailchat-meeting-sdk",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "",
   "source": "./src/index.ts",
   "main": "./lib/index.js",

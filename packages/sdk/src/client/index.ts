@@ -21,6 +21,7 @@ export interface TailchatMeetingClient {
   on(event: 'webcamClose', listener: (webcamProducerId: string) => void): this;
   on(event: 'micProduce', listener: (micProducer: Producer) => void): this;
   on(event: 'micClose', listener: (micProducerId: string) => void): this;
+  on(event: 'clientClose', listener: () => void): this;
 }
 
 export class TailchatMeetingClient extends EventEmitter {
@@ -28,6 +29,7 @@ export class TailchatMeetingClient extends EventEmitter {
   media?: MediaClient;
   room?: RoomClient;
   device = new DeviceClient();
+  private closed = false;
 
   settings: TailchatMeetingClientSettings = { ...defaultSettings };
 
@@ -47,6 +49,9 @@ export class TailchatMeetingClient extends EventEmitter {
     const signalingUrl = `${this.signalingHost}/?peerId=${this.peerId}&roomId=${roomId}`;
     this.signaling = new SignalingClient();
     this.signaling.connect({ url: signalingUrl });
+    this.signaling.on('disconnect', () => {
+      this.close();
+    });
     this.media = new MediaClient(this.signaling);
     await this.media.createTransports();
 
@@ -108,6 +113,20 @@ export class TailchatMeetingClient extends EventEmitter {
       lobbyPeers,
       accessCode,
     });
+  }
+
+  /**
+   * 关闭客户端
+   */
+  close() {
+    if (this.closed) {
+      return;
+    }
+
+    this.closed = true;
+    this.signaling?.disconnect();
+    this.media?.close();
+    this.emit('clientClose');
   }
 
   /**

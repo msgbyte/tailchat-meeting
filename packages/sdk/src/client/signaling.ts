@@ -75,6 +75,10 @@ export class SignalingClient extends EventEmitter {
     this.handleSocket();
   }
 
+  public disconnect() {
+    this.socket?.close();
+  }
+
   private handleSocket(): void {
     this.socket?.on('notification', (notification) => {
       this.emit('notification', notification);
