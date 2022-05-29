@@ -8,55 +8,38 @@ const logger = new Logger('Peer');
 const RECORDING_TYPE_LOCAL = 'local';
 
 export class Peer extends EventEmitter {
+  id: string;
+  roomId: string;
+  socket: any;
+  email = null;
+  authId = null;
+  private _closed = false;
+  private _joined = false;
+  private _joinedTimestamp = null;
+  inLobby = false;
+  _authenticated = false;
+  _authenticatedTimestamp = null;
+  _roles = [userRoles.NORMAL];
+  _displayName = false;
+  _picture = null;
+  from: string | null = null;
+  routerId = null;
+  rtpCapabilities = null;
+  _raisedHand = false;
+  _raisedHandTimestamp = null;
+  _localRecordingState = null;
+  _recordingStateHistory = [];
+  _transports = new Map();
+  _producers = new Map();
+  _consumers = new Map();
+
   constructor({ id, roomId, socket }: any) {
-    logger.info('constructor() [id:"%s"]', id);
     super();
+    logger.info('constructor() [id:"%s"]', id);
 
-    this._id = id;
-
-    this._roomId = roomId;
-
-    this._authId = null;
-
-    this._socket = socket;
-
-    this._closed = false;
-
-    this._joined = false;
-
-    this._joinedTimestamp = null;
-
-    this._inLobby = false;
-
-    this._authenticated = false;
-
-    this._authenticatedTimestamp = null;
-
-    this._roles = [userRoles.NORMAL];
-
-    this._displayName = false;
-
-    this._picture = null;
-
-    this._email = null;
-
-    this._routerId = null;
-
-    this._rtpCapabilities = null;
-
-    this._raisedHand = false;
-
-    this._raisedHandTimestamp = null;
-
-    this._localRecordingState = null;
-
-    this._recordingStateHistory = [];
-
-    this._transports = new Map();
-
-    this._producers = new Map();
-
-    this._consumers = new Map();
+    this.id = id;
+    this.roomId = roomId;
+    this.socket = socket;
 
     this._handlePeer();
   }
@@ -93,38 +76,6 @@ export class Peer extends EventEmitter {
     }
   }
 
-  get id() {
-    return this._id;
-  }
-
-  set id(id) {
-    this._id = id;
-  }
-
-  get roomId() {
-    return this._roomId;
-  }
-
-  set roomId(roomId) {
-    this._roomId = roomId;
-  }
-
-  get authId() {
-    return this._authId;
-  }
-
-  set authId(authId) {
-    this._authId = authId;
-  }
-
-  get socket() {
-    return this._socket;
-  }
-
-  set socket(socket) {
-    this._socket = socket;
-  }
-
   get closed() {
     return this._closed;
   }
@@ -143,14 +94,6 @@ export class Peer extends EventEmitter {
 
   get joinedTimestamp() {
     return this._joinedTimestamp;
-  }
-
-  get inLobby() {
-    return this._inLobby;
-  }
-
-  set inLobby(inLobby) {
-    this._inLobby = inLobby;
   }
 
   get authenticated() {
@@ -205,30 +148,6 @@ export class Peer extends EventEmitter {
 
       this.emit('pictureChanged', { oldPicture });
     }
-  }
-
-  get email() {
-    return this._email;
-  }
-
-  set email(email) {
-    this._email = email;
-  }
-
-  get routerId() {
-    return this._routerId;
-  }
-
-  set routerId(routerId) {
-    this._routerId = routerId;
-  }
-
-  get rtpCapabilities() {
-    return this._rtpCapabilities;
-  }
-
-  set rtpCapabilities(rtpCapabilities) {
-    this._rtpCapabilities = rtpCapabilities;
   }
 
   get raisedHand() {
@@ -357,6 +276,7 @@ export class Peer extends EventEmitter {
       id: this.id,
       displayName: this.displayName,
       picture: this.picture,
+      from: this.from,
       roles: this.roles.map((role) => role.id),
       raisedHand: this.raisedHand,
       raisedHandTimestamp: this.raisedHandTimestamp,

@@ -363,7 +363,7 @@ export class Room extends EventEmitter {
     return false;
   }
 
-  handlePeer({ peer, returning }) {
+  handlePeer({ peer, returning }: { peer: Peer; returning: boolean }) {
     logger.info(
       'handlePeer() [peer:"%s", roles:"%s", returning:"%s"]',
       peer.id,
@@ -384,8 +384,9 @@ export class Room extends EventEmitter {
       this._peerJoining(peer, true);
     }
     // Has a role that is allowed to bypass room lock
-    else if (this._hasAccess(peer, BYPASS_ROOM_LOCK)) this._peerJoining(peer);
-    else if (
+    else if (this._hasAccess(peer, BYPASS_ROOM_LOCK)) {
+      this._peerJoining(peer);
+    } else if (
       config.maxUsersPerRoom &&
       Object.keys(this._peers).length + this._lobby.peerList().length >=
         config.maxUsersPerRoom
@@ -598,7 +599,7 @@ export class Room extends EventEmitter {
     }
   }
 
-  _peerJoining(peer, returning = false) {
+  _peerJoining(peer: Peer, returning = false) {
     this._queue
       .push(async () => {
         peer.socket.join(this._roomId);
@@ -675,7 +676,7 @@ export class Room extends EventEmitter {
       });
   }
 
-  _handlePeer(peer) {
+  _handlePeer(peer: Peer) {
     logger.debug('_handlePeer() [peer:"%s"]', peer.id);
 
     peer.on('close', () => {
@@ -832,7 +833,7 @@ export class Room extends EventEmitter {
     }
   }
 
-  async _handleSocketRequest(peer, request, cb) {
+  async _handleSocketRequest(peer: Peer, request, cb) {
     const router = this._mediasoupRouters.get(peer.routerId);
 
     switch (request.method) {
@@ -844,14 +845,17 @@ export class Room extends EventEmitter {
 
       case 'join': {
         // Ensure the Peer is not already joined.
-        if (peer.joined) throw new Error('Peer already joined');
+        if (peer.joined) {
+          throw new Error('Peer already joined');
+        }
 
-        const { displayName, picture, rtpCapabilities, returning } =
+        const { displayName, picture, from, rtpCapabilities, returning } =
           request.data;
 
         // Store client data into the Peer data object.
         peer.displayName = displayName;
         peer.picture = picture;
+        peer.from = from;
         peer.rtpCapabilities = rtpCapabilities;
 
         // Tell the new Peer about already joined Peers.
@@ -879,7 +883,7 @@ export class Room extends EventEmitter {
           fileHistory: this._fileHistory,
           lastNHistory: this._lastN,
           locked: this._locked,
-          lobbyPeers: lobbyPeers,
+          lobbyPeers,
           accessCode: this._accessCode,
         });
 

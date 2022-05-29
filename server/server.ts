@@ -515,13 +515,15 @@ async function setupAuth() {
         let peer = peers.get(peerId);
         const room = rooms.get(roomId);
 
-        if (!peer)
+        if (!peer) {
           // User has no socket session yet, make temporary
           peer = new Peer({ id: peerId, roomId });
+        }
 
-        if (peer.roomId !== roomId)
+        if (peer.roomId !== roomId) {
           // The peer is mischievous
           throw new Error('peer authenticated with wrong room');
+        }
 
         if (typeof config.userMapping === 'function') {
           await config.userMapping({
