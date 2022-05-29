@@ -80,9 +80,9 @@ export const SpeakerPeer: React.FC<{
 
   const classes = useStyles();
 
-  const width = style.width;
+  const width = Number(style.width);
 
-  const height = style.height;
+  const height = Number(style.height);
 
   const videoVisible =
     Boolean(webcamConsumer) &&

@@ -3,7 +3,6 @@ import hark from 'hark';
 import { getSignalingUrl } from './urlFactory';
 import { SocketTimeoutError } from './utils';
 import * as requestActions from './store/actions/requestActions';
-import * as meActions from './store/actions/meActions';
 import * as intlActions from './store/actions/intlActions';
 import * as roomActions from './store/actions/roomActions';
 import * as peerActions from './store/actions/peerActions';
@@ -32,6 +31,7 @@ import type * as MediasoupClient from 'mediasoup-client';
 import type { ConsumerType } from './store/reducers/consumers';
 import type { IceParameters } from 'mediasoup-client/lib/types';
 import { getEncodings } from 'tailchat-meeting-sdk/lib/helper/encodings';
+import { meActions } from './store/slices/me';
 
 type Priority = 'high' | 'medium' | 'low' | 'very-low';
 
@@ -300,8 +300,11 @@ export class RoomClient {
       muted,
     } = {} as any
   ) {
-    if (!peerId) throw new Error('Missing peerId');
-    else if (!device) throw new Error('Missing device');
+    if (!peerId) {
+      throw new Error('Missing peerId');
+    } else if (!device) {
+      throw new Error('Missing device');
+    }
 
     logger.debug(
       'constructor() [peerId: "%s", device: "%s", produce: "%s", forceTcp: "%s", displayName ""]',
@@ -376,15 +379,15 @@ export class RoomClient {
     // @type {mediasoupClient.Device}
     this._mediasoupDevice = null;
 
-    // Put the browser info into state
-    store.dispatch(meActions.setBrowser(device));
-
     // Our WebTorrent client
     this._webTorrent = null;
 
     // Max spotlights
-    if (device.platform === 'desktop') this._maxSpotlights = config.lastN;
-    else this._maxSpotlights = config.mobileLastN;
+    if (device.platform === 'desktop') {
+      this._maxSpotlights = config.lastN;
+    } else {
+      this._maxSpotlights = config.mobileLastN;
+    }
 
     store.dispatch(settingsActions.setLastN(this._maxSpotlights));
 
@@ -731,10 +734,10 @@ export class RoomClient {
     );
   }
 
-  setLoggedIn(loggedIn) {
+  setLoggedIn(loggedIn: boolean) {
     logger.debug('setLoggedIn() | [loggedIn: "%s"]', loggedIn);
 
-    store.dispatch(meActions.loggedIn(loggedIn));
+    store.dispatch(meActions.setLoggedIn(loggedIn));
   }
 
   setPicture(picture) {
@@ -762,7 +765,7 @@ export class RoomClient {
       store.dispatch(meActions.setPicture(picture));
     }
 
-    store.dispatch(meActions.loggedIn(true));
+    store.dispatch(meActions.setLoggedIn(true));
 
     store.dispatch(
       requestActions.notify({
@@ -781,7 +784,7 @@ export class RoomClient {
       store.dispatch(meActions.setPicture(null));
     }
 
-    store.dispatch(meActions.loggedIn(false));
+    store.dispatch(meActions.setLoggedIn(false));
 
     store.dispatch(
       requestActions.notify({
@@ -1363,11 +1366,11 @@ export class RoomClient {
     });
 
     this._hark.on('speaking', () => {
-      store.dispatch(meActions.setIsSpeaking(true));
+      store.dispatch(meActions.setSpeaking(true));
 
       if (
         (store.getState().settings.voiceActivatedUnmute ||
-          store.getState().me.isAutoMuted) &&
+          store.getState().me.autoMuted) &&
         this._micProducer &&
         this._micProducer.paused
       )
@@ -1377,7 +1380,7 @@ export class RoomClient {
     });
 
     this._hark.on('stopped_speaking', () => {
-      store.dispatch(meActions.setIsSpeaking(false));
+      store.dispatch(meActions.setSpeaking(false));
 
       if (
         store.getState().settings.voiceActivatedUnmute &&
@@ -1635,7 +1638,7 @@ export class RoomClient {
       if (init && videoMuted) return;
       else store.dispatch(settingsActions.setVideoMuted(false));
 
-      store.dispatch(meActions.setWebcamInProgress(true));
+      store.dispatch(meActions.setVideoInProgress(true));
 
       const deviceId = await this._getWebcamDeviceId();
       const device = this._webcams[deviceId];
@@ -1801,7 +1804,7 @@ export class RoomClient {
       if (track) track.stop();
     }
 
-    store.dispatch(meActions.setWebcamInProgress(false));
+    store.dispatch(meActions.setVideoInProgress(false));
   }
 
   addSelectedPeer(peerId) {
@@ -2179,7 +2182,7 @@ export class RoomClient {
   async setRaisedHand(raisedHand) {
     logger.debug('setRaisedHand: ', raisedHand);
 
-    store.dispatch(meActions.setRaisedHandInProgress(true));
+    store.dispatch(meActions.setRaiseHandInProgress(true));
 
     try {
       await this.sendRequest('raisedHand', { raisedHand });
@@ -2192,7 +2195,7 @@ export class RoomClient {
       store.dispatch(meActions.setRaisedHand(!raisedHand));
     }
 
-    store.dispatch(meActions.setRaisedHandInProgress(false));
+    store.dispatch(meActions.setRaiseHandInProgress(false));
   }
 
   async setMaxSendingSpatialLayer(spatialLayer) {
@@ -2647,7 +2650,7 @@ export class RoomClient {
           }
 
           case 'signInRequired': {
-            store.dispatch(meActions.loggedIn(false));
+            store.dispatch(meActions.setLoggedIn(false));
             store.dispatch(roomActions.setSignInRequired(true));
 
             break;
@@ -3536,7 +3539,7 @@ export class RoomClient {
     logger.debug('_joinRoom()');
 
     const { displayName, enableOpusDetails } = store.getState().settings;
-    const { picture } = store.getState().me;
+    const { picture, from } = store.getState().me;
 
     try {
       this._torrentSupport = WebTorrent.WEBRTC_SUPPORT;
@@ -3737,10 +3740,11 @@ export class RoomClient {
         lobbyPeers,
         accessCode,
       } = (await this.sendRequest('join', {
-        displayName: displayName,
-        picture: picture,
+        displayName,
+        picture,
+        from,
         rtpCapabilities: this._mediasoupDevice.rtpCapabilities,
-        returning: returning,
+        returning,
       })) as any;
 
       logger.debug(
@@ -3753,7 +3757,7 @@ export class RoomClient {
 
       tracker && (this._tracker = tracker);
 
-      store.dispatch(meActions.loggedIn(authenticated));
+      store.dispatch(meActions.setLoggedIn(authenticated));
 
       store.dispatch(roomActions.setRoomPermissions(roomPermissions));
 
@@ -4068,9 +4072,9 @@ export class RoomClient {
       return;
     }
 
-    let track;
+    let track: MediaStreamTrack;
 
-    store.dispatch(meActions.setWebcamInProgress(true));
+    store.dispatch(meActions.setVideoInProgress(true));
 
     try {
       const device = this._webcams[videoDeviceId];
@@ -4217,7 +4221,7 @@ export class RoomClient {
       if (track) track.stop();
     }
 
-    store.dispatch(meActions.setWebcamInProgress(false));
+    store.dispatch(meActions.setVideoInProgress(false));
   }
 
   async disableMic() {
@@ -4282,7 +4286,7 @@ export class RoomClient {
       if (newFrameRate)
         store.dispatch(settingsActions.setScreenSharingFrameRate(newFrameRate));
 
-      store.dispatch(meActions.setScreenShareInProgress(true));
+      store.dispatch(meActions.setScreenSharingInProgress(true));
 
       const {
         screenSharingResolution,
@@ -4507,7 +4511,7 @@ export class RoomClient {
       if (track) track.stop();
     }
 
-    store.dispatch(meActions.setScreenShareInProgress(false));
+    store.dispatch(meActions.setScreenSharingInProgress(false));
   }
 
   async disableScreenSharing() {
@@ -4515,7 +4519,7 @@ export class RoomClient {
 
     if (!this._screenSharingProducer) return;
 
-    store.dispatch(meActions.setScreenShareInProgress(true));
+    store.dispatch(meActions.setScreenSharingInProgress(true));
 
     this._screenSharingProducer.close();
 
@@ -4550,7 +4554,7 @@ export class RoomClient {
 
     this._screenSharing.stop();
 
-    store.dispatch(meActions.setScreenShareInProgress(false));
+    store.dispatch(meActions.setScreenSharingInProgress(false));
   }
 
   async disableExtraVideo(id) {
@@ -4560,7 +4564,7 @@ export class RoomClient {
 
     if (!producer) return;
 
-    store.dispatch(meActions.setWebcamInProgress(true));
+    store.dispatch(meActions.setVideoInProgress(true));
 
     producer.close();
 
@@ -4574,7 +4578,7 @@ export class RoomClient {
 
     this._extraVideoProducers.delete(id);
 
-    store.dispatch(meActions.setWebcamInProgress(false));
+    store.dispatch(meActions.setVideoInProgress(false));
   }
 
   async disableWebcam() {
@@ -4590,7 +4594,7 @@ export class RoomClient {
       virtualBackgroundEffect.stop();
     }
 
-    store.dispatch(meActions.setWebcamInProgress(true));
+    store.dispatch(meActions.setVideoInProgress(true));
 
     this._webcamProducer.close();
 
@@ -4606,7 +4610,7 @@ export class RoomClient {
 
     this._webcamProducer = null;
     store.dispatch(settingsActions.setVideoMuted(true));
-    store.dispatch(meActions.setWebcamInProgress(false));
+    store.dispatch(meActions.setVideoInProgress(false));
   }
 
   async _setNoiseThreshold(threshold) {

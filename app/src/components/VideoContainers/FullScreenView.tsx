@@ -261,7 +261,7 @@ const FullScreenView: React.FC<FullScreenViewProps> = React.memo((props) => {
 
       <VideoView
         advancedMode={advancedMode}
-        videoContain
+        videoContain={true}
         consumerSpatialLayers={consumer ? consumer.spatialLayers : null}
         consumerTemporalLayers={consumer ? consumer.temporalLayers : null}
         consumerCurrentSpatialLayer={

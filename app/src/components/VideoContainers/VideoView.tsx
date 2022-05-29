@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
 import EditableInput from '../Controls/EditableInput';
@@ -11,6 +10,8 @@ import SignalCellular1BarIcon from '@material-ui/icons/SignalCellular1Bar';
 import SignalCellular2BarIcon from '@material-ui/icons/SignalCellular2Bar';
 import SignalCellular3BarIcon from '@material-ui/icons/SignalCellular3Bar';
 import { AudioAnalyzer } from './AudioAnalyzer';
+import type { Peer } from 'tailchat-meeting-sdk';
+import { FormattedMessage } from 'react-intl';
 
 const logger = new Logger('VideoView');
 
@@ -158,7 +159,39 @@ const styles = (theme) => ({
 });
 
 interface VideoViewProps {
-  [key: string]: any;
+  peer?: Peer;
+  isMe?: boolean;
+  isMirrored?: boolean;
+  isScreen?: boolean;
+  isExtraVideo?: boolean;
+  showQuality?: boolean;
+  showAudioAnalyzer?: boolean;
+  displayName?: string;
+  showPeerInfo?: boolean;
+  videoContain?: boolean;
+  advancedMode?: boolean;
+  videoTrack?: any;
+  videoVisible: boolean;
+  audioTrack?: any;
+  consumerSpatialLayers?: number;
+  consumerTemporalLayers?: number;
+  consumerCurrentSpatialLayer?: number;
+  consumerCurrentTemporalLayer?: number;
+  consumerPreferredSpatialLayer?: number;
+  consumerPreferredTemporalLayer?: number;
+  videoMultiLayer?: boolean;
+  audioScore?: any;
+  videoScore?: any;
+  audioCodec?: string;
+  videoCodec?: string;
+  onChangeDisplayName?: (newDisplayName: string) => void;
+  classes: any;
+  netInfo?: any;
+  width?: number;
+  height?: number;
+  opusConfig?: string;
+  localRecordingState?: string;
+  recordingConsents?: any[];
 }
 class VideoView extends React.PureComponent<VideoViewProps> {
   state = {
@@ -415,6 +448,15 @@ class VideoView extends React.PureComponent<VideoViewProps> {
                       : displayName}
                   </span>
                 )}
+
+                {!peer.from && (
+                  <span className={classes.displayNameStatic}>
+                    <FormattedMessage
+                      id="label.unauthenticated"
+                      defaultMessage="Unauthenticated"
+                    />
+                  </span>
+                )}
               </div>
             </div>
           )}
@@ -575,42 +617,5 @@ class VideoView extends React.PureComponent<VideoViewProps> {
     this.menuAnchorElement = null;
   }
 }
-
-(VideoView as any).propTypes = {
-  isMe: PropTypes.bool,
-  isMirrored: PropTypes.bool,
-  isScreen: PropTypes.bool,
-  isExtraVideo: PropTypes.bool,
-  showQuality: PropTypes.bool,
-  showAudioAnalyzer: PropTypes.bool,
-  displayName: PropTypes.string,
-  showPeerInfo: PropTypes.bool,
-  videoContain: PropTypes.bool,
-  advancedMode: PropTypes.bool,
-  videoTrack: PropTypes.any,
-  videoVisible: PropTypes.bool.isRequired,
-  audioTrack: PropTypes.any,
-  consumerSpatialLayers: PropTypes.number,
-  consumerTemporalLayers: PropTypes.number,
-  consumerCurrentSpatialLayer: PropTypes.number,
-  consumerCurrentTemporalLayer: PropTypes.number,
-  consumerPreferredSpatialLayer: PropTypes.number,
-  consumerPreferredTemporalLayer: PropTypes.number,
-  videoMultiLayer: PropTypes.bool,
-  audioScore: PropTypes.any,
-  videoScore: PropTypes.any,
-  audioCodec: PropTypes.string,
-  videoCodec: PropTypes.string,
-  onChangeDisplayName: PropTypes.func,
-  children: PropTypes.object,
-  classes: PropTypes.object.isRequired,
-  netInfo: PropTypes.object,
-  width: PropTypes.number,
-  height: PropTypes.number,
-  opusConfig: PropTypes.string,
-  localRecordingState: PropTypes.string,
-  recordingConsents: PropTypes.array,
-  peer: PropTypes.object,
-};
 
 export default withStyles(styles)(VideoView);

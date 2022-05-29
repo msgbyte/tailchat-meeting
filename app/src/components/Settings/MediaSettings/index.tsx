@@ -290,7 +290,7 @@ export const MediaSettings: React.FC = React.memo(({}) => {
                 defaultMessage: 'Camera',
               })}
               autoWidth
-              disabled={webcams.length === 0 || me.webcamInProgress}
+              disabled={webcams.length === 0 || me.videoInProgress}
             >
               {webcams.map((webcam, index) => {
                 return (

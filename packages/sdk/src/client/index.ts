@@ -72,6 +72,7 @@ export class TailchatMeetingClient extends EventEmitter {
     } = await this.signaling.sendRequest('join', {
       displayName: options.displayName,
       picture: options.picture,
+      from: options.from,
       rtpCapabilities: this.media.rtpCapabilities,
       // returning: options.returning, //TODO: 不知道什么用，暂时保留
     });

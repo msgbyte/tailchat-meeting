@@ -12,6 +12,7 @@ export interface JoinOptions {
   forceTcp?: boolean;
   displayName: string;
   picture: string;
+  from?: string;
 }
 
 export interface WebRtcTransportInfo {
@@ -139,6 +140,7 @@ export interface ConsumerData {
 export interface JoinData {
   displayName: string;
   picture: string;
+  from?: string;
   rtpCapabilities: RtpCapabilities;
   returning?: boolean;
 }
@@ -152,6 +154,7 @@ export interface Peer {
   id: string;
   displayName?: string;
   picture?: string;
+  from?: string;
   videoInProgress?: boolean;
   stopVideoInProgress?: boolean;
   audioInProgress?: boolean;

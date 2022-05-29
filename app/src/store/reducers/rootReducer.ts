@@ -1,6 +1,7 @@
 import { CombinedState, combineReducers, Reducer } from '@reduxjs/toolkit';
 import room from './room';
-import me from './me';
+// import me from './me';
+import { meReducer as me } from '../slices/me';
 import producers from './producers';
 import consumers from './consumers';
 import transports from './transports';

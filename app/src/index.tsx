@@ -12,7 +12,6 @@ import debug from 'debug';
 import { RoomClient } from './RoomClient';
 import RoomContext from './RoomContext';
 import deviceInfo from './deviceInfo';
-import * as meActions from './store/actions/meActions';
 import UnsupportedBrowser from './components/UnsupportedBrowser';
 import ConfigDocumentation from './components/ConfigDocumentation';
 import ConfigError from './components/ConfigError';
@@ -27,10 +26,10 @@ import * as serviceWorker from './serviceWorker';
 import { LazyPreload } from './components/Loader/LazyPreload';
 import { detectDevice } from 'mediasoup-client';
 import { recorder } from './features/BrowserRecorder';
+import { config, configError } from './config';
+import { meActions } from './store/slices/me';
 
 import './index.css';
-
-import { config, configError } from './config';
 
 const App = LazyPreload(
   () => import(/* webpackChunkName: "app" */ './components/App')
@@ -90,6 +89,7 @@ function run() {
   const forceTcp = parameters.get('forceTcp') === 'true';
   const displayName = parameters.get('displayName');
   const avatarUrl = parameters.get('avatarUrl');
+  const from = parameters.get('from');
   const muted = parameters.get('muted') === 'true';
   const headless = parameters.get('headless');
   const showConfigDocumentationPath = parameters.get('config') === 'true';
@@ -181,6 +181,9 @@ function run() {
   );
   if (avatarUrl) {
     store.dispatch(meActions.setPicture(avatarUrl));
+  }
+  if (from) {
+    store.dispatch(meActions.setFrom(from));
   }
 
   const roomClient = new RoomClient({
