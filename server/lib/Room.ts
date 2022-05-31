@@ -6,33 +6,26 @@ import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 import { userRoles } from './access/roles';
 import * as mediasoup from 'mediasoup';
-
-const EventEmitter = require('events').EventEmitter;
-const Lobby = require('./Lobby');
-const {
-  SocketTimeoutError,
-  NotFoundInMediasoupError,
-} = require('./helpers/errors');
-
+import { EventEmitter } from 'events';
+import { Lobby } from './Lobby';
+import { SocketTimeoutError, NotFoundInMediasoupError } from './helpers/errors';
 import { BYPASS_ROOM_LOCK, BYPASS_LOBBY } from './access/access';
 import { Peer } from './Peer';
-
-const permissions = require('./access/perms'),
-  {
-    CHANGE_ROOM_LOCK,
-    PROMOTE_PEER,
-    MODIFY_ROLE,
-    SEND_CHAT,
-    MODERATE_CHAT,
-    SHARE_AUDIO,
-    SHARE_VIDEO,
-    SHARE_SCREEN,
-    EXTRA_VIDEO,
-    SHARE_FILE,
-    MODERATE_FILES,
-    MODERATE_ROOM,
-    LOCAL_RECORD_ROOM,
-  } = permissions;
+import {
+  CHANGE_ROOM_LOCK,
+  PROMOTE_PEER,
+  MODIFY_ROLE,
+  SEND_CHAT,
+  MODERATE_CHAT,
+  SHARE_AUDIO,
+  SHARE_VIDEO,
+  SHARE_SCREEN,
+  EXTRA_VIDEO,
+  SHARE_FILE,
+  MODERATE_FILES,
+  MODERATE_ROOM,
+  LOCAL_RECORD_ROOM,
+} from './access/perms';
 
 const { config } = require('./config/config');
 
@@ -216,7 +209,57 @@ export class Room extends EventEmitter {
     });
   }
 
+  // Mediasoup Router instances map.
   _mediasoupRouters: Map<string, mediasoup.types.Router>;
+
+  _uuid = uuidv4();
+
+  _mediasoupWorkers;
+
+  _allPeers;
+
+  // Room ID.
+  _roomId;
+
+  // Closed flag.
+  _closed = false;
+
+  // Joining queue
+  _queue = new AwaitQueue();
+
+  // Locked flag.
+  _locked;
+
+  // if true: accessCode is a possibility to open the room
+  _joinByAccesCode = true;
+
+  // access code to the room,
+  // applicable if ( _locked == true and _joinByAccessCode == true )
+  _accessCode = '';
+
+  _lobby = new Lobby();
+
+  _chatHistory = [];
+
+  _fileHistory = [];
+
+  _lastN = [];
+
+  _peers: {
+    [key: string]: Peer;
+  } = {};
+
+  _selfDestructTimeout = null;
+
+  // Mediasoup AudioLevelObserver instances map.
+  _audioLevelObservers;
+
+  _lastActiveSpeakerUpdateTimestamp = 0;
+
+  // Current active speaker.
+  _currentActiveSpeaker = null;
+
+  _tokens = new Map();
 
   constructor({
     roomId,
@@ -230,62 +273,15 @@ export class Room extends EventEmitter {
     super();
     this.setMaxListeners(Infinity);
 
-    this._uuid = uuidv4();
-
     this._mediasoupWorkers = mediasoupWorkers;
-
     this._allPeers = peers;
-
-    // Room ID.
     this._roomId = roomId;
-
-    // Closed flag.
-    this._closed = false;
-
-    // Joining queue
-    this._queue = new AwaitQueue();
-
-    // Locked flag.
     this._locked =
       config.roomsUnlocked.length && !config.roomsUnlocked.includes(roomId);
-
-    // if true: accessCode is a possibility to open the room
-    this._joinByAccesCode = true;
-
-    // access code to the room,
-    // applicable if ( _locked == true and _joinByAccessCode == true )
-    this._accessCode = '';
-
-    this._lobby = new Lobby();
-
-    this._chatHistory = [];
-
-    this._fileHistory = [];
-
-    this._lastN = [];
-
-    this._peers = {} as {
-      [key: string]: Peer;
-    };
-
-    this._selfDestructTimeout = null;
-
-    // Mediasoup Router instances map.
     this._mediasoupRouters = mediasoupRouters;
-
-    // Mediasoup AudioLevelObserver instances map.
     this._audioLevelObservers = audioLevelObservers;
-
-    this._lastActiveSpeakerUpdateTimestamp = 0;
-
-    // Current active speaker.
-    this._currentActiveSpeaker = null;
-
     this._handleLobby();
-
     this._handleAudioLevelObservers();
-
-    this._tokens = new Map();
   }
 
   isLocked() {

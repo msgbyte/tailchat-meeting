@@ -17,9 +17,8 @@ import { constants } from 'node:crypto';
 import cors from 'cors';
 import { userRoles } from './lib/access/roles';
 import { Server as SocketIOServer } from 'socket.io';
-
-const { loginHelper, logoutHelper } = require('./lib/helpers/httpHelper');
-const { config, configError } = require('./lib/config/config');
+import { loginHelper, logoutHelper } from './lib/helpers/httpHelper';
+import { config, configError } from './lib/config/config';
 const interactiveServer = require('./lib/interactive/Server');
 const promExporter = require('./lib/stats/promExporter');
 

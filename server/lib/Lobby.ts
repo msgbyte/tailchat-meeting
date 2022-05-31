@@ -4,7 +4,7 @@ const EventEmitter = require('events').EventEmitter;
 
 const logger = new Logger('Lobby');
 
-class Lobby extends EventEmitter {
+export class Lobby extends EventEmitter {
   constructor() {
     logger.info('constructor()');
 
@@ -203,5 +203,3 @@ class Lobby extends EventEmitter {
     }
   }
 }
-
-module.exports = Lobby;

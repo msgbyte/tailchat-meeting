@@ -1,6 +1,5 @@
-exports.loginHelper = function(data)
-{
-	const html = `<!DOCTYPE html>
+export function loginHelper(data) {
+  const html = `<!DOCTYPE html>
 	<html>
 		<head>
 			<meta charset='utf-8'>
@@ -17,12 +16,11 @@ exports.loginHelper = function(data)
 		</body>
 	</html>`;
 
-	return html;
-};
+  return html;
+}
 
-exports.logoutHelper = function()
-{
-	const html = `<!DOCTYPE html>
+export function logoutHelper() {
+  const html = `<!DOCTYPE html>
 	<html>
 		<head>
 			<meta charset='utf-8'>
@@ -37,5 +35,5 @@ exports.logoutHelper = function()
 		</body>
 	</html>`;
 
-	return html;
-};
+  return html;
+}
