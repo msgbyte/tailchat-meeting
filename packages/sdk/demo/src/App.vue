@@ -1,6 +1,7 @@
 <template>
   <div>
     <div>远程地址: {{ meetingUrl }}</div>
+    <div>房间号: {{ roomId }}</div>
     <div>
       <button id="webcam-btn" @click="switchWebcam">
         {{ enabledWebcam ? '关闭' : '开启' }} 摄像头
@@ -18,16 +19,22 @@
     <div>
       <div>其他参会人:</div>
       <div>{{ JSON.stringify(peers) }}</div>
+
+      <div v-for="peer in peers" :key="peer.id + consumerUpdater">
+        <PeerView :track="getMediaWebcamTrack(peer.id, 'video')" />
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
-import { TailchatMeetingClient, Peer } from '../../src/index';
+import { TailchatMeetingClient, Peer, MediaKind } from '../../src/index';
+import PeerView from './PeerView.vue';
 
 const meetingUrl = process.env.TAILCHAT_MEETING_URL ?? '';
 console.log('meetingUrl', meetingUrl);
+const roomId = '123456789';
 
 const client = ref<TailchatMeetingClient | null>(null);
 const volume = ref({});
@@ -37,6 +44,7 @@ const enabledMic = computed(() => client.value?.micEnabled ?? false);
 
 const webcamEl = ref<HTMLVideoElement>();
 const peersEl = ref<HTMLDivElement>();
+const consumerUpdater = ref<number>(0);
 
 onMounted(() => {
   const _client = new TailchatMeetingClient(
@@ -69,6 +77,11 @@ onMounted(() => {
     console.log('micClose');
   });
 
+  _client.media?.on('consumerCreated', () => consumerUpdater.value++);
+  _client.media?.on('consumerResumed', () => consumerUpdater.value++);
+  _client.media?.on('consumerClosed', () => consumerUpdater.value++);
+  _client.media?.on('consumerPaused', () => consumerUpdater.value++);
+
   client.value = _client;
   joinRoom();
 });
@@ -81,9 +94,9 @@ async function joinRoom() {
     }
 
     try {
-      await client.value.join('123456789', {
-        video: true,
-        audio: true,
+      await client.value.join(roomId, {
+        video: false,
+        audio: false,
         displayName: 'foo',
         picture: '',
       });
@@ -127,5 +140,15 @@ function switchMic() {
   } else {
     client.value.enableMic();
   }
+}
+
+function getMediaWebcamTrack(peerId: string): MediaStreamTrack | undefined {
+  if (!client.value || !client.value.media) {
+    return;
+  }
+
+  const { webcamConsumer } = client.value.getConsumersByPeerId(peerId);
+
+  return webcamConsumer?.track;
 }
 </script>

@@ -1,4 +1,9 @@
-import type { JoinOptions, MediaDevice, UpdateWebcamParams } from '../types';
+import type {
+  JoinOptions,
+  MediaClientConsumer,
+  MediaDevice,
+  UpdateWebcamParams,
+} from '../types';
 import { SignalingClient } from './signaling';
 import { Logger } from '../helper/logger';
 import { MediaClient } from './media';
@@ -163,6 +168,7 @@ export class TailchatMeetingClient extends EventEmitter {
     }
 
     this.media.changeProducer(this.currentWebcamProducer.id, 'close');
+    this.emit('webcamClose', this.currentWebcamProducer.id);
     this.currentWebcamProducer = undefined;
   }
 
@@ -327,6 +333,7 @@ export class TailchatMeetingClient extends EventEmitter {
     }
 
     this.media.changeProducer(this.currentMicProducer.id, 'close');
+    this.emit('micClose', this.currentMicProducer.id);
     this.currentMicProducer = undefined;
   }
 
@@ -450,4 +457,32 @@ export class TailchatMeetingClient extends EventEmitter {
     }
   }
   //#endregion
+
+  /**
+   * 根据参会者id查找消费端
+   * @param peerId 参会者ID
+   * @returns
+   */
+  getConsumersByPeerId(peerId: string) {
+    const consumers = this.media?.getConsumers();
+
+    const matched = (consumers ?? []).filter(
+      (consumer) => consumer.appData.peerId === peerId
+    );
+
+    const micConsumer = matched.find(
+      (consumer) => consumer.appData.source === 'mic'
+    );
+    const webcamConsumer = matched.find(
+      (consumer) => consumer.appData.source === 'webcam'
+    );
+    const screenConsumer = matched.find(
+      (consumer) => consumer.appData.source === 'screen'
+    );
+    const extraVideoConsumers = matched.filter(
+      (consumer) => consumer.appData.source === 'extravideo'
+    );
+
+    return { micConsumer, webcamConsumer, screenConsumer, extraVideoConsumers };
+  }
 }

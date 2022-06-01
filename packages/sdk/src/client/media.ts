@@ -8,6 +8,7 @@ import { Logger } from '../helper/logger';
 import hark from 'hark';
 import { VolumeWatcher } from '../helper/volumeWatcher';
 import type { SignalingClient } from './signaling';
+import type { MediaClientConsumer } from '../types';
 
 const logger = new Logger('MediaClient');
 
@@ -49,7 +50,7 @@ export class MediaClient extends EventEmitter {
   private sendTransport: Transport | undefined;
   private recvTransport: Transport | undefined;
   private producers: Map<string, Producer> = new Map();
-  private consumers: Map<string, Consumer> = new Map();
+  private consumers: Map<string, MediaClientConsumer> = new Map();
   private tracks: Map<string, MediaStreamTrack> = new Map();
 
   constructor(public signaling: SignalingClient) {
@@ -63,8 +64,12 @@ export class MediaClient extends EventEmitter {
     this.recvTransport?.close();
   }
 
-  public getConsumer(consumerId: string): Consumer | undefined {
+  public getConsumer(consumerId: string): MediaClientConsumer | undefined {
     return this.consumers.get(consumerId);
+  }
+
+  public getConsumers(): MediaClientConsumer[] {
+    return [...this.consumers.values()];
   }
 
   public getProducer(producerId: string): Producer | undefined {
@@ -125,7 +130,7 @@ export class MediaClient extends EventEmitter {
               );
             }
 
-            const consumer = await this.recvTransport.consume({
+            const consumer = (await this.recvTransport.consume({
               id,
               producerId,
               kind,
@@ -134,19 +139,9 @@ export class MediaClient extends EventEmitter {
                 ...appData,
                 peerId,
               },
-            });
+            })) as MediaClientConsumer;
 
             if (kind === 'audio') {
-              await this.signaling
-                .sendRequest('resumeConsumer', { consumerId: consumer.id })
-                .catch((error: any) =>
-                  logger.warn(
-                    'resumeConsumer, unable to resume server-side [consumerId:%s, error:%o]',
-                    consumer.id,
-                    error
-                  )
-                );
-
               const { track } = consumer;
               const harkStream = new MediaStream();
 
@@ -164,8 +159,11 @@ export class MediaClient extends EventEmitter {
                 hark: consumerHark,
               });
             } else {
-              consumer.pause();
+              // 这段逻辑没看懂，先注释
+              // consumer.pause();
             }
+
+            await this.resumeConsumer(consumer, { initial: true });
 
             this.consumers.set(consumer.id, consumer);
 
@@ -420,5 +418,47 @@ export class MediaClient extends EventEmitter {
     });
 
     return producer;
+  }
+
+  private async resumeConsumer(consumer: Consumer, { initial = false } = {}) {
+    logger.debug('resumeConsumer() [consumer:"%o"]', consumer);
+
+    if ((!initial && !consumer.paused) || consumer.closed) return;
+
+    try {
+      consumer.resume();
+      await this.signaling.sendRequest('resumeConsumer', {
+        consumerId: consumer.id,
+      });
+    } catch (error: any) {
+      logger.error(
+        'resumeConsumer() [consumerId: %s; error:"%o"]',
+        consumer.id,
+        error
+      );
+      if (error.notFoundInMediasoupError) {
+        this.closeConsumer(consumer.id);
+      }
+    }
+
+    this.emit('consumerResumed', consumer);
+  }
+
+  private closeConsumer(consumerId: string) {
+    const consumer = this.consumers.get(consumerId);
+
+    if (!consumer) {
+      return;
+    }
+
+    consumer.close();
+
+    if (consumer.appData.hark != null) {
+      consumer.appData.hark.stop();
+    }
+
+    this.consumers.delete(consumerId);
+
+    this.emit('consumerClosed', consumer);
   }
 }

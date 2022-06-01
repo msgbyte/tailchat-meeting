@@ -737,7 +737,7 @@ const JoinDialog: React.FC<{
           </DialogContent>
         )}
 
-        {!isElectron() && (
+        {!isElectron() && locale !== 'zh' && (
           <CookieConsent
             buttonText={intl.formatMessage({
               id: 'room.consentUnderstand',

@@ -1,3 +1,4 @@
+import type { Harker } from 'hark';
 import type { types as mediasoupTypes } from 'mediasoup-client';
 import type {
   MediaKind,
@@ -5,6 +6,9 @@ import type {
   RtpParameters,
 } from 'mediasoup-client/lib/RtpParameters';
 import type { DtlsParameters } from 'mediasoup-client/lib/Transport';
+import type { VolumeWatcher } from './helper/volumeWatcher';
+
+export type { MediaKind };
 
 export interface JoinOptions {
   video: boolean;
@@ -179,4 +183,13 @@ export interface LobbyPeer {
 export interface Volume {
   volume: number;
   scaledVolume: number;
+}
+
+export interface MediaClientConsumer extends mediasoupTypes.Consumer {
+  appData: {
+    peerId: string;
+    source: 'mic' | 'webcam' | 'screen' | 'extravideo';
+    hark?: Harker;
+    volumeWatcher?: VolumeWatcher;
+  };
 }
