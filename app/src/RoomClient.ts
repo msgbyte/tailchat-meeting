@@ -359,8 +359,9 @@ export class RoomClient {
 
     // Alert sounds
     this._soundAlerts = { default: { audio: new Audio('/sounds/notify.mp3') } };
+
     if (config.notificationSounds) {
-      for (const [k, v] of Object.entries(config.notificationSounds)) {
+      for (const [k, v] of Object.entries(config.notificationSounds) as any) {
         if (v != null && v.play !== undefined)
           this._soundAlerts[k] = {
             audio: new Audio(v.play),

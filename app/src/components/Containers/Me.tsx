@@ -132,7 +132,7 @@ const Me = (props) => {
 
   const intl = useIntl();
 
-  let touchTimeout = null;
+  let touchTimeout: number | null = null;
 
   const {
     roomClient,
@@ -446,7 +446,9 @@ const Me = (props) => {
 
   // menu
   const [menuAnchorElement, setMenuAnchorElement] = React.useState(null);
-  const [showAudioAnalyzer, setShowAudioAnalyzer] = React.useState(null);
+  const [showAudioAnalyzer, setShowAudioAnalyzer] = React.useState<
+    boolean | undefined
+  >(undefined);
 
   const handleMenuOpen = (event) => {
     setMenuAnchorElement(event.currentTarget);
@@ -468,14 +470,18 @@ const Me = (props) => {
         onMouseOver={() => setHover(true)}
         onMouseOut={() => setHover(false)}
         onTouchStart={() => {
-          if (touchTimeout) clearTimeout(touchTimeout);
+          if (touchTimeout) {
+            window.clearTimeout(touchTimeout);
+          }
 
           setHover(true);
         }}
         onTouchEnd={() => {
-          if (touchTimeout) clearTimeout(touchTimeout);
+          if (touchTimeout) {
+            window.clearTimeout(touchTimeout);
+          }
 
-          touchTimeout = setTimeout(() => {
+          touchTimeout = window.setTimeout(() => {
             setHover(false);
           }, 2000);
         }}
@@ -524,14 +530,18 @@ const Me = (props) => {
               onMouseOver={() => setHover(true)}
               onMouseOut={() => setHover(false)}
               onTouchStart={() => {
-                if (touchTimeout) clearTimeout(touchTimeout);
+                if (touchTimeout) {
+                  window.clearTimeout(touchTimeout);
+                }
 
                 setHover(true);
               }}
               onTouchEnd={() => {
-                if (touchTimeout) clearTimeout(touchTimeout);
+                if (touchTimeout) {
+                  window.clearTimeout(touchTimeout);
+                }
 
-                touchTimeout = setTimeout(() => {
+                touchTimeout = window.setTimeout(() => {
                   setHover(false);
                 }, 2000);
               }}
@@ -776,14 +786,18 @@ const Me = (props) => {
             onMouseOver={() => setHover(true)}
             onMouseOut={() => setHover(false)}
             onTouchStart={() => {
-              if (touchTimeout) clearTimeout(touchTimeout);
+              if (touchTimeout) {
+                window.clearTimeout(touchTimeout);
+              }
 
               setHover(true);
             }}
             onTouchEnd={() => {
-              if (touchTimeout) clearTimeout(touchTimeout);
+              if (touchTimeout) {
+                window.clearTimeout(touchTimeout);
+              }
 
-              touchTimeout = setTimeout(() => {
+              touchTimeout = window.setTimeout(() => {
                 setHover(false);
               }, 2000);
             }}
@@ -809,14 +823,18 @@ const Me = (props) => {
                 onMouseOver={() => setHover(true)}
                 onMouseOut={() => setHover(false)}
                 onTouchStart={() => {
-                  if (touchTimeout) clearTimeout(touchTimeout);
+                  if (touchTimeout) {
+                    window.clearTimeout(touchTimeout);
+                  }
 
                   setHover(true);
                 }}
                 onTouchEnd={() => {
-                  if (touchTimeout) clearTimeout(touchTimeout);
+                  if (touchTimeout) {
+                    window.clearTimeout(touchTimeout);
+                  }
 
-                  touchTimeout = setTimeout(() => {
+                  touchTimeout = window.setTimeout(() => {
                     setHover(false);
                   }, 2000);
                 }}
@@ -872,14 +890,18 @@ const Me = (props) => {
           onMouseOver={() => setHover(true)}
           onMouseOut={() => setHover(false)}
           onTouchStart={() => {
-            if (touchTimeout) clearTimeout(touchTimeout);
+            if (touchTimeout) {
+              window.clearTimeout(touchTimeout);
+            }
 
             setHover(true);
           }}
           onTouchEnd={() => {
-            if (touchTimeout) clearTimeout(touchTimeout);
+            if (touchTimeout) {
+              window.clearTimeout(touchTimeout);
+            }
 
-            touchTimeout = setTimeout(() => {
+            touchTimeout = window.setTimeout(() => {
               setHover(false);
             }, 2000);
           }}

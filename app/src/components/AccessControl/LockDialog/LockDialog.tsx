@@ -7,7 +7,7 @@ import {
 import { permissions } from '../../../permissions';
 import * as appPropTypes from '../../appPropTypes';
 import { withStyles } from '@material-ui/core/styles';
-import { withRoomContext } from '../../../RoomContext';
+import { useRoomClient, withRoomContext } from '../../../RoomContext';
 import * as roomActions from '../../../store/actions/roomActions';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
@@ -44,13 +44,14 @@ const styles = (theme) => ({
 });
 
 const LockDialog = ({
-  roomClient,
   room,
   handleCloseLockDialog,
   lobbyPeers,
   canPromote,
   classes,
 }) => {
+  const roomClient = useRoomClient();
+
   return (
     <Dialog
       className={classes.root}
@@ -116,7 +117,6 @@ const LockDialog = ({
 };
 
 LockDialog.propTypes = {
-  roomClient: PropTypes.object.isRequired,
   room: appPropTypes.Room.isRequired,
   handleCloseLockDialog: PropTypes.func.isRequired,
   handleAccessCode: PropTypes.func.isRequired,

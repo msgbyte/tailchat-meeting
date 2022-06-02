@@ -1,7 +1,8 @@
 /**
  * Notice: convict 是专为node设计的，这边临时使用了比较低的版本 6.0.1, 高版本不支持在浏览器环境中使用
  */
-import convict from 'convict';
+// import convict from 'convict';
+import convict from 'tailchat-convict';
 import * as convictFormatWithValidator from 'convict-format-with-validator';
 import { configSchema } from './schema';
 
