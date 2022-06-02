@@ -41,6 +41,15 @@ const configuration: webpack.Configuration = {
   resolve: {
     extensions: ['.js', '.jsx', '.json', '.ts', '.tsx'],
     modules: [webpackPaths.srcPath, 'node_modules'],
+    fallback: {
+      crypto: require.resolve('crypto-browserify'),
+      http: require.resolve('stream-http'),
+      https: require.resolve('https-browserify'),
+      path: require.resolve('path-browserify'),
+      stream: require.resolve('stream-browserify'),
+      url: require.resolve('url/'),
+      fs: false,
+    },
   },
 
   plugins: [

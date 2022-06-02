@@ -14,6 +14,7 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+import windowStateKeeper from 'electron-window-state';
 
 export default class AppUpdater {
   constructor() {
@@ -22,8 +23,6 @@ export default class AppUpdater {
     autoUpdater.checkForUpdatesAndNotify();
   }
 }
-
-let mainWindow: BrowserWindow | null = null;
 
 ipcMain.on('ipc-example', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
@@ -56,6 +55,7 @@ const installExtensions = async () => {
     .catch(console.log);
 };
 
+let mainWindow: BrowserWindow | null = null;
 const createWindow = async () => {
   if (isDebug) {
     await installExtensions();
@@ -69,10 +69,17 @@ const createWindow = async () => {
     return path.join(RESOURCES_PATH, ...paths);
   };
 
+  const mainWindowState = windowStateKeeper({
+    defaultWidth: 1024,
+    defaultHeight: 728,
+  });
+
   mainWindow = new BrowserWindow({
     show: false,
-    width: 1024,
-    height: 728,
+    x: mainWindowState.x,
+    y: mainWindowState.y,
+    height: mainWindowState.height,
+    width: mainWindowState.width,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: app.isPackaged
