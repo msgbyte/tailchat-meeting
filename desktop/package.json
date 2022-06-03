@@ -40,6 +40,7 @@
     "postinstall": "ts-node .erb/scripts/check-native-dep.js && electron-builder install-app-deps && cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.renderer.dev.dll.ts",
     "lint": "cross-env NODE_ENV=development eslint . --ext .js,.jsx,.ts,.tsx",
     "package": "ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build --publish never",
+    "package:debug": "cross-env DEBUG_PROD=true yarn package",
     "rebuild": "electron-rebuild --parallel --types prod,dev,optional --module-dir release/app",
     "start": "ts-node ./.erb/scripts/check-port-in-use.js && npm run start:renderer",
     "start:main": "cross-env NODE_ENV=development electronmon -r ts-node/register/transpile-only .",
@@ -109,6 +110,7 @@
   "dependencies": {
     "electron-debug": "^3.2.0",
     "electron-log": "^4.4.7",
+    "electron-serve": "^1.1.0",
     "electron-updater": "^5.0.1",
     "electron-window-state": "^5.0.3",
     "react": "^18.1.0",
@@ -132,6 +134,7 @@
     "browserslist-config-erb": "^0.0.3",
     "chalk": "^4.1.2",
     "concurrently": "^7.1.0",
+    "copy-webpack-plugin": "^11.0.0",
     "core-js": "^3.22.5",
     "cross-env": "^7.0.3",
     "crypto-browserify": "^3.12.0",

@@ -66,8 +66,11 @@ const theme = createTheme(config.theme as any);
 
 let Router: any;
 
-if (isElectron()) Router = HashRouter;
-else Router = BrowserRouter;
+if (isElectron()) {
+  Router = HashRouter;
+} else {
+  Router = BrowserRouter;
+}
 
 domready(() => {
   logger.debug('DOM ready');

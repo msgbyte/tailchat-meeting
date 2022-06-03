@@ -1,3 +1,4 @@
+import './config';
 import '../../../app/src/index';
 
 // import { createRoot } from 'react-dom/client';

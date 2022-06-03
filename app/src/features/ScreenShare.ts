@@ -10,8 +10,9 @@ let electron = null;
  *
  * TODO: do it more inteligently.
  */
-if (isElectron() && typeof window.require === 'function')
+if (isElectron() && typeof window.require === 'function') {
   electron = window.require('electron');
+}
 
 class ElectronScreenShare {
   _stream = null;
