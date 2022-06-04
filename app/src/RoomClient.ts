@@ -32,6 +32,7 @@ import type { ConsumerType } from './store/reducers/consumers';
 import type { IceParameters } from 'mediasoup-client/lib/types';
 import { getEncodings } from 'tailchat-meeting-sdk/lib/helper/encodings';
 import { meActions } from './store/slices/me';
+import isElectron from 'is-electron';
 
 type Priority = 'high' | 'medium' | 'low' | 'very-low';
 
@@ -492,8 +493,12 @@ export class RoomClient {
 
     store.dispatch(roomActions.setRoomState('closed'));
 
-    // @ts-ignore
-    window.location.href = `/room/${this._roomId}`;
+    // TODO: 临时操作，not good. 后期换成SDK后改掉
+    if (isElectron()) {
+      window.location.reload();
+    } else {
+      window.location.href = `/room/${this._roomId}`;
+    }
   }
 
   _startKeyListener() {

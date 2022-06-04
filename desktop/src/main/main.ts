@@ -44,6 +44,12 @@ if (isDebug) {
   require('electron-debug')();
 }
 
+if (app.isPackaged) {
+  log.info('auto catch errors and overwrite default `console.log` functions');
+  log.catchErrors();
+  Object.assign(console, log.functions);
+}
+
 const installExtensions = async () => {
   const installer = require('electron-devtools-installer');
   const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
@@ -95,8 +101,9 @@ const createWindow = async () => {
       },
     });
 
-    log.info('loadUrl:', resolveHtmlPath('index.html'));
-    mainWindow.loadURL(resolveHtmlPath('index.html'));
+    const url = resolveHtmlPath('index.html');
+    log.info('loadUrl:', url);
+    mainWindow.loadURL(url);
 
     mainWindow.on('ready-to-show', () => {
       if (!mainWindow) {
