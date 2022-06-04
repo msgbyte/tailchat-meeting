@@ -16,6 +16,8 @@ import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import windowStateKeeper from 'electron-window-state';
 
+log.info('Start...');
+
 export default class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
@@ -57,66 +59,76 @@ const installExtensions = async () => {
 
 let mainWindow: BrowserWindow | null = null;
 const createWindow = async () => {
-  if (isDebug) {
-    await installExtensions();
+  try {
+    log.info('Create window');
+
+    if (isDebug) {
+      log.info('Install extensions');
+      await installExtensions();
+    }
+
+    const RESOURCES_PATH = app.isPackaged
+      ? path.join(process.resourcesPath, 'assets')
+      : path.join(__dirname, '../../assets');
+    log.info('parse resolve path:', RESOURCES_PATH);
+
+    const mainWindowState = windowStateKeeper({
+      defaultWidth: 1024,
+      defaultHeight: 728,
+    });
+    log.info('load window state with:', mainWindow);
+
+    const getAssetPath = (...paths: string[]): string => {
+      return path.join(RESOURCES_PATH, ...paths);
+    };
+    mainWindow = new BrowserWindow({
+      show: false,
+      x: mainWindowState.x,
+      y: mainWindowState.y,
+      height: mainWindowState.height,
+      width: mainWindowState.width,
+      icon: getAssetPath('icon.png'),
+      webPreferences: {
+        preload: app.isPackaged
+          ? path.join(__dirname, 'preload.js')
+          : path.join(__dirname, '../../.erb/dll/preload.js'),
+      },
+    });
+
+    log.info('loadUrl:', resolveHtmlPath('index.html'));
+    mainWindow.loadURL(resolveHtmlPath('index.html'));
+
+    mainWindow.on('ready-to-show', () => {
+      if (!mainWindow) {
+        throw new Error('"mainWindow" is not defined');
+      }
+      if (process.env.START_MINIMIZED) {
+        mainWindow.minimize();
+      } else {
+        mainWindow.show();
+      }
+    });
+
+    mainWindow.on('closed', () => {
+      mainWindow = null;
+    });
+
+    log.info('Build menu');
+    const menuBuilder = new MenuBuilder(mainWindow);
+    menuBuilder.buildMenu();
+
+    // Open urls in the user's browser
+    mainWindow.webContents.setWindowOpenHandler((edata) => {
+      shell.openExternal(edata.url);
+      return { action: 'deny' };
+    });
+
+    // Remove this if your app does not use auto updates
+    // eslint-disable-next-line
+    new AppUpdater();
+  } catch (err) {
+    log.error('createWindow error:', err);
   }
-
-  const RESOURCES_PATH = app.isPackaged
-    ? path.join(process.resourcesPath, 'assets')
-    : path.join(__dirname, '../../assets');
-
-  const getAssetPath = (...paths: string[]): string => {
-    return path.join(RESOURCES_PATH, ...paths);
-  };
-
-  const mainWindowState = windowStateKeeper({
-    defaultWidth: 1024,
-    defaultHeight: 728,
-  });
-
-  mainWindow = new BrowserWindow({
-    show: false,
-    x: mainWindowState.x,
-    y: mainWindowState.y,
-    height: mainWindowState.height,
-    width: mainWindowState.width,
-    icon: getAssetPath('icon.png'),
-    webPreferences: {
-      preload: app.isPackaged
-        ? path.join(__dirname, 'preload.js')
-        : path.join(__dirname, '../../.erb/dll/preload.js'),
-    },
-  });
-
-  mainWindow.loadURL(resolveHtmlPath('index.html'));
-
-  mainWindow.on('ready-to-show', () => {
-    if (!mainWindow) {
-      throw new Error('"mainWindow" is not defined');
-    }
-    if (process.env.START_MINIMIZED) {
-      mainWindow.minimize();
-    } else {
-      mainWindow.show();
-    }
-  });
-
-  mainWindow.on('closed', () => {
-    mainWindow = null;
-  });
-
-  const menuBuilder = new MenuBuilder(mainWindow);
-  menuBuilder.buildMenu();
-
-  // Open urls in the user's browser
-  mainWindow.webContents.setWindowOpenHandler((edata) => {
-    shell.openExternal(edata.url);
-    return { action: 'deny' };
-  });
-
-  // Remove this if your app does not use auto updates
-  // eslint-disable-next-line
-  new AppUpdater();
 };
 
 /**
@@ -141,4 +153,4 @@ app
       if (mainWindow === null) createWindow();
     });
   })
-  .catch(console.log);
+  .catch(log.error);
