@@ -35,11 +35,20 @@ const changeEvent = {
 export declare interface MediaClient {
   on(
     event: 'consumerCreated',
-    listener: (consumer: Consumer, producerPaused: boolean) => void
+    listener: (consumer: MediaClientConsumer, producerPaused: boolean) => void
   ): this;
-  on(event: 'consumerClosed', listener: (consumer: Consumer) => void): this;
-  on(event: 'consumerPaused', listener: (consumer: Consumer) => void): this;
-  on(event: 'consumerResumed', listener: (consumer: Consumer) => void): this;
+  on(
+    event: 'consumerClosed',
+    listener: (consumer: MediaClientConsumer) => void
+  ): this;
+  on(
+    event: 'consumerPaused',
+    listener: (consumer: MediaClientConsumer) => void
+  ): this;
+  on(
+    event: 'consumerResumed',
+    listener: (consumer: MediaClientConsumer) => void
+  ): this;
   on(event: 'producerClosed', listener: (producer: Producer) => void): this;
   on(event: 'producerPaused', listener: (producer: Producer) => void): this;
   on(event: 'producerResumed', listener: (producer: Producer) => void): this;

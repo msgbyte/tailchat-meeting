@@ -21,7 +21,7 @@
       <div>{{ JSON.stringify(peers) }}</div>
 
       <div v-for="peer in peers" :key="peer.id + consumerUpdater">
-        <PeerView :track="getMediaWebcamTrack(peer.id, 'video')" />
+        <PeerView :track="getMediaWebcamTrack(peer.id)" />
       </div>
     </div>
   </div>
@@ -29,7 +29,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
-import { TailchatMeetingClient, Peer, MediaKind } from '../../src/index';
+import { TailchatMeetingClient, Peer } from '../../src/index';
 import PeerView from './PeerView.vue';
 
 const meetingUrl = process.env.TAILCHAT_MEETING_URL ?? '';
@@ -43,7 +43,6 @@ const enabledWebcam = computed(() => client.value?.webcamEnabled ?? false);
 const enabledMic = computed(() => client.value?.micEnabled ?? false);
 
 const webcamEl = ref<HTMLVideoElement>();
-const peersEl = ref<HTMLDivElement>();
 const consumerUpdater = ref<number>(0);
 
 onMounted(() => {
@@ -77,11 +76,6 @@ onMounted(() => {
     console.log('micClose');
   });
 
-  _client.media?.on('consumerCreated', () => consumerUpdater.value++);
-  _client.media?.on('consumerResumed', () => consumerUpdater.value++);
-  _client.media?.on('consumerClosed', () => consumerUpdater.value++);
-  _client.media?.on('consumerPaused', () => consumerUpdater.value++);
-
   client.value = _client;
   joinRoom();
 });
@@ -101,6 +95,10 @@ async function joinRoom() {
         picture: '',
       });
 
+      client.value.onPeerConsumerUpdate(() => {
+        consumerUpdater.value++;
+      });
+
       const devices = await client.value.getAvailableMediaDevices();
       console.log('devices', devices);
 
@@ -109,7 +107,7 @@ async function joinRoom() {
       if (client.value.room) {
         peers.value = client.value.room.peers;
         client.value.room.on('peersUpdated', (_peers) => {
-          peers.value = _peers;
+          peers.value = [..._peers];
         });
       }
     } catch (err) {
@@ -148,6 +146,7 @@ function getMediaWebcamTrack(peerId: string): MediaStreamTrack | undefined {
   }
 
   const { webcamConsumer } = client.value.getConsumersByPeerId(peerId);
+  console.log('peerId, webcamConsumer', peerId, webcamConsumer);
 
   return webcamConsumer?.track;
 }

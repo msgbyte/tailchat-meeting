@@ -1,7 +1,6 @@
 productName: Tailchat Meeting
 appId: com.msgbyte.tailchat-meeting
-# asar: true
-asar: false
+asar: true
 asarUnpack: '**\*.{node,dll}'
 files:
   - dist

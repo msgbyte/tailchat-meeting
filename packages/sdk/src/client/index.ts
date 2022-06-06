@@ -2,6 +2,7 @@ import type {
   JoinOptions,
   MediaClientConsumer,
   MediaDevice,
+  Peer,
   UpdateWebcamParams,
 } from '../types';
 import { SignalingClient } from './signaling';
@@ -225,7 +226,6 @@ export class TailchatMeetingClient extends EventEmitter {
         .find((producer) => producer.appData.source === 'webcam');
 
       if ((restart && webcamProducer) || start) {
-        // TODO: 需要关掉旧的
         if (this.currentWebcamProducer) {
           await this.disableWebcam();
         }
@@ -248,7 +248,11 @@ export class TailchatMeetingClient extends EventEmitter {
         }
 
         const { deviceId: trackDeviceId, width, height } = track.getSettings();
-        logger.debug('getUserMedia track settings:', track.getSettings());
+        logger.debug(
+          'getUserMedia track settings:',
+          trackDeviceId,
+          track.getSettings()
+        );
 
         if (this.settings.simulcast) {
           const encodings = getEncodings(
@@ -484,5 +488,42 @@ export class TailchatMeetingClient extends EventEmitter {
     );
 
     return { micConsumer, webcamConsumer, screenConsumer, extraVideoConsumers };
+  }
+
+  /**
+   * 当参会者人员信息发生变化时的回调
+   */
+  public onPeersUpdate(callback: (peers: Peer[]) => void) {
+    if (!this.room) {
+      logger.warn('Please call [onPeersUpdate] after join room');
+      return;
+    }
+
+    this.room.on('peersUpdated', callback);
+  }
+
+  /**
+   * 当参会者人员信息发生变化时的回调
+   */
+  public onPeerConsumerUpdate(
+    callback: (peerId: string, consumer: MediaClientConsumer | null) => void
+  ) {
+    if (!this.media) {
+      logger.warn('Please call [onPeerConsumerUpdate] after join room');
+      return;
+    }
+
+    this.media.on('consumerCreated', (consumer) => {
+      callback(consumer.appData.peerId, consumer);
+    });
+    this.media.on('consumerResumed', (consumer) => {
+      callback(consumer.appData.peerId, consumer);
+    });
+    this.media.on('consumerClosed', (consumer) => {
+      callback(consumer.appData.peerId, null);
+    });
+    this.media.on('consumerPaused', (consumer) => {
+      callback(consumer.appData.peerId, null);
+    });
   }
 }
