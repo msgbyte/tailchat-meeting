@@ -1,6 +1,5 @@
-import EventEmitter from 'eventemitter3';
+import { EventEmitter } from 'eventemitter-strict';
 import { Device } from 'mediasoup-client';
-import type { Consumer } from 'mediasoup-client/lib/Consumer';
 import type { Producer, ProducerOptions } from 'mediasoup-client/lib/Producer';
 import type { Transport } from 'mediasoup-client/lib/Transport';
 import type { RtpCapabilities } from 'mediasoup-client/lib/RtpParameters';
@@ -32,29 +31,20 @@ const changeEvent = {
   producerClosed: 'close',
 };
 
-export declare interface MediaClient {
-  on(
-    event: 'consumerCreated',
-    listener: (consumer: MediaClientConsumer, producerPaused: boolean) => void
-  ): this;
-  on(
-    event: 'consumerClosed',
-    listener: (consumer: MediaClientConsumer) => void
-  ): this;
-  on(
-    event: 'consumerPaused',
-    listener: (consumer: MediaClientConsumer) => void
-  ): this;
-  on(
-    event: 'consumerResumed',
-    listener: (consumer: MediaClientConsumer) => void
-  ): this;
-  on(event: 'producerClosed', listener: (producer: Producer) => void): this;
-  on(event: 'producerPaused', listener: (producer: Producer) => void): this;
-  on(event: 'producerResumed', listener: (producer: Producer) => void): this;
+interface MediaClientEventMap {
+  consumerCreated: (
+    consumer: MediaClientConsumer,
+    producerPaused: boolean
+  ) => void;
+  consumerClosed: (consumer: MediaClientConsumer) => void;
+  consumerPaused: (consumer: MediaClientConsumer) => void;
+  consumerResumed: (consumer: MediaClientConsumer) => void;
+  producerClosed: (producer: Producer) => void;
+  producerPaused: (producer: Producer) => void;
+  producerResumed: (producer: Producer) => void;
 }
 
-export class MediaClient extends EventEmitter {
+export class MediaClient extends EventEmitter<MediaClientEventMap> {
   private mediasoup: Device = new Device();
   private sendTransport: Transport | undefined;
   private recvTransport: Transport | undefined;
@@ -263,7 +253,7 @@ export class MediaClient extends EventEmitter {
     }
 
     if (!local) {
-      this.emit(`consumer${changeEvent[change]}`, consumer);
+      this.emit(`consumer${changeEvent[change]}` as any, consumer);
     }
 
     consumer?.[`${change}`]();
@@ -290,7 +280,7 @@ export class MediaClient extends EventEmitter {
     }
 
     if (!local) {
-      this.emit(`producer${changeEvent[change]}`, producer);
+      this.emit(`producer${changeEvent[change]}` as any, producer);
     }
 
     producer?.[`${change}`]();
@@ -429,7 +419,10 @@ export class MediaClient extends EventEmitter {
     return producer;
   }
 
-  private async resumeConsumer(consumer: Consumer, { initial = false } = {}) {
+  private async resumeConsumer(
+    consumer: MediaClientConsumer,
+    { initial = false } = {}
+  ) {
     logger.debug('resumeConsumer() [consumer:"%o"]', consumer);
 
     if ((!initial && !consumer.paused) || consumer.closed) return;

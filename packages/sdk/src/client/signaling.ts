@@ -1,5 +1,5 @@
 import io, { Socket } from 'socket.io-client';
-import EventEmitter from 'eventemitter3';
+import { EventEmitter } from 'eventemitter-strict';
 import { SocketTimeoutError } from '../error';
 import { Logger } from '../helper/logger';
 import type {
@@ -20,20 +20,6 @@ import type {
 
 const logger = new Logger('SignalingClient');
 
-export declare interface SignalingClient {
-  // Signaling events
-  on(event: 'connect', listener: () => void): this;
-  on(event: 'disconnect', listener: () => void): this;
-  on(event: 'reconnect', listener: (attempt: number) => void): this;
-  on(event: 'reconnect_failed', listener: () => void): this;
-
-  // General server messages
-  on(
-    event: 'notification',
-    listener: (notification: SocketInboundNotification) => void
-  ): this;
-}
-
 interface ServerClientEvents {
   notification: ({ method, data }: SocketInboundNotification) => void;
 }
@@ -51,7 +37,18 @@ interface ClientServerEvents {
   ) => void;
 }
 
-export class SignalingClient extends EventEmitter {
+interface SignalingClientEventMap {
+  // Signaling events
+  connect: () => void;
+  disconnect: () => void;
+  reconnect: (attempt?: number) => void;
+  reconnect_failed: () => void;
+
+  // General server messages
+  notification: (notification: SocketInboundNotification) => void;
+}
+
+export class SignalingClient extends EventEmitter<SignalingClientEventMap> {
   /**
    * 请求重试次数
    */

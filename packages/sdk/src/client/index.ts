@@ -14,23 +14,20 @@ import { InitClientError } from '../error';
 import { defaultSettings, TailchatMeetingClientSettings } from './settings';
 import { getEncodings } from '../helper/encodings';
 import type { Producer } from 'mediasoup-client/lib/types';
-import EventEmitter from 'eventemitter3';
+import { EventEmitter } from 'eventemitter-strict';
 import { RoomClient } from './room';
 
 const logger = new Logger('client');
 
-export interface TailchatMeetingClient {
-  on(
-    event: 'webcamProduce',
-    listener: (webcamProducer: Producer) => void
-  ): this;
-  on(event: 'webcamClose', listener: (webcamProducerId: string) => void): this;
-  on(event: 'micProduce', listener: (micProducer: Producer) => void): this;
-  on(event: 'micClose', listener: (micProducerId: string) => void): this;
-  on(event: 'clientClose', listener: () => void): this;
+interface TailchatMeetingClientEventMap {
+  webcamProduce: (webcamProducer: Producer) => void;
+  webcamClose: (webcamProducerId: string) => void;
+  micProduce: (micProducer: Producer) => void;
+  micClose: (micProducerId: string) => void;
+  clientClose: () => void;
 }
 
-export class TailchatMeetingClient extends EventEmitter {
+export class TailchatMeetingClient extends EventEmitter<TailchatMeetingClientEventMap> {
   signaling?: SignalingClient;
   media?: MediaClient;
   room?: RoomClient;
@@ -301,7 +298,7 @@ export class TailchatMeetingClient extends EventEmitter {
         });
       }
 
-      this.emit('webcamProduce', webcamProducer);
+      this.emit('webcamProduce', webcamProducer!);
       this.currentWebcamProducer = webcamProducer;
 
       await this.device.updateMediaDevices();
@@ -448,7 +445,7 @@ export class TailchatMeetingClient extends EventEmitter {
         });
       }
 
-      this.emit('micProduce', micProducer);
+      this.emit('micProduce', micProducer!);
       this.currentMicProducer = micProducer;
 
       await this.device.updateMediaDevices();

@@ -1,19 +1,12 @@
-import EventEmitter from 'eventemitter3';
 import type { Harker } from 'hark';
 import type { Volume } from '../types';
+import { EventEmitter } from 'eventemitter-strict';
 
-export interface VolumeWatcher {
-  // eslint-disable-next-line no-unused-vars
-  on(
-    event: 'volumeChange',
-    listener: (
-      // eslint-disable-next-line no-unused-vars
-      { volume, scaledVolume }: Volume
-    ) => void
-  ): this;
+interface VolumeWatcherEventMap {
+  volumeChange: ({ volume, scaledVolume }: Volume) => void;
 }
 
-export class VolumeWatcher extends EventEmitter<'volumeChange'> {
+export class VolumeWatcher extends EventEmitter<VolumeWatcherEventMap> {
   private hark: Harker;
   private lastVolume = -100;
   private lastScaledVolume = 0;
@@ -21,7 +14,10 @@ export class VolumeWatcher extends EventEmitter<'volumeChange'> {
   constructor({ hark }: { hark: Harker }) {
     super();
 
-    this.emit('volumeChange');
+    this.emit('volumeChange', {
+      volume: this.lastVolume,
+      scaledVolume: this.lastScaledVolume,
+    });
 
     this.hark = hark;
 

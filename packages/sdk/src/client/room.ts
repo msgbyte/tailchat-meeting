@@ -1,4 +1,4 @@
-import EventEmitter from 'eventemitter3';
+import { EventEmitter } from 'eventemitter-strict';
 import { Logger } from '../helper/logger';
 import type { LobbyPeer, Peer } from '../types';
 import type { SignalingClient } from './signaling';
@@ -37,24 +37,14 @@ export interface RoomState {
 
 type RoomUpdate = Omit<RoomState, 'state' | 'selectedPeers' | 'spotlights'>;
 
-export interface MediaClient {
-  on(event: 'roomStateUpdated', listener: (roomState: RoomState) => void): this;
-  on(
-    event: 'activeSpeakerChanged',
-    listener: (activeSpeakerId: string) => void
-  ): this;
-  on(event: 'peersUpdated', listener: (peers: Peer[]) => void): this;
-  on(
-    event: 'lobbyPeersUpdated',
-    listener: (lobbyPeers: LobbyPeer[]) => void
-  ): this;
+interface RoomClientEventMap {
+  roomStateUpdated: (roomState: RoomState) => void;
+  activeSpeakerChanged: (activeSpeakerId: string) => void;
+  peersUpdated: (peers: Peer[]) => void;
+  lobbyPeersUpdated: (lobbyPeers: LobbyPeer[]) => void;
 }
-export class RoomClient extends EventEmitter<
-  | 'roomStateUpdated'
-  | 'activeSpeakerChanged'
-  | 'peersUpdated'
-  | 'lobbyPeersUpdated'
-> {
+
+export class RoomClient extends EventEmitter<RoomClientEventMap> {
   iceServers?: RTCIceServer[]; // TODO: not used
   roomState: RoomState = {
     state: 'new',

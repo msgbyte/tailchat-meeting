@@ -20,7 +20,7 @@
   "dependencies": {
     "bowser": "^2.7.0",
     "debug": "^4.3.1",
-    "eventemitter3": "^4.0.7",
+    "eventemitter-strict": "^1.0.1",
     "hark": "^1.2.3",
     "lodash": "^4.17.21",
     "mediasoup-client": "^3.6.47",

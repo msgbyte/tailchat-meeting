@@ -1,6 +1,5 @@
-import EventEmitter from 'eventemitter3';
+import { EventEmitter } from 'eventemitter-strict';
 import { Logger } from '../helper/logger';
-import type { MediaDevice } from '../types';
 
 const logger = new Logger('DeviceClient');
 
@@ -10,16 +9,12 @@ export interface DevicesUpdated {
   newDevices: MediaDeviceInfo[];
 }
 
-export declare interface DeviceClient {
-  // eslint-disable-next-line no-unused-vars
-  on(
-    event: 'devicesUpdated',
-    listener: (updatedDevices: DevicesUpdated) => void
-  ): this;
+interface DeviceClientEventMap {
+  devicesUpdated: (updatedDevices: DevicesUpdated) => void;
 }
 
-export class DeviceClient extends EventEmitter<'devicesUpdated'> {
-  private devices: MediaDevice[] = [];
+export class DeviceClient extends EventEmitter<DeviceClientEventMap> {
+  private devices: MediaDeviceInfo[] = [];
 
   get allDevices() {
     return this.devices;
@@ -28,13 +23,13 @@ export class DeviceClient extends EventEmitter<'devicesUpdated'> {
   public async updateMediaDevices(): Promise<void> {
     logger.debug('updateMediaDevices()');
 
-    let removedDevices: MediaDevice[];
-    let newDevices: MediaDevice[];
+    let removedDevices: MediaDeviceInfo[];
+    let newDevices: MediaDeviceInfo[];
 
     try {
-      const devicesList = (await navigator.mediaDevices.enumerateDevices())
-        .filter((d) => d.deviceId)
-        .map((d) => ({ deviceId: d.deviceId, kind: d.kind, label: d.label }));
+      const devicesList = (
+        await navigator.mediaDevices.enumerateDevices()
+      ).filter((d) => d.deviceId);
 
       if (devicesList.length === 0) return;
 
