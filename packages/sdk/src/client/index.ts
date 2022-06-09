@@ -484,7 +484,24 @@ export class TailchatMeetingClient extends EventEmitter<TailchatMeetingClientEve
       (consumer) => consumer.appData.source === 'extravideo'
     );
 
-    return { micConsumer, webcamConsumer, screenConsumer, extraVideoConsumers };
+    return {
+      /**
+       * 麦克风
+       */
+      micConsumer,
+      /**
+       * 摄像头
+       */
+      webcamConsumer,
+      /**
+       * 共享屏幕
+       */
+      screenConsumer,
+      /**
+       * 额外视频源
+       */
+      extraVideoConsumers,
+    };
   }
 
   /**
@@ -496,6 +513,7 @@ export class TailchatMeetingClient extends EventEmitter<TailchatMeetingClientEve
       return;
     }
 
+    callback(this.room.peers ?? []);
     this.room.on('peersUpdated', callback);
   }
 
