@@ -40,6 +40,8 @@ type RoomUpdate = Omit<RoomState, 'state' | 'selectedPeers' | 'spotlights'>;
 interface RoomClientEventMap {
   roomStateUpdated: (roomState: RoomState) => void;
   activeSpeakerChanged: (activeSpeakerId: string) => void;
+  peerJoin: (peer: Peer) => void;
+  peerLeave: (peer: Peer) => void;
   peersUpdated: (peers: Peer[]) => void;
   lobbyPeersUpdated: (lobbyPeers: LobbyPeer[]) => void;
 }
@@ -117,14 +119,18 @@ export class RoomClient extends EventEmitter<RoomClientEventMap> {
               raisedHandTimestamp,
             } = notification.data;
 
-            this.peers.push({
+            const peerInfo = {
               id,
               displayName,
               picture,
               roles,
               raisedHand,
               raisedHandTimestamp,
-            });
+            };
+
+            this.peers.push(peerInfo);
+
+            this.emit('peerJoin', peerInfo);
             this.emit('peersUpdated', this.peers);
             break;
           }
@@ -132,7 +138,19 @@ export class RoomClient extends EventEmitter<RoomClientEventMap> {
           case 'peerClosed': {
             const { peerId } = notification.data;
 
-            this.peers = this.peers.filter((peer) => peer.id !== peerId);
+            let leavedPeerInfo: Peer | undefined;
+            this.peers = this.peers.filter((peer) => {
+              if (peer.id !== peerId) {
+                return true;
+              } else {
+                leavedPeerInfo = peer;
+                return false;
+              }
+            });
+
+            if (leavedPeerInfo) {
+              this.emit('peerLeave', leavedPeerInfo);
+            }
             this.emit('peersUpdated', this.peers);
             break;
           }
@@ -222,6 +240,7 @@ export class RoomClient extends EventEmitter<RoomClientEventMap> {
       ...this.roomState,
       ...state,
     };
+
     this.emit('roomStateUpdated', this.roomState);
   }
 

@@ -505,6 +505,30 @@ export class TailchatMeetingClient extends EventEmitter<TailchatMeetingClientEve
   }
 
   /**
+   * 当有参会者入会时的回调
+   */
+  public onPeerJoin(callback: (peer: Peer) => void) {
+    if (!this.room) {
+      logger.warn('Please call [onPeerJoin] after join room');
+      return;
+    }
+
+    this.room.on('peerJoin', callback);
+  }
+
+  /**
+   * 当有参会者离会时的回调
+   */
+  public onPeerLeave(callback: (peer: Peer) => void) {
+    if (!this.room) {
+      logger.warn('Please call [onPeerLeave] after join room');
+      return;
+    }
+
+    this.room.on('peerLeave', callback);
+  }
+
+  /**
    * 当参会者人员信息发生变化时的回调
    */
   public onPeersUpdate(callback: (peers: Peer[]) => void) {
