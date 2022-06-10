@@ -1,11 +1,11 @@
-interface PeerLayoutManagerOptionsLayoutGrid {
+interface ConferenceLayoutManagerOptionsLayoutGrid {
   from: number;
   to: number;
   col: number;
   row: number;
 }
 
-const defaultLayout: PeerLayoutManagerOptionsLayoutGrid[] = [
+const defaultLayout: ConferenceLayoutManagerOptionsLayoutGrid[] = [
   // video layers layout
   { from: 1, to: 1, col: 1, row: 1 },
   { from: 2, to: 2, col: 2, row: 1 },
@@ -14,17 +14,17 @@ const defaultLayout: PeerLayoutManagerOptionsLayoutGrid[] = [
   { from: 7, to: 9, col: 3, row: 3 },
 ];
 
-interface PeerLayoutManagerOptions {
+interface ConferenceLayoutManagerOptions {
   width: number; // container width
   height: number; // container height
   margin?: number;
-  layout?: PeerLayoutManagerOptionsLayoutGrid[];
+  layout?: ConferenceLayoutManagerOptionsLayoutGrid[];
 }
 
 export class PeerLayoutManager {
-  options: Required<PeerLayoutManagerOptions>;
+  options: Required<ConferenceLayoutManagerOptions>;
   max: number;
-  constructor(options: PeerLayoutManagerOptions) {
+  constructor(options: ConferenceLayoutManagerOptions) {
     this.options = {
       margin: 4,
       layout: defaultLayout,
@@ -52,6 +52,13 @@ export class PeerLayoutManager {
         cellHeight: cellHeight - margin * 2,
       };
     });
+  }
+
+  setOptions(options: Partial<ConferenceLayoutManagerOptions>) {
+    this.options = {
+      ...this.options,
+      ...options,
+    };
   }
 
   private pickGrid(count: number) {
