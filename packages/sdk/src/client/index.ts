@@ -32,6 +32,7 @@ export class TailchatMeetingClient extends EventEmitter<TailchatMeetingClientEve
   media?: MediaClient;
   room?: RoomClient;
   device = new DeviceClient();
+  roomId?: string;
   private closed = false;
 
   settings: TailchatMeetingClientSettings = { ...defaultSettings };
@@ -49,6 +50,7 @@ export class TailchatMeetingClient extends EventEmitter<TailchatMeetingClientEve
    */
   async join(roomId: string, options: JoinOptions) {
     logger.debug('join(): %s %o', roomId, options);
+    this.roomId = roomId;
     const signalingUrl = `${this.signalingHost}/?peerId=${this.peerId}&roomId=${roomId}`;
     this.signaling = new SignalingClient();
     this.signaling.connect({ url: signalingUrl });

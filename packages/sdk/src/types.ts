@@ -9,6 +9,7 @@ import type { DtlsParameters } from 'mediasoup-client/lib/Transport';
 import type { VolumeWatcher } from './helper/volumeWatcher';
 
 export type { MediaKind };
+export type { Producer, Consumer } from 'mediasoup-client/lib/types';
 
 export interface JoinOptions {
   video: boolean;

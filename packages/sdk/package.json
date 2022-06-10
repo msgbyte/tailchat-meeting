@@ -15,7 +15,7 @@
     "lib"
   ],
   "keywords": [],
-  "author": "",
+  "author": "moonrailgun <moonrailgun@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "bowser": "^2.7.0",
