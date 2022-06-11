@@ -1,9 +1,15 @@
 {
   "name": "tailchat-meeting-conference-layout-manager",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "files": [
+    "lib"
+  ],
   "scripts": {
+    "prepare": "tsc",
+    "release": "npm publish --registry https://registry.npmjs.com/",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
