@@ -14,6 +14,9 @@ const VIDEO_SVC_ENCODINGS: RtpEncodingParameters[] = [
   { scalabilityMode: 'S3T3', dtx: true },
 ];
 
+/**
+ * 获取编码参数
+ */
 export const getEncodings = (
   rtpCapabilities: RtpCapabilities,
   simulcastProfiles: Record<string, SimulcastProfile[]>,

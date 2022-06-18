@@ -51,19 +51,19 @@ onMounted(() => {
     Math.random().toString()
   );
 
-  _client.on('webcamProduce', (webcamProducer) => {
+  _client.onWebcamProduce((webcamProducer) => {
     if (webcamEl.value && webcamProducer.track) {
       webcamEl.value.srcObject = new MediaStream([webcamProducer.track]);
     }
   });
 
-  _client.on('webcamClose', () => {
+  _client.onWebcamClose(() => {
     if (webcamEl.value) {
       webcamEl.value.srcObject = null;
     }
   });
 
-  _client.on('micProduce', (micProducer) => {
+  _client.onMicProduce((micProducer) => {
     (micProducer.appData as any).volumeWatcher.on(
       'volumeChange',
       (data: any) => {
@@ -72,7 +72,7 @@ onMounted(() => {
     );
   });
 
-  _client.on('micClose', () => {
+  _client.onMicClose(() => {
     console.log('micClose');
   });
 
