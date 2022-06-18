@@ -1,5 +1,6 @@
 {
   "name": "tailchat-convict",
+  "private": true,
   "version": "1.0.0",
   "description": "fork from convict, for browser",
   "main": "lib/index.js",
