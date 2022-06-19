@@ -42,12 +42,12 @@ export class ProducerClient extends EventEmitter<ProducerClientEventMap> {
     return !!this.currentWebcamProducer;
   }
 
-  async enableWebcam() {
+  enableWebcam = async () => {
     logger.debug('enableWebcam()');
     await this.updateWebcam({ init: true, start: true });
-  }
+  };
 
-  async disableWebcam() {
+  disableWebcam = async () => {
     logger.debug('disableWebcam()');
 
     if (!this.media) {
@@ -61,12 +61,12 @@ export class ProducerClient extends EventEmitter<ProducerClientEventMap> {
     this.media.changeProducer(this.currentWebcamProducer.id, 'close');
     this.emit('webcamClose', this.currentWebcamProducer.id);
     this.currentWebcamProducer = undefined;
-  }
+  };
 
   /**
    * 更新摄像头
    */
-  private async updateWebcam({
+  private updateWebcam = async ({
     init = false,
     start = false,
     restart = false,
@@ -74,7 +74,7 @@ export class ProducerClient extends EventEmitter<ProducerClientEventMap> {
     newResolution = null,
     newFrameRate = null,
     selectedVideoDevice = '',
-  }: UpdateWebcamParams = {}) {
+  }: UpdateWebcamParams = {}) => {
     logger.debug(
       'updateWebcam() [start:"%s", restart:"%s", newDeviceId:"%s", newResolution:"%s", newFrameRate:"%s"]',
       start,
@@ -204,7 +204,7 @@ export class ProducerClient extends EventEmitter<ProducerClientEventMap> {
 
       throw err;
     }
-  }
+  };
   //#endregion
 
   //#region mic 麦克风
@@ -213,11 +213,11 @@ export class ProducerClient extends EventEmitter<ProducerClientEventMap> {
     return !!this.currentMicProducer;
   }
 
-  async enableMic() {
+  enableMic = async () => {
     await this.updateMic({ start: true });
-  }
+  };
 
-  async disableMic() {
+  disableMic = async () => {
     if (!this.media) {
       throw new InitClientError();
     }
@@ -229,14 +229,14 @@ export class ProducerClient extends EventEmitter<ProducerClientEventMap> {
     this.media.changeProducer(this.currentMicProducer.id, 'close');
     this.emit('micClose', this.currentMicProducer.id);
     this.currentMicProducer = undefined;
-  }
+  };
 
-  async updateMic({
+  updateMic = async ({
     start = false,
     restart = true,
     newDeviceId = null,
     selectedAudioDevice = '',
-  } = {}) {
+  } = {}) => {
     logger.debug(
       'updateMic() [start:"%s", restart:"%s", newDeviceId:"%s"]',
       start,
@@ -349,6 +349,6 @@ export class ProducerClient extends EventEmitter<ProducerClientEventMap> {
         track.stop();
       }
     }
-  }
+  };
   //#endregion
 }
