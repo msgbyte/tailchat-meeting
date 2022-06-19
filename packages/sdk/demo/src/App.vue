@@ -39,8 +39,8 @@ const roomId = '123456789';
 const client = ref<TailchatMeetingClient | null>(null);
 const volume = ref({});
 const peers = ref<Peer[]>([]);
-const enabledWebcam = computed(() => client.value?.webcamEnabled ?? false);
-const enabledMic = computed(() => client.value?.micEnabled ?? false);
+const enabledWebcam = ref(false);
+const enabledMic = ref(false);
 
 const webcamEl = ref<HTMLVideoElement>();
 const consumerUpdater = ref<number>(0);
@@ -55,12 +55,16 @@ onMounted(() => {
     if (webcamEl.value && webcamProducer.track) {
       webcamEl.value.srcObject = new MediaStream([webcamProducer.track]);
     }
+
+    enabledWebcam.value = true;
   });
 
   _client.onWebcamClose(() => {
     if (webcamEl.value) {
       webcamEl.value.srcObject = null;
     }
+
+    enabledWebcam.value = false;
   });
 
   _client.onMicProduce((micProducer) => {
@@ -70,10 +74,14 @@ onMounted(() => {
         volume.value = data;
       }
     );
+
+    enabledMic.value = true;
   });
 
   _client.onMicClose(() => {
     console.log('micClose');
+
+    enabledMic.value = false;
   });
 
   client.value = _client;
