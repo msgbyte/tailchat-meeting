@@ -21,7 +21,7 @@
       <div>{{ JSON.stringify(peers) }}</div>
 
       <div v-for="peer in peers" :key="peer.id + consumerUpdater">
-        <PeerView :track="getMediaWebcamTrack(peer.id)" />
+        <PeerContainer :tracks="getPeerMediaTracks(peer.id)" />
       </div>
     </div>
   </div>
@@ -30,7 +30,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 import { TailchatMeetingClient, Peer } from '../../src/index';
-import PeerView from './PeerView.vue';
+import PeerContainer from './Peer.vue';
 
 const meetingUrl = process.env.TAILCHAT_MEETING_URL ?? '';
 console.log('meetingUrl', meetingUrl);
@@ -148,14 +148,21 @@ function switchMic() {
   }
 }
 
-function getMediaWebcamTrack(peerId: string): MediaStreamTrack | undefined {
+function getPeerMediaTracks(peerId: string): MediaStreamTrack[] {
   if (!client.value || !client.value.media) {
     return;
   }
 
-  const { webcamConsumer } = client.value.getConsumersByPeerId(peerId);
-  console.log('peerId, webcamConsumer', peerId, webcamConsumer);
+  const { webcamConsumer, screenConsumer } =
+    client.value.getConsumersByPeerId(peerId);
 
-  return webcamConsumer?.track;
+  console.log(
+    'peerId, webcamConsumer',
+    peerId,
+    webcamConsumer?.track,
+    screenConsumer?.track
+  );
+
+  return [webcamConsumer?.track, screenConsumer?.track].filter(Boolean);
 }
 </script>
