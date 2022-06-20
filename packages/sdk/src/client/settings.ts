@@ -1,8 +1,10 @@
 import type { VIDEO_CONSTRAINS } from '../consts';
 import type { SimulcastProfile } from '../types';
 
+export type VideoResolutionType = keyof typeof VIDEO_CONSTRAINS;
+
 export interface TailchatMeetingClientSettings {
-  resolution: keyof typeof VIDEO_CONSTRAINS;
+  resolution: VideoResolutionType;
   aspectRatio: number;
   /**
    * 视频帧率
@@ -12,6 +14,11 @@ export interface TailchatMeetingClientSettings {
    * 是否开启联播
    */
   simulcast: boolean;
+
+  /**
+   * 是否联播屏幕共享
+   */
+  simulcastSharing: boolean;
   simulcastProfiles: Record<string, SimulcastProfile[]>;
   /**
    * 自动增益控制
@@ -43,6 +50,15 @@ export interface TailchatMeetingClientSettings {
   opusFec: boolean;
   opusPtime: number;
   opusMaxPlaybackRate: number;
+
+  /**
+   * 屏幕共享的分辨率
+   */
+  screenSharingResolution: VideoResolutionType;
+  /**
+   * 屏幕共享的帧率
+   */
+  screenSharingFrameRate: number;
 }
 
 export const defaultSettings: TailchatMeetingClientSettings = {
@@ -50,6 +66,7 @@ export const defaultSettings: TailchatMeetingClientSettings = {
   aspectRatio: 1.778,
   frameRate: 30,
   simulcast: true,
+  simulcastSharing: false,
   simulcastProfiles: {
     '320': [
       {
@@ -121,4 +138,6 @@ export const defaultSettings: TailchatMeetingClientSettings = {
   opusFec: true,
   opusPtime: 20,
   opusMaxPlaybackRate: 48000,
+  screenSharingResolution: 'veryhigh',
+  screenSharingFrameRate: 5,
 };

@@ -7,7 +7,7 @@ import { Logger } from '../helper/logger';
 import hark from 'hark';
 import { VolumeWatcher } from '../helper/volumeWatcher';
 import type { SignalingClient } from './signaling';
-import type { MediaClientConsumer } from '../types';
+import type { MediaClientConsumer, MediaSourceType } from '../types';
 
 const logger = new Logger('MediaClient');
 
@@ -77,6 +77,18 @@ export class MediaClient extends EventEmitter<MediaClientEventMap> {
 
   public getProducers(): Producer[] {
     return [...this.producers.values()];
+  }
+
+  /**
+   * 根据来源类型查找生产者
+   * @param sourceType 来源类型
+   */
+  public findProducerWithSourceType(
+    sourceType: MediaSourceType
+  ): Producer | undefined {
+    return this.getProducers().find(
+      (producer) => producer.appData.source === sourceType
+    );
   }
 
   public getTrack(trackId: string): MediaStreamTrack | undefined {

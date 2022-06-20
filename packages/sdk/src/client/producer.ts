@@ -4,7 +4,11 @@ import { getVideoConstrains } from '../consts';
 import { InitClientError } from '../error';
 import { getEncodings } from '../helper/encodings';
 import { Logger } from '../helper/logger';
-import type { Producer, UpdateWebcamParams } from '../types';
+import type {
+  Producer,
+  UpdateDeviceParams,
+  UpdateWebcamParams,
+} from '../types';
 
 const logger = new Logger('producer');
 
@@ -13,6 +17,10 @@ interface ProducerClientEventMap {
   webcamClose: (webcamProducerId: string) => void;
   micProduce: (micProducer: Producer) => void;
   micClose: (micProducerId: string) => void;
+  screenVideoProduce: (screenVideoProducer: Producer) => void;
+  screenAudioProduce: (screenAudioProducer: Producer) => void;
+  screenVideoClose: (screenVideoId: string) => void;
+  screenAudioClose: (screenAudioId: string) => void;
 }
 
 /**
@@ -44,7 +52,7 @@ export class ProducerClient extends EventEmitter<ProducerClientEventMap> {
 
   enableWebcam = async () => {
     logger.debug('enableWebcam()');
-    await this.updateWebcam({ init: true, start: true });
+    await this.updateWebcam({ start: true });
   };
 
   disableWebcam = async () => {
@@ -67,21 +75,16 @@ export class ProducerClient extends EventEmitter<ProducerClientEventMap> {
    * 更新摄像头
    */
   private updateWebcam = async ({
-    init = false,
     start = false,
     restart = false,
     newDeviceId = null,
-    newResolution = null,
-    newFrameRate = null,
     selectedVideoDevice = '',
   }: UpdateWebcamParams = {}) => {
     logger.debug(
-      'updateWebcam() [start:"%s", restart:"%s", newDeviceId:"%s", newResolution:"%s", newFrameRate:"%s"]',
+      'updateWebcam() [start:"%s", restart:"%s", newDeviceId:"%s"]',
       start,
       restart,
-      newDeviceId,
-      newResolution,
-      newFrameRate
+      newDeviceId
     );
 
     if (!this.media) {
@@ -287,9 +290,7 @@ export class ProducerClient extends EventEmitter<ProducerClientEventMap> {
         opusMaxPlaybackRate,
       } = this.settings;
 
-      micProducer = this.media
-        .getProducers()
-        .find((producer) => producer.appData.source === 'mic');
+      micProducer = this.media.findProducerWithSourceType('mic');
 
       if ((restart && micProducer) || start) {
         if (micProducer) {
@@ -350,5 +351,211 @@ export class ProducerClient extends EventEmitter<ProducerClientEventMap> {
       }
     }
   };
+  //#endregion
+
+  //#region 屏幕共享
+
+  private currentScreenProducer?: Producer;
+  private currentScreenAudioProducer?: Producer;
+  get screenSharingEnabled() {
+    return !!this.currentScreenProducer;
+  }
+
+  /**
+   * 启动屏幕共享
+   */
+  enableScreenSharing = async () => {
+    logger.debug('enableScreenSharing()');
+    await this.updateScreenSharing({ start: true });
+  };
+
+  /**
+   * 禁用屏幕共享
+   */
+  disableScreenSharing = async () => {
+    logger.debug('disableScreenSharing()');
+
+    if (!this.media) {
+      throw new InitClientError();
+    }
+
+    if (!this.currentScreenProducer) {
+      return;
+    }
+
+    this.media.changeProducer(this.currentScreenProducer.id, 'close');
+    this.emit('screenVideoClose', this.currentScreenProducer.id);
+    this.currentWebcamProducer = undefined;
+
+    if (this.currentScreenAudioProducer) {
+      this.media.changeProducer(this.currentScreenAudioProducer.id, 'close');
+      this.emit('screenAudioClose', this.currentScreenAudioProducer.id);
+      this.currentScreenAudioProducer = undefined;
+    }
+  };
+
+  /**
+   * 更新屏幕共享流
+   */
+  async updateScreenSharing({ start = false }: UpdateDeviceParams = {}) {
+    logger.debug(
+      'updateScreenSharing() [start:%s, newResolution:%s, newFrameRate:%s]',
+      start
+    );
+
+    if (!this.media) {
+      throw new InitClientError();
+    }
+
+    let audioTrack: MediaStreamTrack | null | undefined;
+    let videoTrack: MediaStreamTrack | null | undefined;
+    let screenAudioProducer: Producer | null | undefined;
+    let screenVideoProducer: Producer | null | undefined;
+
+    try {
+      const canShareScreen = this.media.mediaCapabilities.canShareScreen;
+
+      if (!canShareScreen) {
+        throw new Error('cannot produce screen share');
+      }
+
+      const {
+        screenSharingResolution,
+        autoGainControl,
+        echoCancellation,
+        noiseSuppression,
+        aspectRatio,
+        screenSharingFrameRate,
+        sampleRate,
+        channelCount,
+        sampleSize,
+        opusStereo,
+        opusDtx,
+        opusFec,
+        opusPtime,
+        opusMaxPlaybackRate,
+      } = this.settings;
+
+      screenVideoProducer = this.media.findProducerWithSourceType('screen');
+      screenAudioProducer =
+        this.media.findProducerWithSourceType('screenaudio');
+
+      if (start) {
+        const stream = await navigator.mediaDevices.getDisplayMedia({
+          video: {
+            ...getVideoConstrains(screenSharingResolution, aspectRatio),
+            frameRate: screenSharingFrameRate,
+          },
+          audio: {
+            sampleRate,
+            channelCount,
+            autoGainControl,
+            echoCancellation,
+            noiseSuppression,
+            sampleSize,
+          },
+        });
+
+        [videoTrack] = stream.getVideoTracks();
+
+        if (!videoTrack) throw new Error('no screen track');
+
+        const { width, height } = videoTrack.getSettings();
+
+        if (this.settings.simulcastSharing) {
+          /**
+           * 联播
+           */
+          const encodings = getEncodings(
+            this.media.rtpCapabilities,
+            this.settings.simulcastProfiles,
+            width,
+            height
+          );
+
+          const resolutionScalings = encodings.map(
+            (encoding) => encoding.scaleResolutionDownBy
+          );
+
+          screenVideoProducer = await this.media.produce({
+            track: videoTrack,
+            encodings,
+            codecOptions: {
+              videoGoogleStartBitrate: 1000,
+            },
+            appData: {
+              source: 'screen',
+              width,
+              height,
+              resolutionScalings,
+            },
+          });
+        } else {
+          screenVideoProducer = await this.media.produce({
+            track: videoTrack,
+            codecOptions: {
+              videoGoogleStartBitrate: 1000,
+            },
+            appData: {
+              source: 'screen',
+              width,
+              height,
+            },
+          });
+        }
+
+        [audioTrack] = stream.getAudioTracks();
+
+        if (audioTrack) {
+          screenAudioProducer = await this.media.produce({
+            track: audioTrack,
+            codecOptions: {
+              opusStereo: opusStereo,
+              opusFec: opusFec,
+              opusDtx: opusDtx,
+              opusMaxPlaybackRate: opusMaxPlaybackRate,
+              opusPtime: opusPtime,
+            },
+            appData: { source: 'mic' },
+          });
+        }
+      } else {
+        if (screenVideoProducer) {
+          ({ track: videoTrack } = screenVideoProducer);
+
+          await videoTrack?.applyConstraints({
+            ...getVideoConstrains(screenSharingResolution, aspectRatio),
+            frameRate: screenSharingFrameRate,
+          });
+        }
+
+        if (screenAudioProducer) {
+          ({ track: audioTrack } = screenAudioProducer);
+
+          await audioTrack?.applyConstraints({
+            sampleRate,
+            channelCount,
+            autoGainControl,
+            echoCancellation,
+            noiseSuppression,
+            sampleSize,
+          });
+        }
+      }
+
+      this.emit('screenVideoProduce', screenVideoProducer!);
+      this.emit('screenAudioProduce', screenAudioProducer!);
+    } catch (error) {
+      logger.error('updateScreenSharing() [error:%o]', error);
+
+      if (audioTrack) {
+        audioTrack.stop();
+      }
+
+      if (videoTrack) {
+        videoTrack.stop();
+      }
+    }
+  }
   //#endregion
 }

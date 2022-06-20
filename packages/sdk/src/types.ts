@@ -6,6 +6,7 @@ import type {
   RtpParameters,
 } from 'mediasoup-client/lib/RtpParameters';
 import type { DtlsParameters } from 'mediasoup-client/lib/Transport';
+import type { ProducerOptions } from 'mediasoup-client/lib/types';
 import type { VolumeWatcher } from './helper/volumeWatcher';
 
 export type { MediaKind };
@@ -65,13 +66,14 @@ export interface JoinResponse {
 }
 
 export interface UpdateWebcamParams {
-  init?: boolean;
   start?: boolean;
   restart?: boolean;
   newDeviceId?: any;
-  newResolution?: any;
-  newFrameRate?: any;
   selectedVideoDevice?: string;
+}
+
+export interface UpdateDeviceParams {
+  start?: boolean;
 }
 
 export interface CreateWebRtcTransport {
@@ -186,11 +188,25 @@ export interface Volume {
   scaledVolume: number;
 }
 
+export type MediaSourceType =
+  | 'mic'
+  | 'webcam'
+  | 'screen'
+  | 'extravideo'
+  | 'screen'
+  | 'screenaudio';
+
+export type MediaAppData = {
+  peerId: string;
+  source: MediaSourceType;
+  hark?: Harker;
+  volumeWatcher?: VolumeWatcher;
+};
+
 export interface MediaClientConsumer extends mediasoupTypes.Consumer {
-  appData: {
-    peerId: string;
-    source: 'mic' | 'webcam' | 'screen' | 'extravideo';
-    hark?: Harker;
-    volumeWatcher?: VolumeWatcher;
-  };
+  appData: MediaAppData;
+}
+
+export interface MediaClientProducerOptions extends ProducerOptions {
+  appData: MediaAppData;
 }
