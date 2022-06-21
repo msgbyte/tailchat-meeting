@@ -210,3 +210,10 @@ export interface MediaClientConsumer extends mediasoupTypes.Consumer {
 export interface MediaClientProducerOptions extends ProducerOptions {
   appData: MediaAppData;
 }
+
+export type SignalingSendRequestMap = {
+  chatMessage: [ChatMessageData, any];
+  changeDisplayName: [DisplayNameData, any];
+  resumeProducer: [PauseProducerData, any];
+  produce: [ProduceData, any];
+};

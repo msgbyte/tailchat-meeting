@@ -14,6 +14,7 @@ import type {
   ProduceData,
   PromotePeerData,
   ResumeProducerData,
+  SignalingSendRequestMap,
   SocketInboundNotification,
   SocketOutboundRequest,
 } from '../types';
@@ -46,6 +47,14 @@ interface SignalingClientEventMap {
 
   // General server messages
   notification: (notification: SocketInboundNotification) => void;
+}
+
+export interface SignalingClient {
+  // 增加固定类型输入输出
+  sendRequest<K extends keyof SignalingSendRequestMap>(
+    method: K,
+    data: SignalingSendRequestMap[K][0]
+  ): Promise<SignalingSendRequestMap[K][1]>;
 }
 
 export class SignalingClient extends EventEmitter<SignalingClientEventMap> {
@@ -137,7 +146,6 @@ export class SignalingClient extends EventEmitter<SignalingClientEventMap> {
       | ChatMessageData
       | FilesharingData
       | undefined
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<T> {
     logger.debug('sendRequest() [method:%s, data:%o]', method, data);
 

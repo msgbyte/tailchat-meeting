@@ -15,6 +15,7 @@
     </div>
     <div>
       <video ref="webcamEl" :autoPlay="true"></video>
+      <video ref="screenSharingEl" :autoPlay="true"></video>
       <div>
         音量信息: <span>{{ JSON.stringify(volume) }}</span>
       </div>
@@ -31,7 +32,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { TailchatMeetingClient, Peer } from '../../src/index';
 import PeerContainer from './Peer.vue';
 
@@ -47,6 +48,7 @@ const enabledMic = ref(false);
 const enableScreenSharing = ref(false);
 
 const webcamEl = ref<HTMLVideoElement>();
+const screenSharingEl = ref<HTMLVideoElement>();
 const consumerUpdater = ref<number>(0);
 
 onMounted(() => {
@@ -71,6 +73,24 @@ onMounted(() => {
     enabledWebcam.value = false;
   });
 
+  _client.onScreenSharingProduce((screenSharingProducer) => {
+    if (screenSharingEl.value && screenSharingProducer.track) {
+      screenSharingEl.value.srcObject = new MediaStream([
+        screenSharingProducer.track,
+      ]);
+    }
+
+    enableScreenSharing.value = true;
+  });
+
+  _client.onScreenSharingClose(() => {
+    if (screenSharingEl.value) {
+      screenSharingEl.value.srcObject = null;
+    }
+
+    enableScreenSharing.value = false;
+  });
+
   _client.onMicProduce((micProducer) => {
     (micProducer.appData as any).volumeWatcher.on(
       'volumeChange',
@@ -84,15 +104,6 @@ onMounted(() => {
 
   _client.onMicClose(() => {
     enabledMic.value = false;
-  });
-
-  _client.onScreenSharingProduce(() => {
-    enableScreenSharing.value = true;
-  });
-
-  _client.onScreenSharingClose(() => {
-    console.log('onScreenSharingClose');
-    enableScreenSharing.value = false;
   });
 
   client.value = _client;
