@@ -349,7 +349,9 @@ export class MediaClient extends EventEmitter<MediaClientEventMap> {
 
     // eslint-disable-next-line no-shadow
     transport.on('connect', ({ dtlsParameters }, callback, errback) => {
-      if (!transport) return;
+      if (!transport) {
+        return;
+      }
 
       this.signaling
         .sendRequest('connectWebRtcTransport', {
@@ -421,11 +423,15 @@ export class MediaClient extends EventEmitter<MediaClientEventMap> {
     });
 
     producer.once('transportclose', () => {
-      this.changeProducer(producer.id, 'close', false);
+      // producer 的end行为 应该都是本地
+      // this.changeProducer(producer.id, 'close', false);
+      this.changeProducer(producer.id, 'close', true);
     });
 
     producer.once('trackended', () => {
-      this.changeProducer(producer.id, 'close', false);
+      // this.changeProducer(producer.id, 'close', false);
+      // producer 的end行为 应该都是本地
+      this.changeProducer(producer.id, 'close', true);
     });
 
     return producer;

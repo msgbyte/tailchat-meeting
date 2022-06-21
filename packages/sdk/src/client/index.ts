@@ -63,6 +63,18 @@ export class TailchatMeetingClient extends EventEmitter<TailchatMeetingClientEve
     return this.producer.micEnabled;
   }
 
+  get enableScreenSharing() {
+    return this.producer.enableScreenSharing;
+  }
+
+  get disableScreenSharing() {
+    return this.producer.disableScreenSharing;
+  }
+
+  get screenSharingEnabled() {
+    return this.producer.screenSharingEnabled;
+  }
+
   /**
    * 加入房间
    */
@@ -234,6 +246,22 @@ export class TailchatMeetingClient extends EventEmitter<TailchatMeetingClientEve
    */
   public onMicClose(callback: () => void) {
     this.producer.on('micClose', callback);
+  }
+
+  /**
+   * 当本地麦克风打开
+   */
+  public onScreenSharingProduce(
+    callback: (screenVideoProducer: Producer) => void
+  ) {
+    this.producer.on('screenVideoProduce', callback);
+  }
+
+  /**
+   * 当本地麦克风关闭
+   */
+  public onScreenSharingClose(callback: () => void) {
+    this.producer.on('screenVideoClose', callback);
   }
 
   /**

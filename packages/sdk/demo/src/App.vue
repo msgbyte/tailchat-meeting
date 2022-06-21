@@ -9,6 +9,9 @@
       <button id="mic-btn" @click="switchMic">
         {{ enabledMic ? '关闭' : '开启' }} 麦克风
       </button>
+      <button id="mic-btn" @click="switchScreenSharing">
+        {{ enableScreenSharing ? '关闭' : '开启' }} 屏幕共享
+      </button>
     </div>
     <div>
       <video ref="webcamEl" :autoPlay="true"></video>
@@ -41,6 +44,7 @@ const volume = ref({});
 const peers = ref<Peer[]>([]);
 const enabledWebcam = ref(false);
 const enabledMic = ref(false);
+const enableScreenSharing = ref(false);
 
 const webcamEl = ref<HTMLVideoElement>();
 const consumerUpdater = ref<number>(0);
@@ -79,9 +83,16 @@ onMounted(() => {
   });
 
   _client.onMicClose(() => {
-    console.log('micClose');
-
     enabledMic.value = false;
+  });
+
+  _client.onScreenSharingProduce(() => {
+    enableScreenSharing.value = true;
+  });
+
+  _client.onScreenSharingClose(() => {
+    console.log('onScreenSharingClose');
+    enableScreenSharing.value = false;
   });
 
   client.value = _client;
@@ -145,6 +156,18 @@ function switchMic() {
     client.value.disableMic();
   } else {
     client.value.enableMic();
+  }
+}
+
+function switchScreenSharing() {
+  if (!client.value) {
+    return;
+  }
+
+  if (client.value.screenSharingEnabled) {
+    client.value.disableScreenSharing();
+  } else {
+    client.value.enableScreenSharing();
   }
 }
 

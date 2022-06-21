@@ -354,7 +354,6 @@ export class ProducerClient extends EventEmitter<ProducerClientEventMap> {
   //#endregion
 
   //#region 屏幕共享
-
   private currentScreenProducer?: Producer;
   private currentScreenAudioProducer?: Producer;
   get screenSharingEnabled() {
@@ -385,7 +384,7 @@ export class ProducerClient extends EventEmitter<ProducerClientEventMap> {
 
     this.media.changeProducer(this.currentScreenProducer.id, 'close');
     this.emit('screenVideoClose', this.currentScreenProducer.id);
-    this.currentWebcamProducer = undefined;
+    this.currentScreenProducer = undefined;
 
     if (this.currentScreenAudioProducer) {
       this.media.changeProducer(this.currentScreenAudioProducer.id, 'close');
@@ -545,6 +544,12 @@ export class ProducerClient extends EventEmitter<ProducerClientEventMap> {
 
       this.emit('screenVideoProduce', screenVideoProducer!);
       this.emit('screenAudioProduce', screenAudioProducer!);
+      this.currentScreenProducer = screenVideoProducer;
+      this.currentScreenAudioProducer = screenAudioProducer;
+
+      this.currentScreenProducer?.on('trackended', () => {
+        this.disableScreenSharing();
+      });
     } catch (error) {
       logger.error('updateScreenSharing() [error:%o]', error);
 
