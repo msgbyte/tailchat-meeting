@@ -231,7 +231,7 @@ export class Room extends EventEmitter {
   _locked;
 
   // if true: accessCode is a possibility to open the room
-  _joinByAccesCode = true;
+  _joinByAccessCode = true;
 
   // access code to the room,
   // applicable if ( _locked == true and _joinByAccessCode == true )

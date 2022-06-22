@@ -22,8 +22,8 @@ services:
       - VALIDATION=http
     volumes:
       - ./config/nginx.conf:/config/nginx/site-confs/default:ro
-    ports:
-      - 443:443
+    # ports:
+    #   - 443:443
     restart: unless-stopped
     network_mode: "host"
     extra_hosts:
@@ -41,8 +41,8 @@ services:
       - ${PWD}/config/server-config.js:/tailchat-meeting/server/dist/config/config.js:ro
       - ${PWD}/config/server-config.yaml:/tailchat-meeting/server/dist/config/config.yaml:ro
       - ${PWD}/config/app-config.js:/tailchat-meeting/server/dist/public/config/config.js:ro
-    ports:
-      - 13001:13001
+    # ports:
+    #   - 13001:13001
     depends_on:
       - redis
     network_mode: "host"
