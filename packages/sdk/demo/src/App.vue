@@ -1,40 +1,64 @@
 <template>
   <div>
-    <div>远程地址: {{ meetingUrl }}</div>
-    <div>房间号: {{ roomId }}</div>
-    <div>
-      <button id="webcam-btn" @click="switchWebcam">
-        {{ enabledWebcam ? '关闭' : '开启' }} 摄像头
-      </button>
-      <button id="mic-btn" @click="switchMic">
-        {{ enabledMic ? '关闭' : '开启' }} 麦克风
-      </button>
-      <button id="mic-btn" @click="switchScreenSharing">
-        {{ enableScreenSharing ? '关闭' : '开启' }} 屏幕共享
-      </button>
-    </div>
-    <div>
-      <video ref="webcamEl" :autoPlay="true"></video>
-      <video ref="screenSharingEl" :autoPlay="true"></video>
+    <a-space direction="vertical">
       <div>
-        音量信息: <span>{{ JSON.stringify(volume) }}</span>
+        远程地址: <a-tag>{{ meetingUrl }}</a-tag>
       </div>
-    </div>
-    <div>
-      <div>其他参会人:</div>
-      <div>{{ JSON.stringify(peers) }}</div>
+      <div>
+        房间号:
+        <a-tag>
+          {{ roomId }}
+        </a-tag>
+      </div>
+      <a-space>
+        <a-button
+          :type="enabledWebcam ? 'primary' : 'secondary'"
+          @click="switchWebcam"
+        >
+          {{ enabledWebcam ? '关闭' : '开启' }} 摄像头
+        </a-button>
+        <a-button
+          :type="enabledMic ? 'primary' : 'secondary'"
+          @click="switchMic"
+        >
+          {{ enabledMic ? '关闭' : '开启' }} 麦克风
+        </a-button>
+        <a-button
+          :type="enableScreenSharing ? 'primary' : 'secondary'"
+          @click="switchScreenSharing"
+        >
+          {{ enableScreenSharing ? '关闭' : '开启' }} 屏幕共享
+        </a-button>
+      </a-space>
 
-      <div v-for="peer in peers" :key="peer.id + consumerUpdater">
-        <PeerContainer :tracks="getPeerMediaTracks(peer.id)" />
+      <div v-if="client">
+        <Settings :client="client" />
       </div>
-    </div>
+
+      <div>
+        <video ref="webcamEl" :autoPlay="true"></video>
+        <video ref="screenSharingEl" :autoPlay="true"></video>
+        <div>
+          音量信息: <span>{{ JSON.stringify(volume) }}</span>
+        </div>
+      </div>
+      <div>
+        <div>其他参会人:</div>
+        <div>{{ JSON.stringify(peers) }}</div>
+
+        <div v-for="peer in peers" :key="peer.id + consumerUpdater">
+          <PeerContainer :tracks="getPeerMediaTracks(peer.id)" />
+        </div>
+      </div>
+    </a-space>
   </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { TailchatMeetingClient, Peer } from '../../src/index';
+import { TailchatMeetingClient, Peer } from '../../src';
 import PeerContainer from './Peer.vue';
+import Settings from './Settings.vue';
 
 const meetingUrl = process.env.TAILCHAT_MEETING_URL ?? '';
 console.log('meetingUrl', meetingUrl);
