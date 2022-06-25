@@ -10,6 +10,14 @@
           {{ roomId }}
         </a-tag>
       </div>
+
+      <div>
+        用户名: <a-tag>{{ displayName }}</a-tag>
+      </div>
+      <div>
+        用户头像:
+        <a-avatar><img alt="avatar" :src="picture" /></a-avatar>
+      </div>
       <a-space>
         <a-button
           :type="enabledWebcam ? 'primary' : 'secondary'"
@@ -59,6 +67,12 @@ import { onMounted, ref } from 'vue';
 import { TailchatMeetingClient, Peer } from '../../src';
 import PeerContainer from './Peer.vue';
 import Settings from './Settings.vue';
+import { AvatarGenerator } from 'random-avatar-generator';
+import { Chance } from 'chance';
+
+const chance = new Chance();
+
+const generator = new AvatarGenerator();
 
 const meetingUrl = process.env.TAILCHAT_MEETING_URL ?? '';
 console.log('meetingUrl', meetingUrl);
@@ -74,6 +88,9 @@ const enableScreenSharing = ref(false);
 const webcamEl = ref<HTMLVideoElement>();
 const screenSharingEl = ref<HTMLVideoElement>();
 const consumerUpdater = ref<number>(0);
+
+const displayName = chance.name();
+const picture = generator.generateRandomAvatar();
 
 onMounted(() => {
   const _client = new TailchatMeetingClient(
@@ -145,8 +162,9 @@ async function joinRoom() {
       await client.value.join(roomId, {
         video: false,
         audio: false,
-        displayName: 'foo',
-        picture: '',
+        displayName,
+        // picture: '',
+        picture,
       });
 
       client.value.onPeerConsumerUpdate(() => {
