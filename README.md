@@ -7,6 +7,8 @@ Tailchat 视频会议
 
 ## start with docker
 
+若要查看完整文档, 请访问: [部署视频会议](https://tailchat.msgbyte.com/docs/meeting/deployment)
+
 #### 构建镜像
 ```bash
 cd compose
