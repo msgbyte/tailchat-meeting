@@ -228,7 +228,7 @@ export class Room extends EventEmitter {
   _queue = new AwaitQueue();
 
   // Locked flag.
-  _locked;
+  _locked: boolean;
 
   // if true: accessCode is a possibility to open the room
   _joinByAccessCode = true;
@@ -260,6 +260,18 @@ export class Room extends EventEmitter {
   _currentActiveSpeaker = null;
 
   _tokens = new Map();
+
+  /**
+   * 房间创建时间
+   */
+  startAt = Date.now();
+
+  /**
+   * 房间销毁时间
+   *
+   * 在主要流程中没有什么用
+   */
+  endAt: number;
 
   constructor({
     roomId,
@@ -332,6 +344,8 @@ export class Room extends EventEmitter {
     this._mediasoupRouters.clear();
 
     this._tokens.clear();
+
+    this.endAt = Date.now();
 
     // Emit 'close' event.
     this.emit('close');

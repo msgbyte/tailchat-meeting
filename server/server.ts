@@ -579,6 +579,10 @@ async function setupRoute() {
     res.json({
       count: peers.length,
       joined: peers.filter((p) => p.joined).length,
+      id: room.id,
+      locked: room.isLocked(),
+      startAt: room.startAt,
+      endAt: room.endAt,
     });
   });
 }
