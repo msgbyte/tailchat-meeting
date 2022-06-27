@@ -85,6 +85,7 @@
 		"source-map-explorer": "^2.1.0",
 		"streamsaver": "^2.0.5",
 		"tailchat-convict": "workspace:^1.0.0",
+		"tailchat-meeting-effect-virtual-background": "workspace:^1.0.0",
 		"tailchat-meeting-sdk": "workspace:^1.0.0",
 		"typescript": "^4.2.4",
 		"web-streams-polyfill": "^3.0.2",

@@ -26,7 +26,7 @@ import {
 } from './transforms/receiver';
 import { config } from './config';
 import { store } from './store/store';
-import { virtualBackgroundEffect } from './transforms/virtualBackgroundEffect';
+import { virtualBackground } from './transforms/virtualBackgroundEffect';
 import type * as MediasoupClient from 'mediasoup-client';
 import type { ConsumerType } from './store/reducers/consumers';
 import type { IceParameters } from 'mediasoup-client/lib/types';
@@ -1685,13 +1685,7 @@ export class RoomClient {
         if (virtualBackgroundEnabled) {
           logger.debug('开始加载虚拟背景', track);
 
-          track = virtualBackgroundEffect.start(stream);
-
-          if (virtualBackgroundUrl === 'blur') {
-            virtualBackgroundEffect.applyBlur();
-          } else {
-            virtualBackgroundEffect.applyImageBackground(virtualBackgroundUrl);
-          }
+          track = virtualBackground.apply(stream, virtualBackgroundUrl);
 
           logger.debug('加载虚拟背景完毕', track);
         }
@@ -4597,7 +4591,7 @@ export class RoomClient {
     const { virtualBackgroundEnabled } = store.getState().settings;
     if (virtualBackgroundEnabled === true) {
       // 清理所有的虚拟背景效果
-      virtualBackgroundEffect.stop();
+      virtualBackground.destroy();
     }
 
     store.dispatch(meActions.setVideoInProgress(true));
