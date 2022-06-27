@@ -19,8 +19,8 @@ import { userRoles } from './lib/access/roles';
 import { Server as SocketIOServer } from 'socket.io';
 import { loginHelper, logoutHelper } from './lib/helpers/httpHelper';
 import { config, configError } from './lib/config/config';
+import promExporter from './lib/stats/promExporter';
 const interactiveServer = require('./lib/interactive/Server');
-const promExporter = require('./lib/stats/promExporter');
 
 let spdy;
 if (Number(process.versions.node.split('.')[0]) < 15) {
