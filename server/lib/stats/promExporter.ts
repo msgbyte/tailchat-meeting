@@ -1,13 +1,11 @@
 import Logger from '../logger/Logger';
 import express from 'express';
 import promClient from 'prom-client';
-
-const collectDefaultMetrics = require('../stats/metrics/default');
-const RegisterAggregated = require('../stats/metrics/aggregated');
+import RegisterAggregated from '../stats/metrics/aggregated';
+import collectDefaultMetrics from '../stats/metrics/default';
+import { config } from '../config/config';
 
 const logger = new Logger('promClient');
-
-import { config } from '../config/config';
 
 export default async function (workers, rooms, peers) {
   try {
