@@ -28,6 +28,7 @@ import { detectDevice } from 'mediasoup-client';
 import { recorder } from './features/BrowserRecorder';
 import { config, configError } from './config';
 import { meActions } from './store/slices/me';
+import { initPeerVolume } from './store/actions/peerVolumeActions';
 
 import './index.css';
 
@@ -179,6 +180,8 @@ function run() {
       loginEnabled: config.loginEnabled,
     })
   );
+  // 初始化当前音量配置
+  store.dispatch(initPeerVolume(peerId));
   if (avatarUrl) {
     store.dispatch(meActions.setPicture(avatarUrl));
   }
