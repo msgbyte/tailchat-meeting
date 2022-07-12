@@ -3,7 +3,6 @@ import hark from 'hark';
 import { getSignalingUrl } from './urlFactory';
 import { SocketTimeoutError } from './utils';
 import * as requestActions from './store/actions/requestActions';
-import * as intlActions from './store/actions/intlActions';
 import * as roomActions from './store/actions/roomActions';
 import * as peerActions from './store/actions/peerActions';
 import * as peerVolumeActions from './store/actions/peerVolumeActions';
@@ -33,6 +32,7 @@ import type { IceParameters } from 'mediasoup-client/lib/types';
 import { getEncodings } from 'tailchat-meeting-sdk/lib/helper/encodings';
 import { meActions } from './store/slices/me';
 import isElectron from 'is-electron';
+import { updateIntl } from 'react-intl-redux';
 
 type Priority = 'high' | 'medium' | 'low' | 'very-low';
 
@@ -712,11 +712,10 @@ export class RoomClient {
     const one = locales.loadOne(locale);
 
     store.dispatch(
-      intlActions.updateIntl({
+      updateIntl({
         locale: one.locale[0],
         messages: one.messages,
-        list: locales.getList(),
-      } as any)
+      })
     );
 
     intl = createIntl({

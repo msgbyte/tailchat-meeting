@@ -14,6 +14,9 @@ import { useRoomClient } from '../../RoomContext';
 import { config } from '../../config';
 import { useAppDispatch, useAppSelector } from '../../store/selectors';
 import type { ViewModeType } from '../../store/reducers/room';
+import { getList } from '../../intl/locales';
+
+const localesList = getList();
 
 const useStyles = makeStyles((theme) => ({
   setting: {
@@ -39,7 +42,6 @@ export const AppearanceSettings: React.FC = React.memo(() => {
   const room = useAppSelector((state) => state.room);
   const settings = useAppSelector((state) => state.settings);
   const locale = useAppSelector((state) => state.intl.locale);
-  const localesList = useAppSelector((state) => state.intl.list);
   const dispatch = useAppDispatch();
   const roomClient = useRoomClient();
 

@@ -43,6 +43,7 @@ importers:
       '@types/qs': ^6.9.7
       '@types/react': ^17.0.3
       '@types/react-dom': ^17.0.3
+      '@types/react-intl-redux': ^0.1.16
       '@types/react-redux': ^7.1.24
       '@types/react-router': ^5.1.18
       '@types/react-router-dom': ^5.3.3
@@ -101,7 +102,7 @@ importers:
       react-image-file-resizer: ^0.3.8
       react-images-upload: ^1.2.0
       react-intl: ^3.4.0
-      react-intl-redux: ^2.2.0
+      react-intl-redux: ^2.3.0
       react-number-format: ^4.9.3
       react-redux: ^7.2.3
       react-router: ^5.1.2
@@ -204,6 +205,7 @@ importers:
       '@types/lodash-es': 4.17.6
       '@types/prop-types': 15.7.5
       '@types/qs': 6.9.7
+      '@types/react-intl-redux': 0.1.16_react@16.14.0
       '@types/react-redux': 7.1.24
       '@types/react-router': 5.1.18
       '@types/react-router-dom': 5.3.3
@@ -2937,13 +2939,11 @@ packages:
     resolution: {integrity: sha512-GROA2RP6+7Ouu0WnHFF78O5XIU7pBfI19WM1qm93l6MFWibUk67nCfVCK3VAYJkLy8L8ZxjkYT11VIAfvSz8wg==}
     dependencies:
       '@formatjs/intl-utils': 2.3.0
-    dev: false
 
   /@formatjs/intl-listformat/1.4.8:
     resolution: {integrity: sha512-WNMQlEg0e50VZrGIkgD5n7+DAMGt3boKi1GJALfhFMymslJb5i+5WzWxyj/3a929Z6MAFsmzRIJjKuv+BxKAOQ==}
     dependencies:
       '@formatjs/intl-utils': 2.3.0
-    dev: false
 
   /@formatjs/intl-localematcher/0.2.25:
     resolution: {integrity: sha512-YmLcX70BxoSopLFdLr1Ds99NdlTI2oWoLbaUW2M406lxOIPzE1KQhRz2fPUkq34xVZQaihCoU29h0KK7An3bhA==}
@@ -2955,19 +2955,16 @@ packages:
     resolution: {integrity: sha512-IQ0haY97oHAH5OYUdykNiepdyEWj3SAT+Fp9ZpR85ov2JNiFx+12WWlxlVS8ehdyncC2ZMt/SwFIy2huK2+6/A==}
     dependencies:
       '@formatjs/intl-utils': 2.3.0
-    dev: false
 
   /@formatjs/intl-unified-numberformat/3.3.7:
     resolution: {integrity: sha512-KnWgLRHzCAgT9eyt3OS34RHoyD7dPDYhRcuKn+/6Kv2knDF8Im43J6vlSW6Hm1w63fNq3ZIT1cFk7RuVO3Psag==}
     deprecated: We have renamed the package to @formatjs/intl-numberformat
     dependencies:
       '@formatjs/intl-utils': 2.3.0
-    dev: false
 
   /@formatjs/intl-utils/2.3.0:
     resolution: {integrity: sha512-KWk80UPIzPmUg+P0rKh6TqspRw0G6eux1PuJr+zz47ftMaZ9QDwbGzHZbtzWkl5hgayM/qrKRutllRC7D/vVXQ==}
     deprecated: the package is rather renamed to @formatjs/ecma-abstract with some changes in functionality (primarily selectUnit is removed and we don't plan to make any further changes to this package
-    dev: false
 
   /@formatjs/ts-transformer/3.9.4:
     resolution: {integrity: sha512-S5q/zsTodaKtxVxNvbRQ9APenJtm5smXE76usS+5yF2vWQdZHkagmOKWfgvfIbesP4SR2B+i3koqlnlpqSIp5w==}
@@ -4012,7 +4009,6 @@ packages:
 
   /@types/invariant/2.2.35:
     resolution: {integrity: sha512-DxX1V9P8zdJPYQat1gHyY0xj3efl8gnMVjiM9iCY6y27lj+PoQWkgjt8jDqmovPqULkKVpKRg8J36iQiA+EtEg==}
-    dev: false
 
   /@types/ioredis/4.28.10:
     resolution: {integrity: sha512-69LyhUgrXdgcNDv7ogs1qXZomnfOEnSmrmMFqKgt1XMJxmoOSG/u3wYy13yACIfKuMJ8IhKgHafDO3sx19zVQQ==}
@@ -4148,6 +4144,16 @@ packages:
     dependencies:
       '@types/react': 17.0.45
     dev: false
+
+  /@types/react-intl-redux/0.1.16_react@16.14.0:
+    resolution: {integrity: sha512-Qc4srwfLL9lB6liLSXfjtyfahsUrul3lzH08QkBOuEYrUZNjtTPxH0WykJxP+F+IiZikU5xFxNSautrI8XWmlg==}
+    dependencies:
+      '@types/react-redux': 7.1.24
+      react-intl: 3.12.1_react@16.14.0
+      redux: 4.2.0
+    transitivePeerDependencies:
+      - react
+    dev: true
 
   /@types/react-redux/7.1.24:
     resolution: {integrity: sha512-7FkurKcS1k0FHZEtdbbgN8Oc6b+stGSfZYjQGicofJ0j4U0qIn/jaSvnP2pLwZKiai3/17xqqxkkrxTgN8UNbQ==}
@@ -10747,21 +10753,18 @@ packages:
 
   /intl-format-cache/4.3.1:
     resolution: {integrity: sha512-OEUYNA7D06agqPOYhbTkl0T8HA3QKSuwWh1HiClEnpd9vw7N+3XsQt5iZ0GUEchp5CW1fQk/tary+NsbF3yQ1Q==}
-    dev: false
 
   /intl-messageformat-parser/3.6.4:
     resolution: {integrity: sha512-RgPGwue0mJtoX2Ax8EmMzJzttxjnva7gx0Q7mKJ4oALrTZvtmCeAw5Msz2PcjW4dtCh/h7vN/8GJCxZO1uv+OA==}
     deprecated: We've written a new parser that's 6x faster and is backwards compatible. Please use @formatjs/icu-messageformat-parser
     dependencies:
       '@formatjs/intl-unified-numberformat': 3.3.7
-    dev: false
 
   /intl-messageformat/7.8.4:
     resolution: {integrity: sha512-yS0cLESCKCYjseCOGXuV4pxJm/buTfyCJ1nzQjryHmSehlptbZbn9fnlk1I9peLopZGGbjj46yHHiTAEZ1qOTA==}
     dependencies:
       intl-format-cache: 4.3.1
       intl-messageformat-parser: 3.6.4
-    dev: false
 
   /ip-regex/2.1.0:
     resolution: {integrity: sha512-58yWmlHpp7VYfcdTwMTvwMmqx/Elfxjd9RXTDyMsbL7lLWmhMylLEqiYVLKuLzOZqVgiWXD9MfR62Vv89VRxkw==}
@@ -14865,7 +14868,6 @@ packages:
       intl-messageformat-parser: 3.6.4
       react: 16.14.0
       shallow-equal: 1.2.1
-    dev: false
 
   /react-is/16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
@@ -15944,7 +15946,6 @@ packages:
 
   /shallow-equal/1.2.1:
     resolution: {integrity: sha512-S4vJDjHHMBaiZuT9NPb616CSmLf618jawtv3sufLl6ivK8WocjAo58cXwbRV1cgqxH0Qbv+iUt6m05eqEa2IRA==}
-    dev: false
 
   /shebang-command/1.2.0:
     resolution: {integrity: sha512-EV3L1+UQWGor21OmnvojK36mhg+TyIKDh3iFBKBohr5xeXIhNBcx8oWdgkTEEQ+BEFFYdLRuqMfd5L84N1V5Vg==}

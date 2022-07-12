@@ -67,8 +67,11 @@ import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
 import copy from 'copy-to-clipboard';
 import * as requestActions from '../../store/actions/requestActions';
+import { getList } from '../../intl/locales';
 
 const logger = new Logger('Recorder');
+
+const localesList = getList();
 
 const useStyles = makeStyles((theme) => ({
   persistentDrawerOpen: {
@@ -260,7 +263,6 @@ const TopBar: React.FC = (props: any) => {
     canRecord,
     canPromote,
     locale,
-    localesList,
     localRecordingState,
     recordingInProgress,
     recordingPeers,
@@ -1307,7 +1309,6 @@ const makeMapStateToProps = () => {
     canRecord: hasRecordPermission(state),
     canPromote: hasPromotionPermission(state),
     locale: state.intl.locale,
-    localesList: state.intl.list,
     recordingMimeType: state.settings.recorderPreferredMimeType,
     producers: state.producers,
     consumers: state.consumers,
@@ -1376,7 +1377,6 @@ export default withRoomContext(
         prev.toolarea.unreadFiles === next.toolarea.unreadFiles &&
         prev.toolarea.toolAreaOpen === next.toolarea.toolAreaOpen &&
         prev.intl.locale === next.intl.locale &&
-        prev.intl.localesList === next.intl.localesList &&
         prev.producers === next.producers &&
         prev.consumers === next.consumers &&
         prev.settings.recorderPreferredMimeType ===

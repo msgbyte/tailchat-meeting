@@ -15,10 +15,10 @@ import files from './files';
 import recorder from './recorder';
 import settings from './settings';
 import config from './config';
-import intl from './intl';
+import { intlReducer } from 'react-intl-redux';
 
 export const rootReducer = combineReducers({
-  // intl : intlReducer,
+  intl: intlReducer,
   room,
   me,
   producers,
@@ -34,7 +34,6 @@ export const rootReducer = combineReducers({
   recorder,
   settings,
   config,
-  intl,
 });
 
 export type AppState = typeof rootReducer extends Reducer<

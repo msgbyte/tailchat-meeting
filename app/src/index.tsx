@@ -128,7 +128,7 @@ function run() {
     render(
       <Provider store={store}>
         <MuiThemeProvider theme={theme}>
-          <IntlProvider value={intl}>
+          <IntlProvider locale={intl.locale}>
             <UnsupportedBrowser
               webrtcUnavailable={webrtcUnavailable}
               platform={device.platform}
@@ -146,7 +146,7 @@ function run() {
     render(
       <Provider store={store}>
         <MuiThemeProvider theme={theme}>
-          <IntlProvider value={intl}>
+          <IntlProvider locale={intl.locale}>
             <ConfigDocumentation />
           </IntlProvider>
         </MuiThemeProvider>
@@ -161,7 +161,7 @@ function run() {
     render(
       <Provider store={store}>
         <MuiThemeProvider theme={theme}>
-          <IntlProvider value={intl}>
+          <IntlProvider locale={intl.locale}>
             <ConfigError configError={configError} />
           </IntlProvider>
         </MuiThemeProvider>
@@ -206,7 +206,7 @@ function run() {
   render(
     <Provider store={store}>
       <MuiThemeProvider theme={theme}>
-        <IntlProvider value={intl}>
+        <IntlProvider locale={intl.locale}>
           <PersistGate loading={<LoadingView />} persistor={persistor}>
             <RoomContext.Provider value={roomClient}>
               <SnackbarProvider>

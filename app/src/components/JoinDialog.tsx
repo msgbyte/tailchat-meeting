@@ -43,6 +43,9 @@ import { useAppDispatch, useAppSelector } from '../store/selectors';
 import { isValidStr } from '../utils';
 import { RoomIdInput } from './RoomIdInput';
 import { useHistory } from 'react-router';
+import { getList } from '../intl/locales';
+
+const localesList = getList();
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -158,7 +161,7 @@ const JoinDialog: React.FC<{
   const { displayNameInProgress, loggedIn } = useAppSelector(
     (state) => state.me
   );
-  const { locale, localesList } = useAppSelector((state) => state.intl);
+  const locale = useAppSelector((state) => state.intl.locale);
   const room = useAppSelector((state) => state.room);
   const roomClient = useRoomClient();
   const classes = useStyles();
