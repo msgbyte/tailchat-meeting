@@ -1,8 +1,10 @@
+import { meActions } from '../slices/me';
+
 const initialState: Record<string, number> = {};
 
 const peerVolumes = (state = initialState, action) => {
   switch (action.type) {
-    case 'SET_ME': {
+    case meActions.setMe.type: {
       const { peerId } = action.payload;
 
       return { ...state, [peerId]: -100 };
