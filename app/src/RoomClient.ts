@@ -4,7 +4,6 @@ import { getSignalingUrl } from './urlFactory';
 import { SocketTimeoutError } from './utils';
 import * as requestActions from './store/actions/requestActions';
 import * as roomActions from './store/actions/roomActions';
-import * as peerActions from './store/actions/peerActions';
 import * as peerVolumeActions from './store/actions/peerVolumeActions';
 import * as settingsActions from './store/actions/settingsActions';
 import * as fileActions from './store/actions/fileActions';
@@ -33,6 +32,7 @@ import { meActions } from './store/slices/me';
 import isElectron from 'is-electron';
 import { updateIntl } from 'react-intl-redux';
 import { chatActions, ChatMessage } from './store/slices/chat';
+import { peersActions } from './store/slices/peers';
 
 type Priority = 'high' | 'medium' | 'low' | 'very-low';
 
@@ -1914,7 +1914,9 @@ export class RoomClient {
   async givePeerRole(peerId, roleId) {
     logger.debug('givePeerRole() [peerId:"%s", roleId:"%s"]', peerId, roleId);
 
-    store.dispatch(peerActions.setPeerModifyRolesInProgress(peerId, true));
+    store.dispatch(
+      peersActions.setPeerModifyRolesInProgress({ peerId, flag: true })
+    );
 
     try {
       await this.sendRequest('moderator:giveRole', { peerId, roleId });
@@ -1922,13 +1924,17 @@ export class RoomClient {
       logger.error('givePeerRole() [error:"%o"]', error);
     }
 
-    store.dispatch(peerActions.setPeerModifyRolesInProgress(peerId, false));
+    store.dispatch(
+      peersActions.setPeerModifyRolesInProgress({ peerId, flag: false })
+    );
   }
 
   async removePeerRole(peerId, roleId) {
     logger.debug('removePeerRole() [peerId:"%s", roleId:"%s"]', peerId, roleId);
 
-    store.dispatch(peerActions.setPeerModifyRolesInProgress(peerId, true));
+    store.dispatch(
+      peersActions.setPeerModifyRolesInProgress({ peerId, flag: true })
+    );
 
     try {
       await this.sendRequest('moderator:removeRole', { peerId, roleId });
@@ -1936,13 +1942,15 @@ export class RoomClient {
       logger.error('removePeerRole() [error:"%o"]', error);
     }
 
-    store.dispatch(peerActions.setPeerModifyRolesInProgress(peerId, false));
+    store.dispatch(
+      peersActions.setPeerModifyRolesInProgress({ peerId, flag: false })
+    );
   }
 
   async kickPeer(peerId) {
     logger.debug('kickPeer() [peerId:"%s"]', peerId);
 
-    store.dispatch(peerActions.setPeerKickInProgress(peerId, true));
+    store.dispatch(peersActions.setPeerKickInProgress({ peerId, flag: true }));
 
     try {
       await this.sendRequest('moderator:kickPeer', { peerId });
@@ -1950,13 +1958,13 @@ export class RoomClient {
       logger.error('kickPeer() [error:"%o"]', error);
     }
 
-    store.dispatch(peerActions.setPeerKickInProgress(peerId, false));
+    store.dispatch(peersActions.setPeerKickInProgress({ peerId, flag: false }));
   }
 
   async mutePeer(peerId) {
     logger.debug('mutePeer() [peerId:"%s"]', peerId);
 
-    store.dispatch(peerActions.setMutePeerInProgress(peerId, true));
+    store.dispatch(peersActions.setMutePeerInProgress({ peerId, flag: true }));
 
     try {
       await this.sendRequest('moderator:mute', { peerId });
@@ -1964,13 +1972,15 @@ export class RoomClient {
       logger.error('mutePeer() [error:"%o"]', error);
     }
 
-    store.dispatch(peerActions.setMutePeerInProgress(peerId, false));
+    store.dispatch(peersActions.setMutePeerInProgress({ peerId, flag: false }));
   }
 
   async stopPeerVideo(peerId) {
     logger.debug('stopPeerVideo() [peerId:"%s"]', peerId);
 
-    store.dispatch(peerActions.setStopPeerVideoInProgress(peerId, true));
+    store.dispatch(
+      peersActions.setStopPeerVideoInProgress({ peerId, flag: true })
+    );
 
     try {
       await this.sendRequest('moderator:stopVideo', { peerId });
@@ -1978,14 +1988,16 @@ export class RoomClient {
       logger.error('stopPeerVideo() [error:"%o"]', error);
     }
 
-    store.dispatch(peerActions.setStopPeerVideoInProgress(peerId, false));
+    store.dispatch(
+      peersActions.setStopPeerVideoInProgress({ peerId, flag: false })
+    );
   }
 
   async stopPeerScreenSharing(peerId) {
     logger.debug('stopPeerScreenSharing() [peerId:"%s"]', peerId);
 
     store.dispatch(
-      peerActions.setStopPeerScreenSharingInProgress(peerId, true)
+      peersActions.setStopPeerScreenSharingInProgress({ peerId, flag: true })
     );
 
     try {
@@ -1995,7 +2007,7 @@ export class RoomClient {
     }
 
     store.dispatch(
-      peerActions.setStopPeerScreenSharingInProgress(peerId, false)
+      peersActions.setStopPeerScreenSharingInProgress({ peerId, flag: false })
     );
   }
 
@@ -2061,11 +2073,17 @@ export class RoomClient {
     logger.debug('modifyPeerConsumer() [peerId:"%s", type:"%s"]', peerId, type);
 
     if (type === 'mic')
-      store.dispatch(peerActions.setPeerAudioInProgress(peerId, true));
+      store.dispatch(
+        peersActions.setPeerAudioInProgress({ peerId, flag: true })
+      );
     else if (type === 'webcam')
-      store.dispatch(peerActions.setPeerVideoInProgress(peerId, true));
+      store.dispatch(
+        peersActions.setPeerVideoInProgress({ peerId, flag: true })
+      );
     else if (type === 'screen')
-      store.dispatch(peerActions.setPeerScreenInProgress(peerId, true));
+      store.dispatch(
+        peersActions.setPeerScreenInProgress({ peerId, flag: true })
+      );
 
     try {
       for (const consumer of this._consumers.values()) {
@@ -2082,11 +2100,17 @@ export class RoomClient {
     }
 
     if (type === 'mic')
-      store.dispatch(peerActions.setPeerAudioInProgress(peerId, false));
+      store.dispatch(
+        peersActions.setPeerAudioInProgress({ peerId, flag: false })
+      );
     else if (type === 'webcam')
-      store.dispatch(peerActions.setPeerVideoInProgress(peerId, false));
+      store.dispatch(
+        peersActions.setPeerVideoInProgress({ peerId, flag: false })
+      );
     else if (type === 'screen')
-      store.dispatch(peerActions.setPeerScreenInProgress(peerId, false));
+      store.dispatch(
+        peersActions.setPeerScreenInProgress({ peerId, flag: false })
+      );
   }
 
   async setAudioGain(micConsumer, peerId, audioGain) {
@@ -2167,7 +2191,9 @@ export class RoomClient {
   async lowerPeerHand(peerId) {
     logger.debug('lowerPeerHand() [peerId:"%s"]', peerId);
 
-    store.dispatch(peerActions.setPeerRaisedHandInProgress(peerId, true));
+    store.dispatch(
+      peersActions.setPeerRaisedHandInProgress({ peerId, flag: true })
+    );
 
     try {
       await this.sendRequest('moderator:lowerHand', { peerId });
@@ -2175,7 +2201,9 @@ export class RoomClient {
       logger.error('lowerPeerHand() [error:"%o"]', error);
     }
 
-    store.dispatch(peerActions.setPeerRaisedHandInProgress(peerId, false));
+    store.dispatch(
+      peersActions.setPeerRaisedHandInProgress({ peerId, flag: false })
+    );
   }
 
   async setRaisedHand(raisedHand) {
@@ -2573,7 +2601,7 @@ export class RoomClient {
 
       this._spotlights.clearSpotlights();
 
-      store.dispatch(peerActions.clearPeers());
+      store.dispatch(peersActions.clearPeers());
       store.dispatch(consumerActions.clearConsumers());
       store.dispatch(roomActions.clearSpotlights());
       store.dispatch(roomActions.setRoomState('connecting'));
@@ -2900,7 +2928,9 @@ export class RoomClient {
           case 'changeDisplayName': {
             const { peerId, displayName, oldDisplayName } = notification.data;
 
-            store.dispatch(peerActions.setPeerDisplayName(displayName, peerId));
+            store.dispatch(
+              peersActions.setPeerDisplayName({ displayName, peerId })
+            );
 
             store.dispatch(
               requestActions.notify({
@@ -2925,7 +2955,7 @@ export class RoomClient {
           case 'changePicture': {
             const { peerId, picture } = notification.data;
 
-            store.dispatch(peerActions.setPeerPicture(peerId, picture));
+            store.dispatch(peersActions.setPeerPicture({ peerId, picture }));
 
             break;
           }
@@ -2935,11 +2965,11 @@ export class RoomClient {
               notification.data;
 
             store.dispatch(
-              peerActions.setPeerRaisedHand(
+              peersActions.setPeerRaisedHand({
                 peerId,
                 raisedHand,
-                raisedHandTimestamp
-              )
+                raisedHandTimestamp,
+              })
             );
 
             const { displayName } = store.getState().peers[peerId];
@@ -3075,7 +3105,7 @@ export class RoomClient {
               notification.data;
 
             store.dispatch(
-              peerActions.addPeer({
+              peersActions.addPeer({
                 id,
                 displayName,
                 picture,
@@ -3118,7 +3148,7 @@ export class RoomClient {
 
             this._spotlights.closePeer(peerId);
 
-            store.dispatch(peerActions.removePeer(peerId));
+            store.dispatch(peersActions.removePeer(peerId));
 
             break;
           }
@@ -3191,7 +3221,10 @@ export class RoomClient {
             this._spotlights.addVideoConsumer(consumerStoreObject);
 
             store.dispatch(
-              consumerActions.addConsumer(consumerStoreObject, peerId)
+              consumerActions.addConsumer({
+                consumer: consumerStoreObject,
+                peerId,
+              })
             );
 
             await this._startConsumer(consumer);
@@ -3371,7 +3404,7 @@ export class RoomClient {
                   ),
                 })
               );
-            } else store.dispatch(peerActions.addPeerRole(peerId, roleId));
+            } else store.dispatch(peersActions.addPeerRole({ peerId, roleId }));
 
             break;
           }
@@ -3397,7 +3430,8 @@ export class RoomClient {
                   ),
                 })
               );
-            } else store.dispatch(peerActions.removePeerRole(peerId, roleId));
+            } else
+              store.dispatch(peersActions.removePeerRole({ peerId, roleId }));
 
             break;
           }
@@ -3406,7 +3440,7 @@ export class RoomClient {
             const { peerId, consent } = notification.data;
 
             store.dispatch(
-              peerActions.setPeerLocalRecordingConsent(peerId, consent)
+              peersActions.setPeerLocalRecordingConsent({ peerId, consent })
             );
 
             break;
@@ -3426,10 +3460,10 @@ export class RoomClient {
 
             // Save state to peer
             store.dispatch(
-              peerActions.setPeerLocalRecordingState(
+              peersActions.setPeerLocalRecordingState({
                 peerId,
-                localRecordingState
-              )
+                localRecordingState,
+              })
             );
 
             switch (localRecordingState) {
@@ -3796,7 +3830,7 @@ export class RoomClient {
       }
 
       for (const peer of peers) {
-        store.dispatch(peerActions.addPeer({ ...peer, consumers: [] }));
+        store.dispatch(peersActions.addPeer({ ...peer, consumers: [] }));
       }
 
       chatHistory.length > 0 &&
@@ -4786,7 +4820,7 @@ export class RoomClient {
 
     const { peerId } = consumer.appData;
 
-    store.dispatch(consumerActions.removeConsumer(consumerId, peerId));
+    store.dispatch(consumerActions.removeConsumer({consumerId, peerId}));
   }
 
   _getEncodings(width, height, screenSharing = false) {

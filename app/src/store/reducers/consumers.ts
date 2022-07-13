@@ -1,3 +1,5 @@
+import { addConsumer, removeConsumer } from '../actions/consumerActions';
+
 export interface ConsumerType {
   id: string;
   peerId: string;
@@ -14,6 +16,8 @@ export interface ConsumerType {
   temporalLayers: any;
   preferredSpatialLayer: number;
   preferredTemporalLayer: number;
+  currentSpatialLayer?: number;
+  currentTemporalLayer?: number;
   priority: number;
   codec: string;
   track: any;
@@ -26,13 +30,13 @@ const initialState: Record<string, ConsumerType> = {};
 
 const consumers = (state = initialState, action) => {
   switch (action.type) {
-    case 'ADD_CONSUMER': {
+    case addConsumer.type: {
       const { consumer } = action.payload;
 
       return { ...state, [consumer.id]: consumer };
     }
 
-    case 'REMOVE_CONSUMER': {
+    case removeConsumer.type: {
       const { consumerId } = action.payload;
       const newState = { ...state };
 

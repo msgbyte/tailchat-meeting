@@ -172,7 +172,7 @@ export interface Peer {
   modifyRolesInProgress?: boolean;
   raisedHandInProgress?: boolean;
   raisedHand?: boolean;
-  raisedHandTimestamp?: Date;
+  raisedHandTimestamp?: number;
   roles: number[]; // Role IDs
 }
 

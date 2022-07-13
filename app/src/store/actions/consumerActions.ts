@@ -1,14 +1,15 @@
+import { createAction } from '@reduxjs/toolkit';
 import type { ConsumerType } from '../reducers/consumers';
 
-export const addConsumer = (consumer: ConsumerType, peerId: string) => ({
-  type: 'ADD_CONSUMER',
-  payload: { consumer, peerId },
-});
+export const addConsumer = createAction<{
+  consumer: ConsumerType;
+  peerId: string;
+}>('ADD_CONSUMER');
 
-export const removeConsumer = (consumerId, peerId) => ({
-  type: 'REMOVE_CONSUMER',
-  payload: { consumerId, peerId },
-});
+export const removeConsumer = createAction<{
+  consumerId: string;
+  peerId: string;
+}>('REMOVE_CONSUMER');
 
 export const clearConsumers = () => ({
   type: 'CLEAR_CONSUMERS',

@@ -5,7 +5,6 @@ import { chatReducer as chat } from '../slices/chat';
 import producers from './producers';
 import consumers from './consumers';
 import transports from './transports';
-import peers from './peers';
 import lobbyPeers from './lobbyPeers';
 import peerVolumes from './peerVolumes';
 import notifications from './notifications';
@@ -15,6 +14,7 @@ import recorder from './recorder';
 import settings from './settings';
 import config from './config';
 import { intlReducer } from 'react-intl-redux';
+import { peersReducer } from '../slices/peers';
 
 export const rootReducer = combineReducers({
   intl: intlReducer,
@@ -23,7 +23,7 @@ export const rootReducer = combineReducers({
   producers,
   consumers,
   transports,
-  peers,
+  peers: peersReducer,
   lobbyPeers,
   peerVolumes,
   notifications,
