@@ -7,7 +7,6 @@ import * as roomActions from './store/actions/roomActions';
 import * as peerActions from './store/actions/peerActions';
 import * as peerVolumeActions from './store/actions/peerVolumeActions';
 import * as settingsActions from './store/actions/settingsActions';
-import * as chatActions from './store/actions/chatActions';
 import * as fileActions from './store/actions/fileActions';
 import * as lobbyPeerActions from './store/actions/lobbyPeerActions';
 import * as consumerActions from './store/actions/consumerActions';
@@ -33,6 +32,7 @@ import { getEncodings } from 'tailchat-meeting-sdk/lib/helper/encodings';
 import { meActions } from './store/slices/me';
 import isElectron from 'is-electron';
 import { updateIntl } from 'react-intl-redux';
+import { chatActions, ChatMessage } from './store/slices/chat';
 
 type Priority = 'high' | 'medium' | 'low' | 'very-low';
 
@@ -977,7 +977,7 @@ export class RoomClient {
     }
   }
 
-  async sendChatMessage(chatMessage) {
+  async sendChatMessage(chatMessage: ChatMessage) {
     logger.debug('sendChatMessage() [chatMessage:"%s"]', chatMessage);
 
     try {

@@ -1,7 +1,7 @@
 import { CombinedState, combineReducers, Reducer } from '@reduxjs/toolkit';
 import room from './room';
-// import me from './me';
 import { meReducer as me } from '../slices/me';
+import { chatReducer as chat } from '../slices/chat';
 import producers from './producers';
 import consumers from './consumers';
 import transports from './transports';
@@ -10,7 +10,6 @@ import lobbyPeers from './lobbyPeers';
 import peerVolumes from './peerVolumes';
 import notifications from './notifications';
 import toolarea from './toolarea';
-import chat from './chat';
 import files from './files';
 import recorder from './recorder';
 import settings from './settings';

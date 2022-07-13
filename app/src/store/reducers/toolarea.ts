@@ -1,3 +1,5 @@
+import { chatActions } from '../slices/chat';
+
 const initialState = {
   toolAreaOpen: false,
   currentToolTab: 'chat', // chat, settings, users
@@ -43,7 +45,7 @@ const toolarea = (state = initialState, action) => {
       return { ...state, currentToolTab: toolTab, unreadMessages, unreadFiles };
     }
 
-    case 'ADD_MESSAGE': {
+    case chatActions.addMessage.type: {
       if (state.toolAreaOpen && state.currentToolTab === 'chat') {
         return state;
       }
