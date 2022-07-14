@@ -9,12 +9,12 @@ import lobbyPeers from './lobbyPeers';
 import peerVolumes from './peerVolumes';
 import notifications from './notifications';
 import toolarea from './toolarea';
-import files from './files';
 import recorder from './recorder';
 import settings from './settings';
 import config from './config';
 import { intlReducer } from 'react-intl-redux';
 import { peersReducer } from '../slices/peers';
+import { filesActions, filesReducer } from '../slices/files';
 
 export const rootReducer = combineReducers({
   intl: intlReducer,
@@ -29,7 +29,7 @@ export const rootReducer = combineReducers({
   notifications,
   toolarea,
   chat,
-  files,
+  files: filesReducer,
   recorder,
   settings,
   config,

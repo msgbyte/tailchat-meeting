@@ -6,7 +6,6 @@ import * as requestActions from './store/actions/requestActions';
 import * as roomActions from './store/actions/roomActions';
 import * as peerVolumeActions from './store/actions/peerVolumeActions';
 import * as settingsActions from './store/actions/settingsActions';
-import * as fileActions from './store/actions/fileActions';
 import * as lobbyPeerActions from './store/actions/lobbyPeerActions';
 import * as consumerActions from './store/actions/consumerActions';
 import * as producerActions from './store/actions/producerActions';
@@ -33,6 +32,7 @@ import isElectron from 'is-electron';
 import { updateIntl } from 'react-intl-redux';
 import { chatActions, ChatMessage } from './store/slices/chat';
 import { peersActions } from './store/slices/peers';
+import { filesActions } from './store/slices/files';
 
 type Priority = 'high' | 'medium' | 'low' | 'very-low';
 
@@ -1073,12 +1073,12 @@ export class RoomClient {
     saveAs(blob, fileName);
   }
 
-  sortChat(order) {
+  sortChat(order: 'asc' | 'desc') {
     store.dispatch(chatActions.sortChat(order));
   }
 
-  handleDownload(magnetUri) {
-    store.dispatch(fileActions.setFileActive(magnetUri));
+  handleDownload(magnetUri: string) {
+    store.dispatch(filesActions.setFileActive(magnetUri));
 
     const existingTorrent = this._webTorrent.get(magnetUri);
 
@@ -1096,7 +1096,12 @@ export class RoomClient {
     // Torrent already done, this can happen if the
     // same file was sent multiple times.
     if (torrent.progress === 1) {
-      store.dispatch(fileActions.setFileDone(torrent.magnetURI, torrent.files));
+      store.dispatch(
+        filesActions.setFileDone({
+          magnetUri: torrent.magnetURI,
+          sharedFiles: torrent.files,
+        })
+      );
 
       return;
     }
@@ -1107,7 +1112,10 @@ export class RoomClient {
       // if (Date.now() - lastMove > 1000)
       // {
       store.dispatch(
-        fileActions.setFileProgress(torrent.magnetURI, torrent.progress)
+        filesActions.setFileProgress({
+          magnetUri: torrent.magnetURI,
+          progress: torrent.progress,
+        })
       );
 
       // lastMove = Date.now();
@@ -1115,7 +1123,12 @@ export class RoomClient {
     });
 
     torrent.on('done', () => {
-      store.dispatch(fileActions.setFileDone(torrent.magnetURI, torrent.files));
+      store.dispatch(
+        filesActions.setFileDone({
+          magnetUri: torrent.magnetURI,
+          sharedFiles: torrent.files,
+        })
+      );
     });
   }
 
@@ -1162,7 +1175,7 @@ export class RoomClient {
           magnetUri: existingTorrent.magnetURI,
         };
 
-        store.dispatch(fileActions.addFile(file));
+        store.dispatch(filesActions.addFile(file));
 
         this._sendFile(file);
 
@@ -1188,7 +1201,7 @@ export class RoomClient {
             magnetUri: newTorrent.magnetURI,
           };
 
-          store.dispatch(fileActions.addFile(file));
+          store.dispatch(filesActions.addFile(file));
 
           this._sendFile(file);
         }
@@ -1879,7 +1892,7 @@ export class RoomClient {
 
       store.dispatch(chatActions.clearChat());
 
-      store.dispatch(fileActions.clearFiles());
+      store.dispatch(filesActions.clearFiles());
     } catch (error) {
       logger.error('clearChat() [error:"%o"]', error);
     }
@@ -1899,7 +1912,7 @@ export class RoomClient {
 		{
 			await this.sendRequest('moderator:clearFileSharing');
 
-			store.dispatch(fileActions.clearFiles());
+			store.dispatch(filesActions.clearFiles());
 		}
 		catch (error)
 		{
@@ -3034,7 +3047,7 @@ export class RoomClient {
           case 'moderator:clearChat': {
             store.dispatch(chatActions.clearChat());
 
-            store.dispatch(fileActions.clearFiles());
+            store.dispatch(filesActions.clearFiles());
 
             store.dispatch(
               requestActions.notify({
@@ -3051,7 +3064,7 @@ export class RoomClient {
           case 'sendFile': {
             const file = notification.data;
 
-            store.dispatch(fileActions.addFile({ ...file }));
+            store.dispatch(filesActions.addFile({ ...file }));
 
             store.dispatch(
               requestActions.notify({
@@ -3078,7 +3091,7 @@ export class RoomClient {
           /*
 					case 'moderator:clearFileSharing':
 					{
-						store.dispatch(fileActions.clearFiles());
+						store.dispatch(filesActions.clearFiles());
 
 						store.dispatch(requestActions.notify(
 							{
@@ -3837,7 +3850,7 @@ export class RoomClient {
         store.dispatch(chatActions.addChatHistory(chatHistory));
 
       fileHistory.length > 0 &&
-        store.dispatch(fileActions.addFileHistory(fileHistory));
+        store.dispatch(filesActions.addFileHistory(fileHistory));
 
       locked
         ? store.dispatch(roomActions.setRoomLocked())
@@ -4820,7 +4833,7 @@ export class RoomClient {
 
     const { peerId } = consumer.appData;
 
-    store.dispatch(consumerActions.removeConsumer({consumerId, peerId}));
+    store.dispatch(consumerActions.removeConsumer({ consumerId, peerId }));
   }
 
   _getEncodings(width, height, screenSharing = false) {

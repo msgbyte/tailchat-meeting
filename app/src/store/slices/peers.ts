@@ -25,7 +25,7 @@ export interface PeersState {
 const initialState: PeersState = {};
 
 const peersSlice = createSlice({
-  name: 'chat',
+  name: 'peers',
   initialState,
   reducers: {
     addPeer: (state, action: PayloadAction<PeerInfo>) => {
