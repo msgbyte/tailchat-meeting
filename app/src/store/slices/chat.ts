@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export interface ChatMessage {
-  type: 'message';
+  type: 'message' | 'file';
   time: number;
   sender: 'response' | 'client';
   isRead: boolean;
@@ -9,6 +9,7 @@ export interface ChatMessage {
   peerId: string;
   picture: string;
   text: string;
+  attachment?: File[];
 }
 
 export interface ChatState {

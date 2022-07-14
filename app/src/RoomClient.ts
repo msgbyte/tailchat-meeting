@@ -14,7 +14,6 @@ import * as transportActions from './store/actions/transportActions';
 import Spotlights from './features/Spotlights';
 import { permissions } from './permissions';
 import * as locales from './intl/locales';
-import { createIntl } from 'react-intl';
 import * as recorderActions from './store/actions/recorderActions';
 import {
   directReceiverTransform,
@@ -33,6 +32,8 @@ import { updateIntl } from 'react-intl-redux';
 import { chatActions, ChatMessage } from './store/slices/chat';
 import { peersActions } from './store/slices/peers';
 import { filesActions } from './store/slices/files';
+import { intl, updateGlobalIntl } from './intl';
+import { FileShare } from './features/FileShare';
 
 type Priority = 'high' | 'medium' | 'low' | 'very-low';
 
@@ -40,10 +41,6 @@ interface RestartICEParams {
   timer: any;
   restarting: boolean;
 }
-
-let createTorrent;
-
-let WebTorrent;
 
 let saveAs;
 
@@ -173,8 +170,6 @@ function getResolutionScalings(encodings) {
   return resolutionScalings;
 }
 
-let intl;
-
 const insertableStreamsSupported = Boolean(
   (RTCRtpSender as any).prototype.createEncodedStreams
 );
@@ -195,9 +190,6 @@ export class RoomClient {
   private _displayName: any;
 
   _tracker: any;
-
-  // Torrent support
-  _torrentSupport: any;
 
   // Whether simulcast should be used.
   _useSimulcast: any;
@@ -229,8 +221,7 @@ export class RoomClient {
   // @type {mediasoupClient.Device}
   _mediasoupDevice: MediasoupClient.Device;
 
-  // Our WebTorrent client
-  _webTorrent: any;
+  fileShare: FileShare;
 
   // Manager of spotlight
   _spotlights: any;
@@ -257,7 +248,7 @@ export class RoomClient {
 
   // Map of webcam MediaDeviceInfos indexed by deviceId.
   // @type {Map<String, MediaDeviceInfos>}
-  _webcams: any;
+  _webcams: Record<string, MediaDeviceInfo>;
 
   _audioDevices: any;
 
@@ -337,7 +328,7 @@ export class RoomClient {
     this._tracker = 'wss://tracker.lab.vvc.niif.hu:443';
 
     // Torrent support
-    this._torrentSupport = null;
+    // this._torrentSupport = null;
 
     // Whether simulcast should be used.
     this._useSimulcast = false;
@@ -380,9 +371,6 @@ export class RoomClient {
     // mediasoup-client Device instance.
     // @type {mediasoupClient.Device}
     this._mediasoupDevice = null;
-
-    // Our WebTorrent client
-    this._webTorrent = null;
 
     // Max spotlights
     if (device.platform === 'desktop') {
@@ -701,13 +689,15 @@ export class RoomClient {
             defaultMessage:
               'Your devices changed, configure your devices in the settings dialog',
           }),
-        } as any)
+        })
       );
     });
   }
 
-  setLocale(locale) {
-    if (locale === null) locale = locales.detect();
+  setLocale(locale: string) {
+    if (locale === null) {
+      locale = locales.detect();
+    }
 
     const one = locales.loadOne(locale);
 
@@ -718,10 +708,7 @@ export class RoomClient {
       })
     );
 
-    intl = createIntl({
-      locale: store.getState().intl.locale,
-      messages: store.getState().intl.messages,
-    });
+    updateGlobalIntl();
 
     document.documentElement.lang = store.getState().intl.locale.toUpperCase();
   }
@@ -1019,7 +1006,7 @@ export class RoomClient {
               id: 'filesharing.saveFileError',
               defaultMessage: 'Unable to save file',
             }),
-          } as any)
+          })
         );
 
         return;
@@ -1078,155 +1065,11 @@ export class RoomClient {
   }
 
   handleDownload(magnetUri: string) {
-    store.dispatch(filesActions.setFileActive(magnetUri));
-
-    const existingTorrent = this._webTorrent.get(magnetUri);
-
-    if (existingTorrent) {
-      // Never add duplicate torrents, use the existing one instead.
-      this._handleTorrent(existingTorrent);
-
-      return;
-    }
-
-    this._webTorrent.add(magnetUri, this._handleTorrent);
-  }
-
-  _handleTorrent(torrent) {
-    // Torrent already done, this can happen if the
-    // same file was sent multiple times.
-    if (torrent.progress === 1) {
-      store.dispatch(
-        filesActions.setFileDone({
-          magnetUri: torrent.magnetURI,
-          sharedFiles: torrent.files,
-        })
-      );
-
-      return;
-    }
-
-    // let lastMove = 0;
-
-    torrent.on('download', () => {
-      // if (Date.now() - lastMove > 1000)
-      // {
-      store.dispatch(
-        filesActions.setFileProgress({
-          magnetUri: torrent.magnetURI,
-          progress: torrent.progress,
-        })
-      );
-
-      // lastMove = Date.now();
-      // }
-    });
-
-    torrent.on('done', () => {
-      store.dispatch(
-        filesActions.setFileDone({
-          magnetUri: torrent.magnetURI,
-          sharedFiles: torrent.files,
-        })
-      );
-    });
+    this.fileShare.download(magnetUri);
   }
 
   async shareFiles(data) {
-    store.dispatch(
-      requestActions.notify({
-        text: intl.formatMessage({
-          id: 'filesharing.startingFileShare',
-          defaultMessage: 'Attempting to share file',
-        }),
-      } as any)
-    );
-
-    createTorrent(data.attachment, (err, torrent) => {
-      if (err) {
-        store.dispatch(
-          requestActions.notify({
-            type: 'error',
-            text: intl.formatMessage({
-              id: 'filesharing.unableToShare',
-              defaultMessage: 'Unable to share file',
-            }),
-          } as any)
-        );
-
-        return;
-      }
-
-      const existingTorrent = this._webTorrent.get(torrent);
-
-      if (existingTorrent) {
-        store.dispatch(
-          requestActions.notify({
-            text: intl.formatMessage({
-              id: 'filesharing.successfulFileShare',
-              defaultMessage: 'File successfully shared',
-            }),
-          } as any)
-        );
-
-        const file = {
-          ...data,
-          peerId: this._peerId,
-          magnetUri: existingTorrent.magnetURI,
-        };
-
-        store.dispatch(filesActions.addFile(file));
-
-        this._sendFile(file);
-
-        return;
-      }
-
-      this._webTorrent.seed(
-        data.attachment,
-        { announceList: [[this._tracker]] },
-        (newTorrent) => {
-          store.dispatch(
-            requestActions.notify({
-              text: intl.formatMessage({
-                id: 'filesharing.successfulFileShare',
-                defaultMessage: 'File successfully shared',
-              }),
-            } as any)
-          );
-
-          const file = {
-            ...data,
-            peerId: this._peerId,
-            magnetUri: newTorrent.magnetURI,
-          };
-
-          store.dispatch(filesActions.addFile(file));
-
-          this._sendFile(file);
-        }
-      );
-    });
-  }
-
-  async _sendFile(file) {
-    logger.debug('sendFile() [magnetUri:"%o"]', file.magnetUri);
-
-    try {
-      await this.sendRequest('sendFile', file);
-    } catch (error) {
-      logger.error('sendFile() [error:"%o"]', error);
-
-      store.dispatch(
-        requestActions.notify({
-          type: 'error',
-          text: intl.formatMessage({
-            id: 'filesharing.unableToShare',
-            defaultMessage: 'Unable to share file',
-          }),
-        } as any)
-      );
-    }
+    this.fileShare.shareFiles(data);
   }
 
   async muteMic() {
@@ -2484,18 +2327,6 @@ export class RoomClient {
   }
 
   async _loadDynamicImports() {
-    ({ default: createTorrent } = await import(
-      /* webpackPrefetch: true */
-      /* webpackChunkName: "createtorrent" */
-      'create-torrent'
-    ));
-
-    ({ default: WebTorrent } = await import(
-      /* webpackPrefetch: true */
-      /* webpackChunkName: "webtorrent" */
-      'webtorrent'
-    ));
-
     ({ default: saveAs } = await import(
       /* webpackPrefetch: true */
       /* webpackChunkName: "file-saver" */
@@ -3588,31 +3419,7 @@ export class RoomClient {
     const { picture, from } = store.getState().me;
 
     try {
-      this._torrentSupport = WebTorrent.WEBRTC_SUPPORT;
-
-      this._webTorrent =
-        this._torrentSupport &&
-        new WebTorrent({
-          tracker: {
-            rtcConfig: {
-              iceServers: this._turnServers,
-            },
-          },
-        });
-
-      this._webTorrent.on('error', (error) => {
-        logger.error('Filesharing [error:"%o"]', error);
-
-        store.dispatch(
-          requestActions.notify({
-            type: 'error',
-            text: intl.formatMessage({
-              id: 'filesharing.error',
-              defaultMessage: 'There was a filesharing error',
-            }),
-          })
-        );
-      });
+      this.fileShare = new FileShare(this);
 
       this._mediasoupDevice = new mediasoupClient.Device();
 
@@ -3767,7 +3574,7 @@ export class RoomClient {
           canShareScreen:
             this._mediasoupDevice.canProduce('video') &&
             this._screenSharing.isScreenShareAvailable(),
-          canShareFiles: this._torrentSupport,
+          canShareFiles: this.fileShare.torrentSupport,
         })
       );
 

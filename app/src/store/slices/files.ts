@@ -5,8 +5,9 @@ export interface FileInfo {
   active: boolean;
   progress: number;
   files: unknown;
+  attachment?: unknown;
   magnetUri: string;
-  timeout: boolean;
+  timeout?: boolean;
 }
 
 export interface FilesState {
@@ -25,7 +26,10 @@ const filesSlice = createSlice({
   name: 'file',
   initialState,
   reducers: {
-    addFile(state, action: PayloadAction<FileInfo>) {
+    addFile(
+      state,
+      action: PayloadAction<Omit<FileInfo, 'active' | 'progress' | 'files'>>
+    ) {
       const file = action.payload;
 
       state.files.push({

@@ -35,8 +35,11 @@ importers:
       '@types/chroma-js': ^2.1.3
       '@types/convict': ^6.0.1
       '@types/convict-format-with-validator': ^6.0.2
+      '@types/create-torrent': ^5.0.0
       '@types/domready': ^1.0.0
       '@types/draft-js': ^0.11.9
+      '@types/file-saver': ^2.0.5
+      '@types/hark': ^1.2.2
       '@types/lodash-es': ^4.17.6
       '@types/node': ^14.14.37
       '@types/prop-types': ^15.7.5
@@ -47,6 +50,7 @@ importers:
       '@types/react-redux': ^7.1.24
       '@types/react-router': ^5.1.18
       '@types/react-router-dom': ^5.3.3
+      '@types/webtorrent': ^0.109.3
       '@typescript-eslint/eslint-plugin': ^4.20.0
       '@typescript-eslint/parser': ^4.20.0
       ahooks: ^3.3.10
@@ -200,8 +204,11 @@ importers:
       '@types/chroma-js': 2.1.3
       '@types/convict': 6.1.1
       '@types/convict-format-with-validator': 6.0.2
+      '@types/create-torrent': 5.0.0
       '@types/domready': 1.0.0
       '@types/draft-js': 0.11.9
+      '@types/file-saver': 2.0.5
+      '@types/hark': 1.2.2
       '@types/lodash-es': 4.17.6
       '@types/prop-types': 15.7.5
       '@types/qs': 6.9.7
@@ -209,6 +216,7 @@ importers:
       '@types/react-redux': 7.1.24
       '@types/react-router': 5.1.18
       '@types/react-router-dom': 5.3.3
+      '@types/webtorrent': 0.109.3
       '@typescript-eslint/eslint-plugin': 4.33.0_lb3b477geoygjbfgoeerwfn46y
       '@typescript-eslint/parser': 4.33.0_utdtartgf6fqqgkivzeynh76la
       babel-eslint: 10.1.0_eslint@8.16.0
@@ -3831,6 +3839,12 @@ packages:
     resolution: {integrity: sha512-LiMQ6EOPob/4yUL66SZzu6Yh77cbzJFYll+ZfaPiPPFswtIlA/Fs1MzdKYA7JApHU49zQTbJGX3PDmCpIdDBRQ==}
     dev: true
 
+  /@types/bittorrent-protocol/3.1.2:
+    resolution: {integrity: sha512-7k9nivNeG7Sc8wVuBs+XjBp2u7pH8tqW3BB93/SAg3xht/cZEK+Rqkj79xSyJqyj86eA0F6n85EKkkyGki8afg==}
+    dependencies:
+      '@types/node': 16.11.36
+    dev: true
+
   /@types/body-parser/1.19.2:
     resolution: {integrity: sha512-ALYone6pm6QmwZoAgeyNksccT9Q4AWZQ6PvfwR37GT6r6FWUPguq6sUmNGSMV2Wr761oQoBxwGGa6DR5o1DC9g==}
     dependencies:
@@ -3896,6 +3910,12 @@ packages:
   /@types/cors/2.8.12:
     resolution: {integrity: sha512-vt+kDhq/M2ayberEtJcIN/hxXy1Pk+59g2FV/ZQceeaTyCtCucjL2Q7FXlFjtWn4n15KCr1NE2lNNFhp0lEThw==}
 
+  /@types/create-torrent/5.0.0:
+    resolution: {integrity: sha512-mZbaThIOP3NQru6/oi7I3hcWSu8/d0/4os13JVWGAU5hoAZIUc6MbeloHAX5nnnIZgn7YIp5PpNRf9Im/QvAvA==}
+    dependencies:
+      '@types/node': 16.11.36
+    dev: true
+
   /@types/debug/4.1.7:
     resolution: {integrity: sha512-9AonUzyTjXXhEOa0DnqpzZi6VHlqKMswga9EXjpXnnqxwLtdvPPtlO8evrI5D9S6asFRCQ6v+wpiUKbw+vKqyg==}
     dependencies:
@@ -3960,6 +3980,10 @@ packages:
 
   /@types/fast-stats/0.0.32:
     resolution: {integrity: sha512-UofRbwaYx42bqBkleJbjb1b/A3FANo/A2apFJMN9SSAAPWGyhxlfgW0xKCiu3X9UvlMugmZC5ZVoIr6Gik8Krw==}
+    dev: true
+
+  /@types/file-saver/2.0.5:
+    resolution: {integrity: sha512-zv9kNf3keYegP5oThGLaPk8E081DFDuwfqjtiTzm6PoxChdJ1raSuADf2YGCVIyrSynLrgc8JWv296s7Q7pQSQ==}
     dev: true
 
   /@types/fs-extra/9.0.13:
@@ -4070,6 +4094,12 @@ packages:
     resolution: {integrity: sha512-/THyiqyQAP9AfARo4pF+aCGcyiQ94tX/Is2I7HofNRqoYLgN1PBoOWu2/zTA5zMxzP5EFutMtWtGAFRKUe961Q==}
     dev: true
 
+  /@types/magnet-uri/5.1.3:
+    resolution: {integrity: sha512-FvJN1yYdLhvU6zWJ2YnWQ2GnpFLsA8bt+85WY0tLh6ehzGNrvBorjlcc53/zY43r/IKn+ctFs1nt7andwGnQCQ==}
+    dependencies:
+      '@types/node': 16.11.36
+    dev: true
+
   /@types/mime/1.3.2:
     resolution: {integrity: sha512-YATxVxgRqNH6nHEIsvg6k2Boc1JHI9ZbH5iWFFv/MTkchz3b1ieGDa5T0a9RznNdI0KhVbdbWSN+KWWrQZRxTw==}
     dev: true
@@ -4093,6 +4123,20 @@ packages:
 
   /@types/parse-json/4.0.0:
     resolution: {integrity: sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==}
+    dev: true
+
+  /@types/parse-torrent-file/4.0.3:
+    resolution: {integrity: sha512-dFkPnJPKiFWiGX+HXmyTVt2js3k0d9dThmUxX8nfGC22hbyZ5BTmetsEl45sQhHLcFo43njVrIKMXM3F1ahXRw==}
+    dependencies:
+      '@types/node': 16.11.36
+    dev: true
+
+  /@types/parse-torrent/5.8.4:
+    resolution: {integrity: sha512-FdKs5yN5iYO5Cu9gVz1Zl30CbZe6HTsqloWmCf+LfbImgSzlsUkov2+npQWCQSQ3zi/a2G5C824K0UpZ2sRufA==}
+    dependencies:
+      '@types/magnet-uri': 5.1.3
+      '@types/node': 16.11.36
+      '@types/parse-torrent-file': 4.0.3
     dev: true
 
   /@types/passport-local/1.0.34:
@@ -4219,6 +4263,12 @@ packages:
       '@types/node': 16.11.36
     dev: true
 
+  /@types/simple-peer/9.11.4:
+    resolution: {integrity: sha512-Elje14YvM47k+XEaoyRAeUSvZN7TOLWYL233QCckUaXjT4lRESHnYs0iOK2JoosO5DnCvWu/0Vpl9qnw4KCLWw==}
+    dependencies:
+      '@types/node': 16.11.36
+    dev: true
+
   /@types/source-list-map/0.1.2:
     resolution: {integrity: sha512-K5K+yml8LTo9bWJI/rECfIPrGgxdpeNbj+d53lwN4QjW1MCwlkhUms+gtdzigTeUyBr09+u8BwOIY3MXvHdcsA==}
     dev: true
@@ -4262,6 +4312,15 @@ packages:
       '@types/webpack-sources': 3.2.0
       anymatch: 3.1.2
       source-map: 0.6.1
+    dev: true
+
+  /@types/webtorrent/0.109.3:
+    resolution: {integrity: sha512-EJLsxMEcEjPXHcBqL6TRAbUwIpxAul5ULrXHJ0zwig7Oe70FS6dAzCWLq4MBafX3QrQG1DzGAS0fS8iJEOjD0g==}
+    dependencies:
+      '@types/bittorrent-protocol': 3.1.2
+      '@types/node': 16.11.36
+      '@types/parse-torrent': 5.8.4
+      '@types/simple-peer': 9.11.4
     dev: true
 
   /@types/yargs-parser/21.0.0:

@@ -96,7 +96,8 @@ export const AppearanceSettings: React.FC = React.memo(() => {
         <Select
           value={locale || ''}
           onChange={(event) => {
-            if (event.target.value) roomClient.setLocale(event.target.value);
+            if (event.target.value)
+              roomClient.setLocale(event.target.value as string);
           }}
           name={intl.formatMessage({
             id: 'settings.language',
