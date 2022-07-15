@@ -15,7 +15,7 @@ import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
 import Drawer from '@material-ui/core/Drawer';
 import Hidden from '@material-ui/core/Hidden';
 import Notifications from './Notifications/Notifications';
-import MeetingDrawer from './MeetingDrawer/MeetingDrawer';
+import { MeetingDrawer } from './MeetingDrawer/MeetingDrawer';
 import Democratic from './MeetingViews/Democratic';
 import Filmstrip from './MeetingViews/Filmstrip';
 import AudioPeers from './PeerAudio/AudioPeers';

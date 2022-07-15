@@ -3,8 +3,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import { config } from '../../../config';
 import classNames from 'classnames';
 import { useAppDispatch, useAppSelector } from '../../../store/selectors';
-import { setVirtualBackgroundUrl } from '../../../store/actions/settingsActions';
 import { useIntl } from 'react-intl';
+import { settingsActions } from '../../../store/slices/settings';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -61,7 +61,7 @@ export const VirtualBackgroundItems: React.FC<{
         return;
       }
 
-      dispatch(setVirtualBackgroundUrl(url));
+      dispatch(settingsActions.set('virtualBackgroundUrl', url));
       props.onChange(url);
     },
     [virtualBackgroundUrl, props.onChange]

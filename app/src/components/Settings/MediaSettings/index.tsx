@@ -2,7 +2,6 @@ import React from 'react';
 import { useDispatch } from 'react-redux';
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 import { useRoomClient } from '../../../RoomContext';
-import * as settingsActions from '../../../store/actions/settingsActions';
 import { useIntl, FormattedMessage } from 'react-intl';
 import classnames from 'classnames';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -18,8 +17,6 @@ import Tab from '@material-ui/core/Tab';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
-// import ListItemIcon from '@material-ui/core/ListItemIcon';
-// import Divider from '@material-ui/core/Divider';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import Mic from '@material-ui/icons/Mic';
@@ -30,6 +27,13 @@ import Resizer from 'react-image-file-resizer';
 import { config } from '../../../config';
 import { VirtualBackgroundItems } from './VirtualBackgroundItems';
 import { useAppSelector } from '../../../store/selectors';
+import { settingsActions } from '../../../store/slices/settings';
+import type {
+  AudioChannelCount,
+  AudioSampleRate,
+  AudioSampleSize,
+  OPUSPacketTime,
+} from 'tailchat-meeting-sdk';
 
 const insertableStreamsSupported = Boolean(
   // @ts-ignore
@@ -105,28 +109,6 @@ export const MediaSettings: React.FC = React.memo(({}) => {
   const volume = useAppSelector((state) => state.peerVolumes[state.me.id]);
   const settings = useAppSelector((state) => state.settings);
   const roomClient = useRoomClient();
-  const setAudioPreset = (audioPreset) =>
-    dispatch(settingsActions.setAudioPreset(audioPreset));
-  const setEchoCancellation = (echoCancellation) =>
-    dispatch(settingsActions.setEchoCancellation(echoCancellation));
-  const setAutoGainControl = (autoGainControl) =>
-    dispatch(settingsActions.setAutoGainControl(autoGainControl));
-  const setNoiseSuppression = (noiseSuppression) =>
-    dispatch(settingsActions.setNoiseSuppression(noiseSuppression));
-  const setVoiceActivatedUnmute = (voiceActivatedUnmute) =>
-    dispatch(settingsActions.setVoiceActivatedUnmute(voiceActivatedUnmute));
-  const setSampleRate = (sampleRate) =>
-    dispatch(settingsActions.setSampleRate(sampleRate));
-  const setChannelCount = (channelCount) =>
-    dispatch(settingsActions.setChannelCount(channelCount));
-  const setSampleSize = (sampleSize) =>
-    dispatch(settingsActions.setSampleSize(sampleSize));
-  const setOpusDtx = (opusDtx) => dispatch(settingsActions.setOpusDtx(opusDtx));
-  const setOpusFec = (opusFec) => dispatch(settingsActions.setOpusFec(opusFec));
-  const setOpusPtime = (opusPtime) =>
-    dispatch(settingsActions.setOpusPtime(opusPtime));
-  const setEnableOpusDetails = (enableOpusDetails) =>
-    dispatch(settingsActions.setEnableOpusDetails(enableOpusDetails));
 
   const [audioSettingsOpen, setAudioSettingsOpen] = React.useState(false);
   const [videoSettingsOpen, setVideoSettingsOpen] = React.useState(false);
@@ -319,7 +301,9 @@ export const MediaSettings: React.FC = React.memo(({}) => {
               <Switch
                 checked={settings.virtualBackgroundEnabled}
                 onChange={(_, checked) => {
-                  dispatch(settingsActions.setVirtualBackgroundEnable(checked));
+                  dispatch(
+                    settingsActions.set('virtualBackgroundEnabled', checked)
+                  );
                   roomClient.updateWebcam({
                     restart: true,
                   });
@@ -565,7 +549,7 @@ export const MediaSettings: React.FC = React.memo(({}) => {
                   const audioPreset: any = event.target.value;
 
                   if (audioPreset) {
-                    setAudioPreset(audioPreset);
+                    dispatch(settingsActions.set('audioPreset', audioPreset));
 
                     if (
                       settings.audioPresets &&
@@ -586,19 +570,41 @@ export const MediaSettings: React.FC = React.memo(({}) => {
                         opusMaxPlaybackRate,
                       } = settings.audioPresets[audioPreset];
 
-                      setAutoGainControl(autoGainControl);
-                      setEchoCancellation(echoCancellation);
-                      setNoiseSuppression(noiseSuppression);
-                      setVoiceActivatedUnmute(voiceActivatedUnmute);
+                      dispatch(
+                        settingsActions.set('autoGainControl', autoGainControl)
+                      );
+                      dispatch(
+                        settingsActions.set(
+                          'echoCancellation',
+                          echoCancellation
+                        )
+                      );
+                      dispatch(
+                        settingsActions.set(
+                          'noiseSuppression',
+                          noiseSuppression
+                        )
+                      );
+                      dispatch(
+                        settingsActions.set(
+                          'voiceActivatedUnmute',
+                          voiceActivatedUnmute
+                        )
+                      );
                       roomClient._setNoiseThreshold(noiseThreshold);
-                      setSampleRate(sampleRate);
-                      setChannelCount(channelCount);
-                      setSampleSize(sampleSize);
-                      setOpusDtx(opusDtx);
-                      setOpusFec(opusFec);
-                      setOpusPtime(opusPtime);
-                      settingsActions.setOpusMaxPlaybackRate(
-                        opusMaxPlaybackRate
+                      dispatch(settingsActions.set('sampleRate', sampleRate));
+                      dispatch(
+                        settingsActions.set('channelCount', channelCount)
+                      );
+                      dispatch(settingsActions.set('sampleSize', sampleSize));
+                      dispatch(settingsActions.set('opusDtx', opusDtx));
+                      dispatch(settingsActions.set('opusFec', opusFec));
+                      dispatch(settingsActions.set('opusPtime', opusPtime));
+                      dispatch(
+                        settingsActions.set(
+                          'opusMaxPlaybackRate',
+                          opusMaxPlaybackRate
+                        )
                       );
                     }
 
@@ -648,7 +654,12 @@ export const MediaSettings: React.FC = React.memo(({}) => {
                         color="secondary"
                         checked={settings.echoCancellation}
                         onChange={(event) => {
-                          setEchoCancellation(event.target.checked);
+                          dispatch(
+                            settingsActions.set(
+                              'echoCancellation',
+                              event.target.checked
+                            )
+                          );
                           roomClient.updateMic();
                         }}
                       />
@@ -668,7 +679,12 @@ export const MediaSettings: React.FC = React.memo(({}) => {
                         color="secondary"
                         checked={settings.autoGainControl}
                         onChange={(event) => {
-                          setAutoGainControl(event.target.checked);
+                          dispatch(
+                            settingsActions.set(
+                              'autoGainControl',
+                              event.target.checked
+                            )
+                          );
                           roomClient.updateMic();
                         }}
                       />
@@ -688,7 +704,12 @@ export const MediaSettings: React.FC = React.memo(({}) => {
                         color="secondary"
                         checked={settings.noiseSuppression}
                         onChange={(event) => {
-                          setNoiseSuppression(event.target.checked);
+                          dispatch(
+                            settingsActions.set(
+                              'noiseSuppression',
+                              event.target.checked
+                            )
+                          );
                           roomClient.updateMic();
                         }}
                       />
@@ -708,7 +729,12 @@ export const MediaSettings: React.FC = React.memo(({}) => {
                         color="secondary"
                         checked={settings.voiceActivatedUnmute}
                         onChange={(event) => {
-                          setVoiceActivatedUnmute(event.target.checked);
+                          dispatch(
+                            settingsActions.set(
+                              'voiceActivatedUnmute',
+                              event.target.checked
+                            )
+                          );
                         }}
                       />
                     }
@@ -736,7 +762,7 @@ export const MediaSettings: React.FC = React.memo(({}) => {
                     max={0}
                     valueLabelDisplay={'auto'}
                     onChange={(event, value) => {
-                      roomClient._setNoiseThreshold(value);
+                      roomClient._setNoiseThreshold(Number(value));
                     }}
                     marks={[
                       { value: volume, label: `${volume.toFixed(0)} dB` },
@@ -752,7 +778,12 @@ export const MediaSettings: React.FC = React.memo(({}) => {
                       value={settings.sampleRate || ''}
                       onChange={(event) => {
                         if (event.target.value) {
-                          setSampleRate(event.target.value);
+                          dispatch(
+                            settingsActions.set(
+                              'sampleRate',
+                              event.target.value as AudioSampleRate
+                            )
+                          );
                           roomClient.updateMic();
                         }
                       }}
@@ -782,7 +813,12 @@ export const MediaSettings: React.FC = React.memo(({}) => {
                       value={settings.channelCount || ''}
                       onChange={(event) => {
                         if (event.target.value) {
-                          setChannelCount(event.target.value);
+                          dispatch(
+                            settingsActions.set(
+                              'channelCount',
+                              event.target.value as AudioChannelCount
+                            )
+                          );
                           roomClient.updateMic();
                         }
                       }}
@@ -813,7 +849,12 @@ export const MediaSettings: React.FC = React.memo(({}) => {
                       value={settings.sampleSize || ''}
                       onChange={(event) => {
                         if (event.target.value) {
-                          setSampleSize(event.target.value);
+                          dispatch(
+                            settingsActions.set(
+                              'sampleSize',
+                              event.target.value as AudioSampleSize
+                            )
+                          );
                           roomClient.updateMic();
                         }
                       }}
@@ -845,7 +886,12 @@ export const MediaSettings: React.FC = React.memo(({}) => {
                         color="secondary"
                         checked={settings.opusDtx}
                         onChange={(event) => {
-                          setOpusDtx(Boolean(event.target.checked));
+                          dispatch(
+                            settingsActions.set(
+                              'opusDtx',
+                              Boolean(event.target.checked)
+                            )
+                          );
                           roomClient.updateMic();
                         }}
                       />
@@ -867,7 +913,12 @@ export const MediaSettings: React.FC = React.memo(({}) => {
                         color="secondary"
                         checked={settings.opusFec}
                         onChange={(event) => {
-                          setOpusFec(event.target.checked);
+                          dispatch(
+                            settingsActions.set(
+                              'opusFec',
+                              Boolean(event.target.checked)
+                            )
+                          );
                           roomClient.updateMic();
                         }}
                       />
@@ -887,7 +938,12 @@ export const MediaSettings: React.FC = React.memo(({}) => {
                       value={settings.opusPtime || ''}
                       onChange={(event) => {
                         if (event.target.value) {
-                          setOpusPtime(event.target.value);
+                          dispatch(
+                            settingsActions.set(
+                              'opusPtime',
+                              event.target.value as OPUSPacketTime
+                            )
+                          );
                           roomClient.updateMic();
                         }
                       }}
@@ -923,7 +979,12 @@ export const MediaSettings: React.FC = React.memo(({}) => {
                           color="secondary"
                           checked={settings.enableOpusDetails}
                           onChange={(event) => {
-                            setEnableOpusDetails(event.target.checked);
+                            dispatch(
+                              settingsActions.set(
+                                'enableOpusDetails',
+                                event.target.checked
+                              )
+                            );
                           }}
                         />
                       }

@@ -11,7 +11,7 @@ import Select from '@material-ui/core/Select';
 import Switch from '@material-ui/core/Switch';
 import { config } from '../../config';
 import { useAppDispatch, useAppSelector } from '../../store/selectors';
-import * as settingsActions from '../../store/actions/settingsActions';
+import { settingsActions } from '../../store/slices/settings';
 
 const useStyles = makeStyles((theme) => ({
   setting: {
@@ -36,9 +36,9 @@ export const AdvancedSettings: React.FC = React.memo(() => {
   const settings = useAppSelector((state) => state.settings);
   const dispatch = useAppDispatch();
   const onToggleAdvancedMode = () =>
-    dispatch(settingsActions.toggleAdvancedMode());
+    dispatch(settingsActions.toggle('advancedMode'));
   const onToggleNotificationSounds = () =>
-    dispatch(settingsActions.toggleNotificationSounds());
+    dispatch(settingsActions.toggle('notificationSounds'));
 
   return (
     <React.Fragment>

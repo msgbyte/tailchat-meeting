@@ -1,10 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { raisedHandsSelector } from '../../store/selectors';
+import {
+  raisedHandsSelector,
+  useAppDispatch,
+  useAppSelector,
+} from '../../store/selectors';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+import { makeStyles, useTheme, withStyles } from '@material-ui/core/styles';
 import * as toolareaActions from '../../store/actions/toolareaActions';
-import * as settingsActions from '../../store/actions/settingsActions';
 import { useIntl } from 'react-intl';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
@@ -20,6 +23,7 @@ import GroupIcon from '@material-ui/icons/Group';
 
 import { ReactComponent as PinIcon } from '../../images/pin-icon-baseline.svg';
 import { ReactComponent as UnpinIcon } from '../../images/pin-icon-outline.svg';
+import { settingsActions } from '../../store/slices/settings';
 
 const tabs = ['users', 'chat'];
 
@@ -40,22 +44,50 @@ const styles = (theme) => ({
   },
 });
 
-const MeetingDrawer = (props) => {
+interface Props {
+  closeDrawer: () => void;
+}
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    display: 'flex',
+    flexDirection: 'column',
+    width: '100%',
+    height: '100%',
+    backgroundColor: theme.palette.background.paper,
+  },
+  appBar: {
+    display: 'flex',
+    flexDirection: 'row',
+  },
+  tabsHeader: {
+    flexGrow: 1,
+  },
+}));
+
+export const MeetingDrawer: React.FC<Props> = React.memo((props) => {
   const intl = useIntl();
+  const classes = useStyles();
+  const theme = useTheme();
 
   const {
     currentToolTab,
     unreadMessages,
     unreadFiles,
     raisedHands,
-    closeDrawer,
-    setToolTab,
-    classes,
-    theme,
     drawerOverlayed,
-    toggleDrawerOverlayed,
     browser,
-  } = props;
+  } = useAppSelector((state) => ({
+    currentToolTab: state.toolarea.currentToolTab,
+    unreadMessages: state.toolarea.unreadMessages,
+    unreadFiles: state.toolarea.unreadFiles,
+    raisedHands: raisedHandsSelector(state),
+    drawerOverlayed: state.settings.drawerOverlayed,
+    browser: state.me.browser,
+  }));
+  const dispatch = useAppDispatch();
+
+  const { closeDrawer } = props;
 
   return (
     <div className={classes.root}>
@@ -63,7 +95,9 @@ const MeetingDrawer = (props) => {
         <Tabs
           className={classes.tabsHeader}
           value={tabs.indexOf(currentToolTab)}
-          onChange={(event, value) => setToolTab(tabs[value])}
+          onChange={(event, value) =>
+            dispatch(toolareaActions.setToolTab(tabs[value]))
+          }
           indicatorColor="primary"
           textColor="primary"
           variant="fullWidth"
@@ -100,7 +134,11 @@ const MeetingDrawer = (props) => {
         </Tabs>
         {browser.platform !== 'mobile' && (
           <React.Fragment>
-            <IconButton onClick={toggleDrawerOverlayed}>
+            <IconButton
+              onClick={() =>
+                dispatch(settingsActions.toggle('drawerOverlayed'))
+              }
+            >
               {drawerOverlayed ? <UnpinIcon /> : <PinIcon />}
             </IconButton>
             <IconButton onClick={closeDrawer}>
@@ -117,47 +155,4 @@ const MeetingDrawer = (props) => {
       {currentToolTab === 'users' && <ParticipantList />}
     </div>
   );
-};
-
-MeetingDrawer.propTypes = {
-  currentToolTab: PropTypes.string.isRequired,
-  setToolTab: PropTypes.func.isRequired,
-  unreadMessages: PropTypes.number.isRequired,
-  unreadFiles: PropTypes.number.isRequired,
-  raisedHands: PropTypes.number.isRequired,
-  closeDrawer: PropTypes.func.isRequired,
-  classes: PropTypes.object.isRequired,
-  theme: PropTypes.object.isRequired,
-  drawerOverlayed: PropTypes.bool.isRequired,
-  toggleDrawerOverlayed: PropTypes.func.isRequired,
-  browser: PropTypes.object.isRequired,
-};
-
-const mapStateToProps = (state) => {
-  return {
-    currentToolTab: state.toolarea.currentToolTab,
-    unreadMessages: state.toolarea.unreadMessages,
-    unreadFiles: state.toolarea.unreadFiles,
-    raisedHands: raisedHandsSelector(state),
-    drawerOverlayed: state.settings.drawerOverlayed,
-    browser: state.me.browser,
-  };
-};
-
-const mapDispatchToProps = {
-  setToolTab: toolareaActions.setToolTab,
-  toggleDrawerOverlayed: settingsActions.toggleDrawerOverlayed,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps, null, {
-  areStatesEqual: (next, prev) => {
-    return (
-      prev.toolarea.currentToolTab === next.toolarea.currentToolTab &&
-      prev.toolarea.unreadMessages === next.toolarea.unreadMessages &&
-      prev.toolarea.drawerOverlayed === next.toolarea.drawerOverlayed &&
-      prev.toolarea.unreadFiles === next.toolarea.unreadFiles &&
-      prev.peers === next.peers &&
-      prev.me.browser === next.me.browser
-    );
-  },
-})(withStyles(styles as any, { withTheme: true })(MeetingDrawer));
+});

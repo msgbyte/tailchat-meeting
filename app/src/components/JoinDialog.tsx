@@ -5,7 +5,6 @@ import { useRoomClient } from '../RoomContext';
 import randomString from 'crypto-random-string';
 import classnames from 'classnames';
 import isElectron from 'is-electron';
-import * as settingsActions from '../store/actions/settingsActions';
 import { useIntl, FormattedMessage } from 'react-intl';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContentText from '@material-ui/core/DialogContentText';
@@ -44,6 +43,7 @@ import { isValidStr } from '../utils';
 import { RoomIdInput } from './RoomIdInput';
 import { useHistory } from 'react-router';
 import { getList } from '../intl/locales';
+import { settingsActions } from '../store/slices/settings';
 
 const localesList = getList();
 
@@ -202,17 +202,17 @@ const JoinDialog: React.FC<{
 	}; */
 
   const changeDisplayName = useCallback((displayName: string) => {
-    dispatch(settingsActions.setDisplayName(displayName));
+    dispatch(settingsActions.set('displayName', displayName));
   }, []);
 
-  const setMediaPerms = (mediaPerms) => {
-    dispatch(settingsActions.setMediaPerms(mediaPerms));
+  const setMediaPerms = (mediaPerms: { audio: boolean; video: boolean }) => {
+    dispatch(settingsActions.set('mediaPerms', mediaPerms));
   };
-  const setAudioMuted = (flag) => {
-    dispatch(settingsActions.setAudioMuted(flag));
+  const setAudioMuted = (flag: boolean) => {
+    dispatch(settingsActions.set('audioMuted', flag));
   };
-  const setVideoMuted = (flag) => {
-    dispatch(settingsActions.setVideoMuted(flag));
+  const setVideoMuted = (flag: boolean) => {
+    dispatch(settingsActions.set('videoMuted', flag));
   };
 
   const handleSetMediaPerms = (event, newMediaPerms) => {

@@ -217,3 +217,38 @@ export type SignalingSendRequestMap = {
   resumeProducer: [PauseProducerData, any];
   produce: [ProduceData, any];
 };
+
+/**
+ * 视频分辨率类型
+ */
+export type VideoResolutionType =
+  | 'low'
+  | 'medium'
+  | 'high'
+  | 'veryhigh'
+  | 'ultra';
+
+/**
+ * 音频采样率
+ */
+export type AudioSampleRate = 8000 | 16000 | 24000 | 44100 | 48000;
+
+/**
+ * 音频通道数
+ */
+export type AudioChannelCount = 1 | 2;
+
+/**
+ * 音频采样大小
+ */
+export type AudioSampleSize = 8 | 16 | 24 | 32;
+
+/**
+ * OPUS 数据包时间
+ */
+export type OPUSPacketTime = 3 | 5 | 10 | 20 | 30 | 40 | 50 | 60;
+
+/**
+ * OPUS 最大回放速率
+ */
+export type OPUSMaxPlaybackRate = 8000 | 16000 | 24000 | 44100 | 48000;

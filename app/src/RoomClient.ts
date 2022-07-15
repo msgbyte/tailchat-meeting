@@ -4,7 +4,6 @@ import { getSignalingUrl } from './urlFactory';
 import { SocketTimeoutError } from './utils';
 import * as requestActions from './store/actions/requestActions';
 import * as roomActions from './store/actions/roomActions';
-import * as settingsActions from './store/actions/settingsActions';
 import * as consumerActions from './store/actions/consumerActions';
 import * as producerActions from './store/actions/producerActions';
 import * as notificationActions from './store/actions/notificationActions';
@@ -34,6 +33,7 @@ import { FileShare } from './features/FileShare';
 import { peerVolumesActions } from './store/slices/peerVolumes';
 import { recorderActions } from './store/slices/recorder';
 import { lobbyPeersActions } from './store/slices/lobbyPeers';
+import { settingsActions } from './store/slices/settings';
 
 type Priority = 'high' | 'medium' | 'low' | 'very-low';
 
@@ -321,7 +321,7 @@ export class RoomClient {
     // Use displayName
     this._displayName = null;
     if (displayName) {
-      store.dispatch(settingsActions.setDisplayName(displayName));
+      store.dispatch(settingsActions.set('displayName', displayName));
       this._displayName = displayName;
     }
 
@@ -379,7 +379,7 @@ export class RoomClient {
       this._maxSpotlights = config.mobileLastN;
     }
 
-    store.dispatch(settingsActions.setLastN(this._maxSpotlights));
+    store.dispatch(settingsActions.set('lastN', this._maxSpotlights));
 
     // Manager of spotlight
     this._spotlights = new Spotlights(
@@ -439,7 +439,8 @@ export class RoomClient {
       );
     }
     store.dispatch(
-      settingsActions.setRecorderSupportedMimeTypes(
+      settingsActions.set(
+        'recorderSupportedMimeTypes',
         this.getRecorderSupportedMimeTypes()
       )
     );
@@ -527,7 +528,7 @@ export class RoomClient {
 
           case 'A': {
             // Activate advanced mode
-            store.dispatch(settingsActions.toggleAdvancedMode());
+            store.dispatch(settingsActions.toggle('advancedMode'));
             store.dispatch(
               requestActions.notify({
                 text: intl.formatMessage({
@@ -733,7 +734,7 @@ export class RoomClient {
   }
 
   setPicture(picture) {
-    store.dispatch(settingsActions.setLocalPicture(picture));
+    store.dispatch(settingsActions.set('localPicture', picture));
     store.dispatch(meActions.setPicture(picture));
     this.changePicture(picture);
   }
@@ -743,13 +744,15 @@ export class RoomClient {
 
     const { picture } = data;
 
-    let displayName;
+    let displayName: string;
 
-    if (typeof data.displayName === 'undefined' || !data.displayName)
+    if (typeof data.displayName === 'undefined' || !data.displayName) {
       displayName = '';
-    else displayName = data.displayName;
+    } else {
+      displayName = data.displayName;
+    }
 
-    store.dispatch(settingsActions.setDisplayName(displayName));
+    store.dispatch(settingsActions.set('displayName', displayName));
 
     this._displayName = displayName;
 
@@ -765,7 +768,7 @@ export class RoomClient {
           id: 'room.loggedIn',
           defaultMessage: 'You are logged in',
         }),
-      } as any)
+      })
     );
   }
 
@@ -919,7 +922,7 @@ export class RoomClient {
     try {
       await this.sendRequest('changeDisplayName', { displayName });
 
-      store.dispatch(settingsActions.setDisplayName(displayName));
+      store.dispatch(settingsActions.set('displayName', displayName));
 
       store.dispatch(
         requestActions.notify({
@@ -1084,7 +1087,7 @@ export class RoomClient {
 
       store.dispatch(producerActions.setProducerPaused(this._micProducer.id));
 
-      store.dispatch(settingsActions.setAudioMuted(true));
+      store.dispatch(settingsActions.set('audioMuted', true));
     } catch (error) {
       logger.error('muteMic() [error:"%o"]', error);
 
@@ -1117,7 +1120,7 @@ export class RoomClient {
           producerActions.setProducerResumed(this._micProducer.id)
         );
 
-        store.dispatch(settingsActions.setAudioMuted(false));
+        store.dispatch(settingsActions.set('audioMuted', false));
       } catch (error) {
         logger.error('unmuteMic() [error:"%o"]', error);
 
@@ -1137,7 +1140,7 @@ export class RoomClient {
   changeMaxSpotlights(maxSpotlights) {
     this._spotlights.maxSpotlights = maxSpotlights;
 
-    store.dispatch(settingsActions.setLastN(maxSpotlights));
+    store.dispatch(settingsActions.set('lastN', maxSpotlights));
   }
 
   // Updated consumers based on spotlights
@@ -1268,7 +1271,9 @@ export class RoomClient {
       if (!device)
         throw new Error('Selected audio output device no longer available');
 
-      store.dispatch(settingsActions.setSelectedAudioOutputDevice(deviceId));
+      store.dispatch(
+        settingsActions.set('selectedAudioOutputDevice', deviceId)
+      );
 
       await this._updateAudioOutputDevices();
     } catch (error) {
@@ -1299,7 +1304,7 @@ export class RoomClient {
         throw new Error('changing device requires restart');
 
       if (newDeviceId)
-        store.dispatch(settingsActions.setSelectedAudioDevice(newDeviceId));
+        store.dispatch(settingsActions.set('selectedAudioDevice', newDeviceId));
 
       store.dispatch(meActions.setAudioInProgress(true));
 
@@ -1348,7 +1353,9 @@ export class RoomClient {
 
         const { deviceId: trackDeviceId } = track.getSettings();
 
-        store.dispatch(settingsActions.setSelectedAudioDevice(trackDeviceId));
+        store.dispatch(
+          settingsActions.set('selectedAudioDevice', trackDeviceId)
+        );
 
         const networkPriority: Priority = config.networkPriorities?.audio
           ? (config.networkPriorities?.audio as Priority)
@@ -1481,25 +1488,33 @@ export class RoomClient {
     let track;
 
     try {
-      if (!this._mediasoupDevice.canProduce('video'))
+      if (!this._mediasoupDevice.canProduce('video')) {
         throw new Error('cannot produce video');
+      }
 
-      if (newDeviceId && !restart)
+      if (newDeviceId && !restart) {
         throw new Error('changing device requires restart');
+      }
 
-      if (newDeviceId)
-        store.dispatch(settingsActions.setSelectedWebcamDevice(newDeviceId));
+      if (newDeviceId) {
+        store.dispatch(settingsActions.set('selectedWebcam', newDeviceId));
+      }
 
-      if (newResolution)
-        store.dispatch(settingsActions.setVideoResolution(newResolution));
+      if (newResolution) {
+        store.dispatch(settingsActions.set('resolution', newResolution));
+      }
 
-      if (newFrameRate)
-        store.dispatch(settingsActions.setVideoFrameRate(newFrameRate));
+      if (newFrameRate) {
+        store.dispatch(settingsActions.set('frameRate', newFrameRate));
+      }
 
       const { videoMuted } = store.getState().settings;
 
-      if (init && videoMuted) return;
-      else store.dispatch(settingsActions.setVideoMuted(false));
+      if (init && videoMuted) {
+        return;
+      } else {
+        store.dispatch(settingsActions.set('videoMuted', false));
+      }
 
       store.dispatch(meActions.setVideoInProgress(true));
 
@@ -1537,7 +1552,7 @@ export class RoomClient {
 
         logger.debug('getUserMedia track settings:', track.getSettings());
 
-        store.dispatch(settingsActions.setSelectedWebcamDevice(trackDeviceId));
+        store.dispatch(settingsActions.set('selectedWebcam', trackDeviceId));
 
         if (virtualBackgroundEnabled) {
           logger.debug('开始加载虚拟背景', track);
@@ -1624,7 +1639,7 @@ export class RoomClient {
           this.disableWebcam();
         });
 
-        store.dispatch(settingsActions.setVideoMuted(false));
+        store.dispatch(settingsActions.set('videoMuted', false));
       } else if (this._webcamProducer) {
         ({ track } = this._webcamProducer);
 
@@ -3720,7 +3735,8 @@ export class RoomClient {
 
       if (!selectedAudioOutputDevice && this._audioOutputDevices !== {}) {
         store.dispatch(
-          settingsActions.setSelectedAudioOutputDevice(
+          settingsActions.set(
+            'selectedAudioOutputDevice',
             Object.keys(this._audioOutputDevices)[0]
           )
         );
@@ -4125,7 +4141,10 @@ export class RoomClient {
       recorderPreferredMimeType
     );
     store.dispatch(
-      settingsActions.setRecorderPreferredMimeType(recorderPreferredMimeType)
+      settingsActions.set(
+        'recorderPreferredMimeType',
+        recorderPreferredMimeType
+      )
     );
   }
 
@@ -4143,18 +4162,25 @@ export class RoomClient {
 
       const isAudioEnabled = this._screenSharing.isAudioEnabled();
 
-      if (!available) throw new Error('screen sharing not available');
+      if (!available) {
+        throw new Error('screen sharing not available');
+      }
 
-      if (!this._mediasoupDevice.canProduce('video'))
+      if (!this._mediasoupDevice.canProduce('video')) {
         throw new Error('cannot produce video');
+      }
 
-      if (newResolution)
+      if (newResolution) {
         store.dispatch(
-          settingsActions.setScreenSharingResolution(newResolution)
+          settingsActions.set('screenSharingResolution', newResolution)
         );
+      }
 
-      if (newFrameRate)
-        store.dispatch(settingsActions.setScreenSharingFrameRate(newFrameRate));
+      if (newFrameRate) {
+        store.dispatch(
+          settingsActions.set('screenSharingFrameRate', newFrameRate)
+        );
+      }
 
       store.dispatch(meActions.setScreenSharingInProgress(true));
 
@@ -4479,16 +4505,16 @@ export class RoomClient {
     }
 
     this._webcamProducer = null;
-    store.dispatch(settingsActions.setVideoMuted(true));
+    store.dispatch(settingsActions.set('videoMuted', true));
     store.dispatch(meActions.setVideoInProgress(false));
   }
 
-  async _setNoiseThreshold(threshold) {
+  async _setNoiseThreshold(threshold: number) {
     logger.debug('_setNoiseThreshold() [threshold:"%s"]', threshold);
 
     this._hark?.setThreshold(threshold);
 
-    store.dispatch(settingsActions.setNoiseThreshold(threshold));
+    store.dispatch(settingsActions.set('noiseThreshold', threshold));
   }
 
   async _updateAudioDevices() {

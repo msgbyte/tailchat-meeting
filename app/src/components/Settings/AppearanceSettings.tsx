@@ -1,7 +1,6 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import * as roomActions from '../../store/actions/roomActions';
-import * as settingsActions from '../../store/actions/settingsActions';
 import classnames from 'classnames';
 import { useIntl, FormattedMessage } from 'react-intl';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -15,6 +14,7 @@ import { config } from '../../config';
 import { useAppDispatch, useAppSelector } from '../../store/selectors';
 import type { ViewModeType } from '../../store/reducers/room';
 import { getList } from '../../intl/locales';
+import { settingsActions } from '../../store/slices/settings';
 
 const localesList = getList();
 
@@ -46,23 +46,23 @@ export const AppearanceSettings: React.FC = React.memo(() => {
   const roomClient = useRoomClient();
 
   const onTogglePermanentTopBar = () =>
-    dispatch(settingsActions.togglePermanentTopBar());
+    dispatch(settingsActions.toggle('permanentTopBar'));
   const onToggleHiddenControls = () =>
-    dispatch(settingsActions.toggleHiddenControls());
+    dispatch(settingsActions.toggle('hiddenControls'));
   const onToggleShowNotifications = () =>
-    dispatch(settingsActions.toggleShowNotifications());
+    dispatch(settingsActions.toggle('showNotifications'));
   const onToggleButtonControlBar = () =>
-    dispatch(settingsActions.toggleButtonControlBar());
+    dispatch(settingsActions.toggle('buttonControlBar'));
   const onToggleDrawerOverlayed = () =>
-    dispatch(settingsActions.toggleDrawerOverlayed());
+    dispatch(settingsActions.toggle('drawerOverlayed'));
   const onToggleMirrorOwnVideo = () =>
-    dispatch(settingsActions.toggleMirrorOwnVideo());
+    dispatch(settingsActions.toggle('mirrorOwnVideo'));
   const onToggleHideNoVideoParticipants = () =>
-    dispatch(settingsActions.toggleHideNoVideoParticipants());
+    dispatch(settingsActions.toggle('hideNoVideoParticipants'));
   const handleChangeMode = (mode: ViewModeType) =>
     dispatch(roomActions.setDisplayMode(mode));
-  const handleChangeAspectRatio = (aspectRatio) =>
-    dispatch(settingsActions.setAspectRatio(aspectRatio));
+  const handleChangeAspectRatio = (aspectRatio: number) =>
+    dispatch(settingsActions.set('aspectRatio', aspectRatio));
 
   const intl = useIntl();
 
@@ -154,7 +154,7 @@ export const AppearanceSettings: React.FC = React.memo(() => {
           value={settings.aspectRatio || ''}
           onChange={(event) => {
             if (event.target.value) {
-              handleChangeAspectRatio(event.target.value);
+              handleChangeAspectRatio(Number(event.target.value));
               roomClient.updateWebcam({ restart: true });
             }
           }}
