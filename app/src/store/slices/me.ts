@@ -100,7 +100,10 @@ const meSlice = createSlice({
         canShareFiles?: boolean;
       }>
     ) => {
-      return { ...state, ...action.payload };
+      state = {
+        ...state,
+        ...action.payload,
+      };
     },
     setDevices: (state, action: PayloadAction<MediaDeviceInfo[]>) => {
       state.devices = action.payload;

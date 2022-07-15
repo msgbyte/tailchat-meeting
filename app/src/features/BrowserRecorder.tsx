@@ -4,7 +4,7 @@ import { WritableStream } from 'web-streams-polyfill/ponyfill';
 import { openDB, deleteDB } from 'idb';
 import { store } from '../store/store';
 import * as requestActions from '../store/actions/requestActions';
-import * as recorderActions from '../store/actions/recorderActions';
+import { recorderActions } from '../store/slices/recorder';
 
 /**
  * 浏览器录制

@@ -4,7 +4,6 @@ import { getSignalingUrl } from './urlFactory';
 import { SocketTimeoutError } from './utils';
 import * as requestActions from './store/actions/requestActions';
 import * as roomActions from './store/actions/roomActions';
-import * as peerVolumeActions from './store/actions/peerVolumeActions';
 import * as settingsActions from './store/actions/settingsActions';
 import * as lobbyPeerActions from './store/actions/lobbyPeerActions';
 import * as consumerActions from './store/actions/consumerActions';
@@ -14,7 +13,6 @@ import * as transportActions from './store/actions/transportActions';
 import Spotlights from './features/Spotlights';
 import { permissions } from './permissions';
 import * as locales from './intl/locales';
-import * as recorderActions from './store/actions/recorderActions';
 import {
   directReceiverTransform,
   opusReceiverTransform,
@@ -34,6 +32,8 @@ import { peersActions } from './store/slices/peers';
 import { filesActions } from './store/slices/files';
 import { intl, updateGlobalIntl } from './intl';
 import { FileShare } from './features/FileShare';
+import { peerVolumesActions } from './store/slices/peerVolumes';
+import { recorderActions } from './store/slices/recorder';
 
 type Priority = 'high' | 'medium' | 'low' | 'very-low';
 
@@ -1222,7 +1222,9 @@ export class RoomClient {
 
         this._hark.lastVolume = volume;
 
-        store.dispatch(peerVolumeActions.setPeerVolume(this._peerId, volume));
+        store.dispatch(
+          peerVolumesActions.setPeerVolume({ peerId: this._peerId, volume })
+        );
       }
     });
 
@@ -3094,7 +3096,7 @@ export class RoomClient {
                   consumer.volume = volume;
 
                   store.dispatch(
-                    peerVolumeActions.setPeerVolume(peerId, volume)
+                    peerVolumesActions.setPeerVolume({ peerId, volume })
                   );
                 }
               });

@@ -26,8 +26,7 @@ import {
   MODERATE_ROOM,
   LOCAL_RECORD_ROOM,
 } from './access/perms';
-
-const { config } = require('./config/config');
+import { config } from './config/config';
 
 const logger = new Logger('Room');
 

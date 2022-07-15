@@ -2,17 +2,6 @@ import { meActions } from '../slices/me';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { peersActions } from './peers';
 
-export interface ChatMessage {
-  type: 'message';
-  time: number;
-  sender: 'response' | 'client';
-  isRead: boolean;
-  name: string;
-  peerId: string;
-  picture: string;
-  text: string;
-}
-
 export interface PeerVolumesState {
   [peerId: string]: number;
 }
@@ -30,7 +19,7 @@ const peerVolumesSlice = createSlice({
       const { peerId, volume } = action.payload;
       const dBs = volume < -100 ? -100 : volume;
 
-      return { ...state, [peerId]: dBs };
+      state[peerId] = dBs;
     },
   },
   extraReducers: (builder) => {
