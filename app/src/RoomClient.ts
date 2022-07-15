@@ -5,7 +5,6 @@ import { SocketTimeoutError } from './utils';
 import * as requestActions from './store/actions/requestActions';
 import * as roomActions from './store/actions/roomActions';
 import * as settingsActions from './store/actions/settingsActions';
-import * as lobbyPeerActions from './store/actions/lobbyPeerActions';
 import * as consumerActions from './store/actions/consumerActions';
 import * as producerActions from './store/actions/producerActions';
 import * as notificationActions from './store/actions/notificationActions';
@@ -34,6 +33,7 @@ import { intl, updateGlobalIntl } from './intl';
 import { FileShare } from './features/FileShare';
 import { peerVolumesActions } from './store/slices/peerVolumes';
 import { recorderActions } from './store/slices/recorder';
+import { lobbyPeersActions } from './store/slices/lobbyPeers';
 
 type Priority = 'high' | 'medium' | 'low' | 'very-low';
 
@@ -1713,7 +1713,10 @@ export class RoomClient {
     logger.debug('promoteLobbyPeer() [peerId:"%s"]', peerId);
 
     store.dispatch(
-      lobbyPeerActions.setLobbyPeerPromotionInProgress(peerId, true)
+      lobbyPeersActions.setLobbyPeerPromotionInProgress({
+        peerId,
+        promotionInProgress: true,
+      })
     );
 
     try {
@@ -1723,7 +1726,10 @@ export class RoomClient {
     }
 
     store.dispatch(
-      lobbyPeerActions.setLobbyPeerPromotionInProgress(peerId, false)
+      lobbyPeersActions.setLobbyPeerPromotionInProgress({
+        peerId,
+        promotionInProgress: false,
+      })
     );
   }
 
@@ -2591,7 +2597,7 @@ export class RoomClient {
           case 'parkedPeer': {
             const { peerId } = notification.data;
 
-            store.dispatch(lobbyPeerActions.addLobbyPeer(peerId));
+            store.dispatch(lobbyPeersActions.addLobbyPeer(peerId));
             store.dispatch(roomActions.setToolbarsVisible(true));
 
             this._soundNotification(notification.method);
@@ -2613,17 +2619,20 @@ export class RoomClient {
 
             if (lobbyPeers.length > 0) {
               lobbyPeers.forEach((peer) => {
-                store.dispatch(lobbyPeerActions.addLobbyPeer(peer.id));
+                store.dispatch(lobbyPeersActions.addLobbyPeer(peer.id));
 
                 store.dispatch(
-                  lobbyPeerActions.setLobbyPeerDisplayName(
-                    peer.displayName,
-                    peer.id
-                  )
+                  lobbyPeersActions.setLobbyPeerDisplayName({
+                    peerId: peer.id,
+                    displayName: peer.displayName,
+                  })
                 );
 
                 store.dispatch(
-                  lobbyPeerActions.setLobbyPeerPicture(peer.picture, peer.id)
+                  lobbyPeersActions.setLobbyPeerPicture({
+                    peerId: peer.id,
+                    picture: peer.picture,
+                  })
                 );
               });
 
@@ -2647,7 +2656,7 @@ export class RoomClient {
           case 'lobby:peerClosed': {
             const { peerId } = notification.data;
 
-            store.dispatch(lobbyPeerActions.removeLobbyPeer(peerId));
+            store.dispatch(lobbyPeersActions.removeLobbyPeer(peerId));
 
             store.dispatch(
               requestActions.notify({
@@ -2664,7 +2673,7 @@ export class RoomClient {
           case 'lobby:promotedPeer': {
             const { peerId } = notification.data;
 
-            store.dispatch(lobbyPeerActions.removeLobbyPeer(peerId));
+            store.dispatch(lobbyPeersActions.removeLobbyPeer(peerId));
 
             break;
           }
@@ -2673,7 +2682,7 @@ export class RoomClient {
             const { peerId, displayName } = notification.data;
 
             store.dispatch(
-              lobbyPeerActions.setLobbyPeerDisplayName(displayName, peerId)
+              lobbyPeersActions.setLobbyPeerDisplayName({ displayName, peerId })
             );
 
             store.dispatch(
@@ -2700,7 +2709,7 @@ export class RoomClient {
             const { peerId, picture } = notification.data;
 
             store.dispatch(
-              lobbyPeerActions.setLobbyPeerPicture(picture, peerId)
+              lobbyPeersActions.setLobbyPeerPicture({ picture, peerId })
             );
 
             store.dispatch(
@@ -3667,12 +3676,18 @@ export class RoomClient {
 
       lobbyPeers.length > 0 &&
         lobbyPeers.forEach((peer) => {
-          store.dispatch(lobbyPeerActions.addLobbyPeer(peer.id));
+          store.dispatch(lobbyPeersActions.addLobbyPeer(peer.id));
           store.dispatch(
-            lobbyPeerActions.setLobbyPeerDisplayName(peer.displayName, peer.id)
+            lobbyPeersActions.setLobbyPeerDisplayName({
+              peerId: peer.id,
+              displayName: peer.displayName,
+            })
           );
           store.dispatch(
-            lobbyPeerActions.setLobbyPeerPicture(peer.picture, peer.id)
+            lobbyPeersActions.setLobbyPeerPicture({
+              peerId: peer.id,
+              picture: peer.picture,
+            })
           );
         });
 

@@ -23,7 +23,7 @@ const initialState: FilesState = {
 };
 
 const filesSlice = createSlice({
-  name: 'file',
+  name: 'files',
   initialState,
   reducers: {
     addFile(
