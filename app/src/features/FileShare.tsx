@@ -1,12 +1,12 @@
 import WebTorrent, { Torrent } from 'webtorrent';
 import { store } from '../store/store';
 import Logger from './Logger';
-import * as requestActions from '../store/actions/requestActions';
 import { intl } from '../intl';
 import { filesActions } from '../store/slices/files';
 import createTorrent from 'create-torrent';
 import type { ChatMessage } from '../store/slices/chat';
 import type { RoomClient } from '../RoomClient';
+import { notifyAction } from '../store/slices/notifications';
 
 const logger = new Logger('FileShare');
 
@@ -30,7 +30,7 @@ export class FileShare {
       logger.error('Filesharing [error:"%o"]', error);
 
       store.dispatch(
-        requestActions.notify({
+        notifyAction({
           type: 'error',
           text: intl.formatMessage({
             id: 'filesharing.error',
@@ -43,7 +43,7 @@ export class FileShare {
 
   shareFiles(data: ChatMessage) {
     store.dispatch(
-      requestActions.notify({
+      notifyAction({
         text: intl.formatMessage({
           id: 'filesharing.startingFileShare',
           defaultMessage: 'Attempting to share file',
@@ -54,7 +54,7 @@ export class FileShare {
     createTorrent(data.attachment, (err, torrent) => {
       if (err) {
         store.dispatch(
-          requestActions.notify({
+          notifyAction({
             type: 'error',
             text: intl.formatMessage({
               id: 'filesharing.unableToShare',
@@ -69,7 +69,7 @@ export class FileShare {
       const existingTorrent = this.webTorrent.get(torrent);
       if (existingTorrent) {
         store.dispatch(
-          requestActions.notify({
+          notifyAction({
             text: intl.formatMessage({
               id: 'filesharing.successfulFileShare',
               defaultMessage: 'File successfully shared',
@@ -93,7 +93,7 @@ export class FileShare {
         { announceList: [[this.tracker]] },
         (newTorrent) => {
           store.dispatch(
-            requestActions.notify({
+            notifyAction({
               text: intl.formatMessage({
                 id: 'filesharing.successfulFileShare',
                 defaultMessage: 'File successfully shared',
@@ -123,7 +123,7 @@ export class FileShare {
       logger.error('sendFile() [error:"%o"]', error);
 
       store.dispatch(
-        requestActions.notify({
+        notifyAction({
           type: 'error',
           text: intl.formatMessage({
             id: 'filesharing.unableToShare',

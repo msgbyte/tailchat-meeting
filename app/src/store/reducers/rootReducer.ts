@@ -3,7 +3,6 @@ import { meReducer as me } from '../slices/me';
 import { chatReducer as chat } from '../slices/chat';
 import producers from './producers';
 import consumers from './consumers';
-import notifications from './notifications';
 import config from './config';
 import { intlReducer } from 'react-intl-redux';
 import { peersReducer } from '../slices/peers';
@@ -15,6 +14,7 @@ import { settingsReducer } from '../slices/settings';
 import { toolareaReducer } from '../slices/toolarea';
 import { transportsReducer } from '../slices/transports';
 import { roomReducer } from '../slices/room';
+import { notificationsReducer } from '../slices/notifications';
 
 export const rootReducer = combineReducers({
   intl: intlReducer,
@@ -26,7 +26,7 @@ export const rootReducer = combineReducers({
   peers: peersReducer,
   lobbyPeers: lobbyPeersReducer,
   peerVolumes: peerVolumesReducer,
-  notifications,
+  notifications: notificationsReducer,
   toolarea: toolareaReducer,
   chat,
   files: filesReducer,

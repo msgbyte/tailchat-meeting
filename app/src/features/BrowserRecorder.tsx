@@ -3,8 +3,8 @@ import streamSaver from 'streamsaver';
 import { WritableStream } from 'web-streams-polyfill/ponyfill';
 import { openDB, deleteDB } from 'idb';
 import { store } from '../store/store';
-import * as requestActions from '../store/actions/requestActions';
 import { recorderActions } from '../store/slices/recorder';
+import { notifyAction } from '../store/slices/notifications';
 
 /**
  * 浏览器录制
@@ -199,7 +199,7 @@ export default class BrowserRecorder {
           switch (error.name) {
             case 'SecurityError':
               store.dispatch(
-                requestActions.notify({
+                notifyAction({
                   type: 'error',
                   text: this.intl.formatMessage({
                     id: 'room.localRecordingSecurityError',
@@ -281,7 +281,7 @@ export default class BrowserRecorder {
       }
     } catch (error) {
       store.dispatch(
-        requestActions.notify({
+        notifyAction({
           type: 'error',
           text: this.intl.formatMessage({
             id: 'room.unexpectedErrorDuringLocalRecording',
@@ -314,7 +314,7 @@ export default class BrowserRecorder {
       });
 
       store.dispatch(
-        requestActions.notify({
+        notifyAction({
           text: this.intl.formatMessage({
             id: 'room.youStartedLocalRecording',
             defaultMessage: 'You started local recording',
@@ -323,7 +323,7 @@ export default class BrowserRecorder {
       );
     } catch (error) {
       store.dispatch(
-        requestActions.notify({
+        notifyAction({
           type: 'error',
           text: this.intl.formatMessage({
             id: 'room.unexpectedErrorDuringLocalRecording',
@@ -341,7 +341,7 @@ export default class BrowserRecorder {
       this.recorder.stop();
 
       store.dispatch(
-        requestActions.notify({
+        notifyAction({
           text: this.intl.formatMessage({
             id: 'room.youStoppedLocalRecording',
             defaultMessage: 'You stopped local recording',
@@ -355,7 +355,7 @@ export default class BrowserRecorder {
       });
     } catch (error) {
       store.dispatch(
-        requestActions.notify({
+        notifyAction({
           type: 'error',
           text: this.intl.formatMessage({
             id: 'room.unexpectedErrorDuringLocalRecording',

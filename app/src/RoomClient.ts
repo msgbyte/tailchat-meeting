@@ -2,10 +2,8 @@ import Logger from './features/Logger';
 import hark from 'hark';
 import { getSignalingUrl } from './urlFactory';
 import { SocketTimeoutError } from './utils';
-import * as requestActions from './store/actions/requestActions';
 import * as consumerActions from './store/actions/consumerActions';
 import * as producerActions from './store/actions/producerActions';
-import * as notificationActions from './store/actions/notificationActions';
 import Spotlights from './features/Spotlights';
 import { permissions } from './permissions';
 import * as locales from './intl/locales';
@@ -34,6 +32,10 @@ import { lobbyPeersActions } from './store/slices/lobbyPeers';
 import { settingsActions } from './store/slices/settings';
 import { transportsActions } from './store/slices/transports';
 import { roomActions } from './store/slices/room';
+import {
+  notificationsActions,
+  notifyAction,
+} from './store/slices/notifications';
 
 type Priority = 'high' | 'medium' | 'low' | 'very-low';
 
@@ -530,7 +532,7 @@ export class RoomClient {
             // Activate advanced mode
             store.dispatch(settingsActions.toggle('advancedMode'));
             store.dispatch(
-              requestActions.notify({
+              notifyAction({
                 text: intl.formatMessage({
                   id: 'room.toggleAdvancedMode',
                   defaultMessage: 'Toggled advanced mode',
@@ -544,7 +546,7 @@ export class RoomClient {
             // Set democratic view
             store.dispatch(roomActions.set('layout', 'democratic'));
             store.dispatch(
-              requestActions.notify({
+              notifyAction({
                 text: intl.formatMessage({
                   id: 'room.setDemocraticView',
                   defaultMessage: 'Changed layout to democratic view',
@@ -558,7 +560,7 @@ export class RoomClient {
             // Set filmstrip view
             store.dispatch(roomActions.set('layout', 'filmstrip'));
             store.dispatch(
-              requestActions.notify({
+              notifyAction({
                 text: intl.formatMessage({
                   id: 'room.setFilmStripView',
                   defaultMessage: 'Changed layout to filmstrip view',
@@ -580,7 +582,7 @@ export class RoomClient {
                 this.muteMic();
 
                 store.dispatch(
-                  requestActions.notify({
+                  notifyAction({
                     text: intl.formatMessage({
                       id: 'devices.microphoneMute',
                       defaultMessage: 'Muted your microphone',
@@ -591,7 +593,7 @@ export class RoomClient {
                 this.unmuteMic();
 
                 store.dispatch(
-                  requestActions.notify({
+                  notifyAction({
                     text: intl.formatMessage({
                       id: 'devices.microphoneUnMute',
                       defaultMessage: 'Unmuted your microphone',
@@ -603,7 +605,7 @@ export class RoomClient {
               this.updateMic({ start: true });
 
               store.dispatch(
-                requestActions.notify({
+                notifyAction({
                   text: intl.formatMessage({
                     id: 'devices.microphoneEnable',
                     defaultMessage: 'Enabled your microphone',
@@ -684,7 +686,7 @@ export class RoomClient {
       await this._updateAudioOutputDevices();
 
       store.dispatch(
-        requestActions.notify({
+        notifyAction({
           text: intl.formatMessage({
             id: 'devices.devicesChanged',
             defaultMessage:
@@ -763,7 +765,7 @@ export class RoomClient {
     store.dispatch(meActions.setLoggedIn(true));
 
     store.dispatch(
-      requestActions.notify({
+      notifyAction({
         text: intl.formatMessage({
           id: 'room.loggedIn',
           defaultMessage: 'You are logged in',
@@ -782,7 +784,7 @@ export class RoomClient {
     store.dispatch(meActions.setLoggedIn(false));
 
     store.dispatch(
-      requestActions.notify({
+      notifyAction({
         text: intl.formatMessage({
           id: 'room.loggedOut',
           defaultMessage: 'You are logged out',
@@ -929,7 +931,7 @@ export class RoomClient {
       store.dispatch(settingsActions.set('displayName', displayName));
 
       store.dispatch(
-        requestActions.notify({
+        notifyAction({
           text: intl.formatMessage(
             {
               id: 'room.changedDisplayName',
@@ -947,7 +949,7 @@ export class RoomClient {
       logger.error('changeDisplayName() [error:"%o"]', error);
 
       store.dispatch(
-        requestActions.notify({
+        notifyAction({
           type: 'error',
           text: intl.formatMessage({
             id: 'room.changeDisplayNameError',
@@ -992,7 +994,7 @@ export class RoomClient {
       logger.error('sendChatMessage() [error:"%o"]', error);
 
       store.dispatch(
-        requestActions.notify({
+        notifyAction({
           type: 'error',
           text: intl.formatMessage({
             id: 'room.chatError',
@@ -1007,7 +1009,7 @@ export class RoomClient {
     file.getBlob((err, blob) => {
       if (err) {
         store.dispatch(
-          requestActions.notify({
+          notifyAction({
             type: 'error',
             text: intl.formatMessage({
               id: 'filesharing.saveFileError',
@@ -1096,7 +1098,7 @@ export class RoomClient {
       logger.error('muteMic() [error:"%o"]', error);
 
       store.dispatch(
-        requestActions.notify({
+        notifyAction({
           type: 'error',
           text: intl.formatMessage({
             id: 'devices.microphoneMuteError',
@@ -1129,7 +1131,7 @@ export class RoomClient {
         logger.error('unmuteMic() [error:"%o"]', error);
 
         store.dispatch(
-          requestActions.notify({
+          notifyAction({
             type: 'error',
             text: intl.formatMessage({
               id: 'devices.microphoneUnMuteError',
@@ -1400,7 +1402,7 @@ export class RoomClient {
 
         this._micProducer.on('trackended', () => {
           store.dispatch(
-            requestActions.notify({
+            notifyAction({
               type: 'error',
               text: intl.formatMessage({
                 id: 'devices.microphoneDisconnected',
@@ -1457,7 +1459,7 @@ export class RoomClient {
       logger.error('updateMic() [error:"%o"]', error);
 
       store.dispatch(
-        requestActions.notify({
+        notifyAction({
           type: 'error',
           text: intl.formatMessage({
             id: 'devices.microphoneError',
@@ -1631,7 +1633,7 @@ export class RoomClient {
 
         this._webcamProducer.on('trackended', () => {
           store.dispatch(
-            requestActions.notify({
+            notifyAction({
               type: 'error',
               text: intl.formatMessage({
                 id: 'devices.cameraDisconnected',
@@ -1668,7 +1670,7 @@ export class RoomClient {
       logger.error('updateWebcam() [error:"%o"]', error);
 
       store.dispatch(
-        requestActions.notify({
+        notifyAction({
           type: 'error',
           text: intl.formatMessage({
             id: 'devices.cameraError',
@@ -2404,7 +2406,7 @@ export class RoomClient {
 
       if (reason === 'io server disconnect') {
         store.dispatch(
-          requestActions.notify({
+          notifyAction({
             text: intl.formatMessage({
               id: 'socket.disconnected',
               defaultMessage: 'You are disconnected',
@@ -2416,7 +2418,7 @@ export class RoomClient {
       }
 
       store.dispatch(
-        requestActions.notify({
+        notifyAction({
           text: intl.formatMessage({
             id: 'socket.reconnecting',
             defaultMessage: 'You are disconnected, attempting to reconnect',
@@ -2481,7 +2483,7 @@ export class RoomClient {
       logger.warn('signaling Peer "reconnect_failed" event');
 
       store.dispatch(
-        requestActions.notify({
+        notifyAction({
           text: intl.formatMessage({
             id: 'socket.disconnected',
             defaultMessage: 'You are disconnected',
@@ -2499,7 +2501,7 @@ export class RoomClient {
       );
 
       store.dispatch(
-        requestActions.notify({
+        notifyAction({
           text: intl.formatMessage({
             id: 'socket.reconnected',
             defaultMessage: 'You are reconnected',
@@ -2586,7 +2588,7 @@ export class RoomClient {
             store.dispatch(roomActions.set('locked', true));
 
             store.dispatch(
-              requestActions.notify({
+              notifyAction({
                 text: intl.formatMessage({
                   id: 'room.locked',
                   defaultMessage: 'Room is now locked',
@@ -2601,7 +2603,7 @@ export class RoomClient {
             store.dispatch(roomActions.set('locked', false));
 
             store.dispatch(
-              requestActions.notify({
+              notifyAction({
                 text: intl.formatMessage({
                   id: 'room.unlocked',
                   defaultMessage: 'Room is now unlocked',
@@ -2621,7 +2623,7 @@ export class RoomClient {
             this._soundNotification(notification.method);
 
             store.dispatch(
-              requestActions.notify({
+              notifyAction({
                 text: intl.formatMessage({
                   id: 'room.newLobbyPeer',
                   defaultMessage: 'New participant entered the lobby',
@@ -2659,7 +2661,7 @@ export class RoomClient {
               this._soundNotification(notification.method);
 
               store.dispatch(
-                requestActions.notify({
+                notifyAction({
                   text: intl.formatMessage({
                     id: 'room.newLobbyPeer',
                     defaultMessage: 'New participant entered the lobby',
@@ -2677,7 +2679,7 @@ export class RoomClient {
             store.dispatch(lobbyPeersActions.removeLobbyPeer(peerId));
 
             store.dispatch(
-              requestActions.notify({
+              notifyAction({
                 text: intl.formatMessage({
                   id: 'room.lobbyPeerLeft',
                   defaultMessage: 'Participant in lobby left',
@@ -2704,7 +2706,7 @@ export class RoomClient {
             );
 
             store.dispatch(
-              requestActions.notify({
+              notifyAction({
                 text: intl.formatMessage(
                   {
                     id: 'room.lobbyPeerChangedDisplayName',
@@ -2731,7 +2733,7 @@ export class RoomClient {
             );
 
             store.dispatch(
-              requestActions.notify({
+              notifyAction({
                 text: intl.formatMessage({
                   id: 'room.lobbyPeerChangedPicture',
                   defaultMessage: 'Participant in lobby changed picture',
@@ -2748,7 +2750,7 @@ export class RoomClient {
             store.dispatch(roomActions.set('accessCode', accessCode));
 
             store.dispatch(
-              requestActions.notify({
+              notifyAction({
                 text: intl.formatMessage({
                   id: 'room.setAccessCode',
                   defaultMessage: 'Access code for room updated',
@@ -2768,7 +2770,7 @@ export class RoomClient {
 
             if (joinByAccessCode) {
               store.dispatch(
-                requestActions.notify({
+                notifyAction({
                   text: intl.formatMessage({
                     id: 'room.accessCodeOn',
                     defaultMessage: 'Access code for room is now activated',
@@ -2777,7 +2779,7 @@ export class RoomClient {
               );
             } else {
               store.dispatch(
-                requestActions.notify({
+                notifyAction({
                   text: intl.formatMessage({
                     id: 'room.accessCodeOff',
                     defaultMessage: 'Access code for room is now deactivated',
@@ -2808,7 +2810,7 @@ export class RoomClient {
             );
 
             store.dispatch(
-              requestActions.notify({
+              notifyAction({
                 text: intl.formatMessage(
                   {
                     id: 'room.peerChangedDisplayName',
@@ -2875,7 +2877,7 @@ export class RoomClient {
 
             if (displayName) {
               store.dispatch(
-                requestActions.notify({
+                notifyAction({
                   text,
                 })
               );
@@ -2912,7 +2914,7 @@ export class RoomClient {
             store.dispatch(filesActions.clearFiles());
 
             store.dispatch(
-              requestActions.notify({
+              notifyAction({
                 text: intl.formatMessage({
                   id: 'moderator.clearChat',
                   defaultMessage: 'Moderator cleared the chat',
@@ -2929,7 +2931,7 @@ export class RoomClient {
             store.dispatch(filesActions.addFile({ ...file }));
 
             store.dispatch(
-              requestActions.notify({
+              notifyAction({
                 text: intl.formatMessage({
                   id: 'room.newFile',
                   defaultMessage: 'New file available',
@@ -2955,7 +2957,7 @@ export class RoomClient {
 					{
 						store.dispatch(filesActions.clearFiles());
 
-						store.dispatch(requestActions.notify(
+						store.dispatch(notifyAction(
 							{
 								text : intl.formatMessage({
 									id             : 'moderator.clearFiles',
@@ -2995,7 +2997,7 @@ export class RoomClient {
               this._soundNotification(notification.method);
 
               store.dispatch(
-                requestActions.notify({
+                notifyAction({
                   text: intl.formatMessage(
                     {
                       id: 'room.newPeer',
@@ -3203,7 +3205,7 @@ export class RoomClient {
               this.muteMic();
 
               store.dispatch(
-                requestActions.notify({
+                notifyAction({
                   text: intl.formatMessage({
                     id: 'moderator.muteAudio',
                     defaultMessage: 'Moderator muted your audio',
@@ -3219,7 +3221,7 @@ export class RoomClient {
             this.disableWebcam();
 
             store.dispatch(
-              requestActions.notify({
+              notifyAction({
                 text: intl.formatMessage({
                   id: 'moderator.muteVideo',
                   defaultMessage: 'Moderator stopped your video',
@@ -3234,7 +3236,7 @@ export class RoomClient {
             this.disableScreenSharing();
 
             store.dispatch(
-              requestActions.notify({
+              notifyAction({
                 text: intl.formatMessage({
                   id: 'moderator.stopScreenSharing',
                   defaultMessage: 'Moderator stopped your screen sharing',
@@ -3267,7 +3269,7 @@ export class RoomClient {
               store.dispatch(meActions.addRole(roleId));
 
               store.dispatch(
-                requestActions.notify({
+                notifyAction({
                   text: intl.formatMessage(
                     {
                       id: 'roles.gotRole',
@@ -3293,7 +3295,7 @@ export class RoomClient {
               store.dispatch(meActions.removeRole(roleId));
 
               store.dispatch(
-                requestActions.notify({
+                notifyAction({
                   text: intl.formatMessage(
                     {
                       id: 'roles.lostRole',
@@ -3344,7 +3346,7 @@ export class RoomClient {
             switch (localRecordingState) {
               case 'start':
                 store.dispatch(
-                  requestActions.notify({
+                  notifyAction({
                     text: intl.formatMessage(
                       {
                         id: 'room.localRecordingStarted',
@@ -3359,7 +3361,7 @@ export class RoomClient {
                 break;
               case 'resume':
                 store.dispatch(
-                  requestActions.notify({
+                  notifyAction({
                     text: intl.formatMessage(
                       {
                         id: 'room.localRecordingResumed',
@@ -3374,7 +3376,7 @@ export class RoomClient {
                 break;
               case 'pause': {
                 store.dispatch(
-                  requestActions.notify({
+                  notifyAction({
                     text: intl.formatMessage(
                       {
                         id: 'room.localRecordingPaused',
@@ -3390,7 +3392,7 @@ export class RoomClient {
               }
               case 'stop':
                 store.dispatch(
-                  requestActions.notify({
+                  notifyAction({
                     text: intl.formatMessage(
                       {
                         id: 'room.localRecordingStopped',
@@ -3423,7 +3425,7 @@ export class RoomClient {
         );
 
         store.dispatch(
-          requestActions.notify({
+          notifyAction({
             type: 'error',
             text: intl.formatMessage({
               id: 'socket.requestError',
@@ -3665,7 +3667,7 @@ export class RoomClient {
           store.dispatch(meActions.addRole(roleId));
 
           store.dispatch(
-            requestActions.notify({
+            notifyAction({
               text: intl.formatMessage(
                 {
                   id: 'roles.gotRole',
@@ -3748,10 +3750,10 @@ export class RoomClient {
       store.dispatch(roomActions.setRoomState('connected'));
 
       // Clean all the existing notifications.
-      store.dispatch(notificationActions.removeAllNotifications());
+      store.dispatch(notificationsActions.removeAllNotifications());
 
       store.dispatch(
-        requestActions.notify({
+        notifyAction({
           text: intl.formatMessage({
             id: 'room.joined',
             defaultMessage: 'You have joined the room',
@@ -3772,7 +3774,7 @@ export class RoomClient {
       logger.error('_joinRoom() [error:"%o"]', error);
 
       store.dispatch(
-        requestActions.notify({
+        notifyAction({
           type: 'error',
           text: intl.formatMessage({
             id: 'room.cantJoin',
@@ -3836,7 +3838,7 @@ export class RoomClient {
       store.dispatch(roomActions.set('locked', true));
 
       store.dispatch(
-        requestActions.notify({
+        notifyAction({
           text: intl.formatMessage({
             id: 'room.youLocked',
             defaultMessage: 'You locked the room',
@@ -3845,7 +3847,7 @@ export class RoomClient {
       );
     } catch (error) {
       store.dispatch(
-        requestActions.notify({
+        notifyAction({
           type: 'error',
           text: intl.formatMessage({
             id: 'room.cantLock',
@@ -3867,7 +3869,7 @@ export class RoomClient {
       store.dispatch(roomActions.set('locked', false));
 
       store.dispatch(
-        requestActions.notify({
+        notifyAction({
           text: intl.formatMessage({
             id: 'room.youUnLocked',
             defaultMessage: 'You unlocked the room',
@@ -3876,7 +3878,7 @@ export class RoomClient {
       );
     } catch (error) {
       store.dispatch(
-        requestActions.notify({
+        notifyAction({
           type: 'error',
           text: intl.formatMessage({
             id: 'room.cantUnLock',
@@ -3909,14 +3911,14 @@ export class RoomClient {
       store.dispatch(roomActions.set('accessCode', accessCode));
 
       store.dispatch(
-        requestActions.notify({
+        notifyAction({
           text: 'Access code saved.',
         })
       );
     } catch (error) {
       logger.error('setAccessCode() [error:"%o"]', error);
       store.dispatch(
-        requestActions.notify({
+        notifyAction({
           type: 'error',
           text: 'Unable to set access code.',
         })
@@ -3935,14 +3937,14 @@ export class RoomClient {
       store.dispatch(roomActions.set('joinByAccessCode', value));
 
       store.dispatch(
-        requestActions.notify({
+        notifyAction({
           text: `You switched Join by access-code to ${value}`,
         })
       );
     } catch (error) {
       logger.error('setAccessCode() [error:"%o"]', error);
       store.dispatch(
-        requestActions.notify({
+        notifyAction({
           type: 'error',
           text: 'Unable to set join by access code.',
         })
@@ -4069,7 +4071,7 @@ export class RoomClient {
 
         producer.on('trackended', () => {
           store.dispatch(
-            requestActions.notify({
+            notifyAction({
               type: 'error',
               text: intl.formatMessage({
                 id: 'devices.cameraDisconnected',
@@ -4085,7 +4087,7 @@ export class RoomClient {
       } else {
         logger.error('addExtraVideo() duplicate');
         store.dispatch(
-          requestActions.notify({
+          notifyAction({
             type: 'error',
             text: intl.formatMessage({
               id: 'room.extraVideoDuplication',
@@ -4098,7 +4100,7 @@ export class RoomClient {
       logger.error('addExtraVideo() [error:"%o"]', error);
 
       store.dispatch(
-        requestActions.notify({
+        notifyAction({
           type: 'error',
           text: intl.formatMessage({
             id: 'devices.cameraError',
@@ -4311,7 +4313,7 @@ export class RoomClient {
 
         this._screenSharingProducer.on('trackended', () => {
           store.dispatch(
-            requestActions.notify({
+            notifyAction({
               type: 'error',
               text: intl.formatMessage({
                 id: 'devices.screenSharingDisconnected',
@@ -4358,7 +4360,7 @@ export class RoomClient {
 
           this._screenSharingAudioProducer.on('trackended', () => {
             store.dispatch(
-              requestActions.notify({
+              notifyAction({
                 type: 'error',
                 text: intl.formatMessage({
                   id: 'devices.screenSharingDisconnected',
@@ -4398,7 +4400,7 @@ export class RoomClient {
       logger.error('updateScreenSharing() [error:"%o"]', error);
 
       store.dispatch(
-        requestActions.notify({
+        notifyAction({
           type: 'error',
           text: intl.formatMessage({
             id: 'devices.screenSharingError',

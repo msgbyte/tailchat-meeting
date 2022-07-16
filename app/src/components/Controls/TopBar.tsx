@@ -13,7 +13,6 @@ import {
 import { permissions } from '../../permissions';
 import { useRoomClient } from '../../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
-import * as notificationActions from '../../store/actions/notificationActions';
 import { useIntl, FormattedMessage } from 'react-intl';
 import classnames from 'classnames';
 import AppBar from '@material-ui/core/AppBar';
@@ -60,10 +59,13 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
 import copy from 'copy-to-clipboard';
-import * as requestActions from '../../store/actions/requestActions';
 import { getList } from '../../intl/locales';
 import { toolareaActions } from '../../store/slices/toolarea';
 import { roomActions } from '../../store/slices/room';
+import {
+  notificationsActions,
+  notifyAction,
+} from '../../store/slices/notifications';
 
 const logger = new Logger('Recorder');
 
@@ -336,10 +338,10 @@ export const TopBar: React.FC<TopBarProps> = React.memo((props) => {
     dispatch(toolareaActions.setToolTab('users'));
   }, []);
   const addNotification = useCallback((notification) => {
-    dispatch(notificationActions.addNotification(notification));
+    dispatch(notificationsActions.addNotification(notification));
   }, []);
   const closeNotification = useCallback((notificationId) => {
-    dispatch(notificationActions.closeNotification(notificationId));
+    dispatch(notificationsActions.closeNotification(notificationId));
   }, []);
 
   // did it change?
@@ -411,7 +413,7 @@ export const TopBar: React.FC<TopBarProps> = React.memo((props) => {
     );
 
     dispatch(
-      requestActions.notify({
+      notifyAction({
         text: intl.formatMessage({
           id: 'room.hasCopied',
           defaultMessage: 'Has copied to clipboard',
