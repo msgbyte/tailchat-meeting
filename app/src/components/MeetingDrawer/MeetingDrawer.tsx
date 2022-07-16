@@ -7,7 +7,6 @@ import {
 } from '../../store/selectors';
 import PropTypes from 'prop-types';
 import { makeStyles, useTheme, withStyles } from '@material-ui/core/styles';
-import * as toolareaActions from '../../store/actions/toolareaActions';
 import { useIntl } from 'react-intl';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
@@ -24,25 +23,9 @@ import GroupIcon from '@material-ui/icons/Group';
 import { ReactComponent as PinIcon } from '../../images/pin-icon-baseline.svg';
 import { ReactComponent as UnpinIcon } from '../../images/pin-icon-outline.svg';
 import { settingsActions } from '../../store/slices/settings';
+import { toolareaActions } from '../../store/slices/toolarea';
 
-const tabs = ['users', 'chat'];
-
-const styles = (theme) => ({
-  root: {
-    display: 'flex',
-    flexDirection: 'column',
-    width: '100%',
-    height: '100%',
-    backgroundColor: theme.palette.background.paper,
-  },
-  appBar: {
-    display: 'flex',
-    flexDirection: 'row',
-  },
-  tabsHeader: {
-    flexGrow: 1,
-  },
-});
+const tabs = ['users', 'chat'] as const;
 
 interface Props {
   closeDrawer: () => void;

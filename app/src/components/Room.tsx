@@ -5,7 +5,6 @@ import * as appPropTypes from './appPropTypes';
 import { withStyles } from '@material-ui/core/styles';
 import isElectron from 'is-electron';
 import * as roomActions from '../store/actions/roomActions';
-import * as toolareaActions from '../store/actions/toolareaActions';
 import { idle } from '../utils';
 import FullScreen from './FullScreen';
 import { FormattedMessage } from 'react-intl';
@@ -34,6 +33,7 @@ import LeaveDialog from './LeaveDialog';
 import { config } from '../config';
 import type { AppState } from '../store/reducers/rootReducer';
 import { AutoMeetingView } from './MeetingViews/Auto';
+import { toolareaActions } from '../store/slices/toolarea';
 
 const TIMEOUT = config.hideTimeout || 5000;
 

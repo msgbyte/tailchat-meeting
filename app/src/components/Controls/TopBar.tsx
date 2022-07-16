@@ -17,7 +17,6 @@ import * as appPropTypes from '../appPropTypes';
 import { useRoomClient, withRoomContext } from '../../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
 import * as roomActions from '../../store/actions/roomActions';
-import * as toolareaActions from '../../store/actions/toolareaActions';
 import * as notificationActions from '../../store/actions/notificationActions';
 import { useIntl, FormattedMessage } from 'react-intl';
 import classnames from 'classnames';
@@ -68,6 +67,7 @@ import TableRow from '@material-ui/core/TableRow';
 import copy from 'copy-to-clipboard';
 import * as requestActions from '../../store/actions/requestActions';
 import { getList } from '../../intl/locales';
+import { toolareaActions } from '../../store/slices/toolarea';
 
 const logger = new Logger('Recorder');
 
