@@ -7,7 +7,6 @@ import * as roomActions from './store/actions/roomActions';
 import * as consumerActions from './store/actions/consumerActions';
 import * as producerActions from './store/actions/producerActions';
 import * as notificationActions from './store/actions/notificationActions';
-import * as transportActions from './store/actions/transportActions';
 import Spotlights from './features/Spotlights';
 import { permissions } from './permissions';
 import * as locales from './intl/locales';
@@ -34,6 +33,7 @@ import { peerVolumesActions } from './store/slices/peerVolumes';
 import { recorderActions } from './store/slices/recorder';
 import { lobbyPeersActions } from './store/slices/lobbyPeers';
 import { settingsActions } from './store/slices/settings';
+import { transportsActions } from './store/slices/transports';
 
 type Priority = 'high' | 'medium' | 'low' | 'very-low';
 
@@ -867,7 +867,9 @@ export class RoomClient {
           transportId: this._recvTransport.id,
         });
 
-        store.dispatch(transportActions.addTransportStats(recv, 'recv'));
+        store.dispatch(
+          transportsActions.addTransportStats({ transport: recv, type: 'recv' })
+        );
       }
 
       if (this._sendTransport) {
@@ -880,7 +882,9 @@ export class RoomClient {
           transportId: this._sendTransport.id,
         });
 
-        store.dispatch(transportActions.addTransportStats(send, 'send'));
+        store.dispatch(
+          transportsActions.addTransportStats({ transport: send, type: 'send' })
+        );
       }
     } catch (error) {
       logger.error('getTransportStats() [error:"%o"]', error);
