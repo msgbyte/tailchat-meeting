@@ -7,8 +7,9 @@ import {
 import classnames from 'classnames';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import Peer from '../Containers/Peer';
+import { Peer } from '../Containers/Peer';
 import Me from '../Containers/Me';
+import type { AppState } from '../../store/reducers/rootReducer';
 
 const PADDING_V = 64;
 const PADDING_H = 50;
@@ -195,8 +196,9 @@ class Democratic extends React.PureComponent<DemocraticProps> {
   classes: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state: AppState) => {
   return {
+    advancedMode: state.settings.advancedMode,
     boxes: videoBoxesSelector(state),
     spotlightsPeers: spotlightPeersSelector(state),
     toolbarsVisible: state.room.toolbarsVisible,

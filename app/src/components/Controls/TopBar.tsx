@@ -1,6 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   lobbyPeersKeySelector,
   peersLengthSelector,
@@ -13,10 +11,8 @@ import {
   useAppDispatch,
 } from '../../store/selectors';
 import { permissions } from '../../permissions';
-import * as appPropTypes from '../appPropTypes';
-import { useRoomClient, withRoomContext } from '../../RoomContext';
+import { useRoomClient } from '../../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
-import * as roomActions from '../../store/actions/roomActions';
 import * as notificationActions from '../../store/actions/notificationActions';
 import { useIntl, FormattedMessage } from 'react-intl';
 import classnames from 'classnames';
@@ -55,7 +51,6 @@ import randomString from 'crypto-random-string';
 import { recorder } from '../../features/BrowserRecorder';
 import Logger from '../../features/Logger';
 import { config } from '../../config';
-import type { AppState } from '../../store/reducers/rootReducer';
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
@@ -68,10 +63,61 @@ import copy from 'copy-to-clipboard';
 import * as requestActions from '../../store/actions/requestActions';
 import { getList } from '../../intl/locales';
 import { toolareaActions } from '../../store/slices/toolarea';
+import { roomActions } from '../../store/slices/room';
 
 const logger = new Logger('Recorder');
 
 const localesList = getList();
+
+const hasExtraVideoPermission = makePermissionSelector(permissions.EXTRA_VIDEO);
+
+const hasLockPermission = makePermissionSelector(permissions.CHANGE_ROOM_LOCK);
+
+const hasRecordPermission = makePermissionSelector(
+  permissions.LOCAL_RECORD_ROOM
+);
+const hasPromotionPermission = makePermissionSelector(permissions.PROMOTE_PEER);
+
+const PulsingBadge = withStyles((theme) => ({
+  badge: {
+    backgroundColor: theme.palette.secondary.main,
+    '&::after': {
+      position: 'absolute',
+      width: '100%',
+      height: '100%',
+      borderRadius: '50%',
+      animation: '$ripple 1.2s infinite ease-in-out',
+      border: `3px solid ${theme.palette.secondary.main}`,
+      content: '""',
+    },
+  },
+  '@keyframes ripple': {
+    '0%': {
+      transform: 'scale(.8)',
+      opacity: 1,
+    },
+    '100%': {
+      transform: 'scale(2.4)',
+      opacity: 0,
+    },
+  },
+}))(Badge);
+
+const RecIcon = withStyles(() => ({
+  root: {
+    animation: '$pulse 2s infinite ease-in-out',
+  },
+  '@keyframes pulse': {
+    '0%': {
+      transform: 'scale(.8)',
+      opacity: 1,
+    },
+    '100%': {
+      transform: 'scale(1.2)',
+      opacity: 0,
+    },
+  },
+}))(FiberManualRecordIcon);
 
 const useStyles = makeStyles((theme) => ({
   persistentDrawerOpen: {
@@ -160,48 +206,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const PulsingBadge = withStyles((theme) => ({
-  badge: {
-    backgroundColor: theme.palette.secondary.main,
-    '&::after': {
-      position: 'absolute',
-      width: '100%',
-      height: '100%',
-      borderRadius: '50%',
-      animation: '$ripple 1.2s infinite ease-in-out',
-      border: `3px solid ${theme.palette.secondary.main}`,
-      content: '""',
-    },
-  },
-  '@keyframes ripple': {
-    '0%': {
-      transform: 'scale(.8)',
-      opacity: 1,
-    },
-    '100%': {
-      transform: 'scale(2.4)',
-      opacity: 0,
-    },
-  },
-}))(Badge);
-
-const RecIcon = withStyles(() => ({
-  root: {
-    animation: '$pulse 2s infinite ease-in-out',
-  },
-  '@keyframes pulse': {
-    '0%': {
-      transform: 'scale(.8)',
-      opacity: 1,
-    },
-    '100%': {
-      transform: 'scale(1.2)',
-      opacity: 0,
-    },
-  },
-}))(FiberManualRecordIcon);
-
-const TopBar: React.FC = (props: any) => {
+interface TopBarProps {
+  fullscreenEnabled: boolean;
+  fullscreen: boolean;
+  onFullscreen: () => void;
+}
+export const TopBar: React.FC<TopBarProps> = React.memo((props) => {
   const intl = useIntl();
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -232,51 +242,105 @@ const TopBar: React.FC = (props: any) => {
     handleMobileMenuClose();
   };
 
+  const { fullscreenEnabled, fullscreen, onFullscreen } = props;
+
   const {
+    room,
+    isSafari,
+    meId,
+    isMobile,
     peersLength,
     lobbyPeers,
     permanentTopBar,
     drawerOverlayed,
     toolAreaOpen,
-    isSafari,
-    meId,
-    isMobile,
     loggedIn,
     loginEnabled,
-    fullscreenEnabled,
-    fullscreen,
-    onFullscreen,
-    setSettingsOpen,
-    setExtraVideoOpen,
-    setHelpOpen,
-    setAboutOpen,
-    setLeaveOpen,
-    setLockDialogOpen,
-    setHideSelfView,
-    toggleToolArea,
-    openUsersTab,
-    addNotification,
-    closeNotification,
+    localRecordingState,
+    recordingInProgress,
+    recordingPeers,
+    recordingConsents,
     unread,
     canProduceExtraVideo,
     canLock,
     canRecord,
     canPromote,
     locale,
-    localRecordingState,
-    recordingInProgress,
-    recordingPeers,
     recordingMimeType,
+    producers,
     consumers,
-    recordingConsents,
-  } = props;
+  } = useAppSelector((state) => ({
+    room: state.room,
+    isSafari: state.me.browser.name !== 'safari',
+    meId: state.me.id,
+    isMobile: state.me.browser.platform === 'mobile',
+    peersLength: peersLengthSelector(state),
+    lobbyPeers: lobbyPeersKeySelector(state),
+    permanentTopBar: state.settings.permanentTopBar,
+    drawerOverlayed: state.settings.drawerOverlayed,
+    toolAreaOpen: state.toolarea.toolAreaOpen,
+    loggedIn: state.me.loggedIn,
+    loginEnabled: state.me.loginEnabled,
+    localRecordingState: state.recorder.localRecordingState,
+    recordingInProgress: recordingInProgressSelector(state),
+    recordingPeers: recordingInProgressPeersSelector(state),
+    recordingConsents: recordingConsentsPeersSelector(state),
+    unread:
+      state.toolarea.unreadMessages +
+      state.toolarea.unreadFiles +
+      raisedHandsSelector(state),
+    canProduceExtraVideo: hasExtraVideoPermission(state),
+    canLock: hasLockPermission(state),
+    canRecord: hasRecordPermission(state),
+    canPromote: hasPromotionPermission(state),
+    locale: state.intl.locale,
+    recordingMimeType: state.settings.recorderPreferredMimeType,
+    producers: state.producers,
+    consumers: state.consumers,
+  }));
+
   const roomClient = useRoomClient();
-  const room = useAppSelector((state) => state.room);
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const displayName = useAppSelector((state) => state.settings.displayName);
 
-  const producers = useAppSelector((state) => state.producers);
+  const setToolbarsVisible = useCallback((visible) => {
+    dispatch(roomActions.set('toolbarsVisible', visible));
+  }, []);
+  const setSettingsOpen = useCallback((settingsOpen) => {
+    dispatch(roomActions.set('settingsOpen', settingsOpen));
+  }, []);
+  const setExtraVideoOpen = useCallback((extraVideoOpen) => {
+    dispatch(roomActions.set('extraVideoOpen', extraVideoOpen));
+  }, []);
+  const setHelpOpen = useCallback((helpOpen) => {
+    dispatch(roomActions.set('helpOpen', helpOpen));
+  }, []);
+  const setAboutOpen = useCallback((aboutOpen) => {
+    dispatch(roomActions.set('aboutOpen', aboutOpen));
+  }, []);
+  const setLeaveOpen = useCallback((leaveOpen) => {
+    dispatch(roomActions.set('leaveOpen', leaveOpen));
+  }, []);
+  const setLockDialogOpen = useCallback((lockDialogOpen) => {
+    dispatch(roomActions.set('lockDialogOpen', lockDialogOpen));
+  }, []);
+  const setHideSelfView = useCallback((hideSelfView) => {
+    dispatch(roomActions.set('hideSelfView', hideSelfView));
+  }, []);
+  const toggleToolArea = useCallback(() => {
+    dispatch(toolareaActions.toggleToolArea());
+  }, []);
+  const openUsersTab = useCallback(() => {
+    dispatch(toolareaActions.openToolArea());
+    dispatch(toolareaActions.setToolTab('users'));
+  }, []);
+  const addNotification = useCallback((notification) => {
+    dispatch(notificationActions.addNotification(notification));
+  }, []);
+  const closeNotification = useCallback((notificationId) => {
+    dispatch(notificationActions.closeNotification(notificationId));
+  }, []);
 
   // did it change?
   recorder.checkMicProducer(producers);
@@ -1219,171 +1283,4 @@ const TopBar: React.FC = (props: any) => {
       </Menu>
     </React.Fragment>
   );
-};
-
-TopBar.propTypes = {
-  roomClient: PropTypes.object.isRequired,
-  room: appPropTypes.Room.isRequired,
-  isSafari: PropTypes.bool,
-  meId: PropTypes.string,
-  isMobile: PropTypes.bool.isRequired,
-  peersLength: PropTypes.number,
-  lobbyPeers: PropTypes.array,
-  permanentTopBar: PropTypes.bool.isRequired,
-  drawerOverlayed: PropTypes.bool.isRequired,
-  toolAreaOpen: PropTypes.bool.isRequired,
-  loggedIn: PropTypes.bool.isRequired,
-  loginEnabled: PropTypes.bool.isRequired,
-  fullscreenEnabled: PropTypes.bool,
-  fullscreen: PropTypes.bool,
-  onFullscreen: PropTypes.func.isRequired,
-  setToolbarsVisible: PropTypes.func.isRequired,
-  setSettingsOpen: PropTypes.func.isRequired,
-  setLeaveOpen: PropTypes.func.isRequired,
-  setExtraVideoOpen: PropTypes.func.isRequired,
-  setHelpOpen: PropTypes.func.isRequired,
-  setAboutOpen: PropTypes.func.isRequired,
-  setLockDialogOpen: PropTypes.func.isRequired,
-  setHideSelfView: PropTypes.func.isRequired,
-  toggleToolArea: PropTypes.func.isRequired,
-  openUsersTab: PropTypes.func.isRequired,
-  addNotification: PropTypes.func.isRequired,
-  closeNotification: PropTypes.func.isRequired,
-  unread: PropTypes.number.isRequired,
-  canProduceExtraVideo: PropTypes.bool.isRequired,
-  canLock: PropTypes.bool.isRequired,
-  canRecord: PropTypes.bool.isRequired,
-  canPromote: PropTypes.bool.isRequired,
-  classes: PropTypes.object.isRequired,
-  theme: PropTypes.object.isRequired,
-  intl: PropTypes.object,
-  locale: PropTypes.string.isRequired,
-  localesList: PropTypes.array.isRequired,
-  localRecordingState: PropTypes.string,
-  recordingInProgress: PropTypes.bool,
-  recordingPeers: PropTypes.array,
-  recordingMimeType: PropTypes.string,
-  producers: PropTypes.object,
-  consumers: PropTypes.object,
-  recordingConsents: PropTypes.array,
-};
-
-const makeMapStateToProps = () => {
-  const hasExtraVideoPermission = makePermissionSelector(
-    permissions.EXTRA_VIDEO
-  );
-
-  const hasLockPermission = makePermissionSelector(
-    permissions.CHANGE_ROOM_LOCK
-  );
-
-  const hasRecordPermission = makePermissionSelector(
-    permissions.LOCAL_RECORD_ROOM
-  );
-  const hasPromotionPermission = makePermissionSelector(
-    permissions.PROMOTE_PEER
-  );
-
-  const mapStateToProps = (state: AppState) => ({
-    room: state.room,
-    isSafari: state.me.browser.name !== 'safari',
-    meId: state.me.id,
-    isMobile: state.me.browser.platform === 'mobile',
-    peersLength: peersLengthSelector(state),
-    lobbyPeers: lobbyPeersKeySelector(state),
-    permanentTopBar: state.settings.permanentTopBar,
-    drawerOverlayed: state.settings.drawerOverlayed,
-    toolAreaOpen: state.toolarea.toolAreaOpen,
-    loggedIn: state.me.loggedIn,
-    loginEnabled: state.me.loginEnabled,
-    localRecordingState: state.recorder.localRecordingState,
-    recordingInProgress: recordingInProgressSelector(state),
-    recordingPeers: recordingInProgressPeersSelector(state),
-    recordingConsents: recordingConsentsPeersSelector(state),
-    unread:
-      state.toolarea.unreadMessages +
-      state.toolarea.unreadFiles +
-      raisedHandsSelector(state),
-    canProduceExtraVideo: hasExtraVideoPermission(state),
-    canLock: hasLockPermission(state),
-    canRecord: hasRecordPermission(state),
-    canPromote: hasPromotionPermission(state),
-    locale: state.intl.locale,
-    recordingMimeType: state.settings.recorderPreferredMimeType,
-    producers: state.producers,
-    consumers: state.consumers,
-  });
-
-  return mapStateToProps;
-};
-
-const mapDispatchToProps = (dispatch) => ({
-  setToolbarsVisible: (visible) => {
-    dispatch(roomActions.setToolbarsVisible(visible));
-  },
-  setSettingsOpen: (settingsOpen) => {
-    dispatch(roomActions.setSettingsOpen(settingsOpen));
-  },
-  setExtraVideoOpen: (extraVideoOpen) => {
-    dispatch(roomActions.setExtraVideoOpen(extraVideoOpen));
-  },
-  setHelpOpen: (helpOpen) => {
-    dispatch(roomActions.setHelpOpen(helpOpen));
-  },
-  setAboutOpen: (aboutOpen) => {
-    dispatch(roomActions.setAboutOpen(aboutOpen));
-  },
-  setLeaveOpen: (leaveOpen) => {
-    dispatch(roomActions.setLeaveOpen(leaveOpen));
-  },
-  setLockDialogOpen: (lockDialogOpen) => {
-    dispatch(roomActions.setLockDialogOpen(lockDialogOpen));
-  },
-  setHideSelfView: (hideSelfView) => {
-    dispatch(roomActions.setHideSelfView(hideSelfView));
-  },
-  toggleToolArea: () => {
-    dispatch(toolareaActions.toggleToolArea());
-  },
-  openUsersTab: () => {
-    dispatch(toolareaActions.openToolArea());
-    dispatch(toolareaActions.setToolTab('users'));
-  },
-  addNotification: (notification) => {
-    dispatch(notificationActions.addNotification(notification));
-  },
-  closeNotification: (notificationId) => {
-    dispatch(notificationActions.closeNotification(notificationId));
-  },
 });
-
-export default withRoomContext(
-  connect(makeMapStateToProps, mapDispatchToProps, null, {
-    areStatesEqual: (next, prev) => {
-      return (
-        prev.room === next.room &&
-        prev.peers === next.peers &&
-        prev.lobbyPeers === next.lobbyPeers &&
-        prev.settings.permanentTopBar === next.settings.permanentTopBar &&
-        prev.settings.drawerOverlayed === next.settings.drawerOverlayed &&
-        prev.me.loggedIn === next.me.loggedIn &&
-        prev.me.browser === next.me.browser &&
-        prev.me.loginEnabled === next.me.loginEnabled &&
-        prev.me.picture === next.me.picture &&
-        prev.me.roles === next.me.roles &&
-        prev.recorder.localRecordingState.status ===
-          next.recorder.localRecordingState.status &&
-        prev.toolarea.unreadMessages === next.toolarea.unreadMessages &&
-        prev.toolarea.unreadFiles === next.toolarea.unreadFiles &&
-        prev.toolarea.toolAreaOpen === next.toolarea.toolAreaOpen &&
-        prev.intl.locale === next.intl.locale &&
-        prev.producers === next.producers &&
-        prev.consumers === next.consumers &&
-        prev.settings.recorderPreferredMimeType ===
-          next.settings.recorderPreferredMimeType &&
-        recordingConsentsPeersSelector(prev) ===
-          recordingConsentsPeersSelector(next)
-      );
-    },
-  })(TopBar)
-);

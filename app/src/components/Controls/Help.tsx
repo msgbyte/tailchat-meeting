@@ -1,9 +1,5 @@
-import React from 'react';
-import { connect } from 'react-redux';
-import { withStyles } from '@material-ui/core/styles';
-import { withRoomContext } from '../../RoomContext';
-import * as roomActions from '../../store/actions/roomActions';
-import PropTypes from 'prop-types';
+import React, { useCallback } from 'react';
+import { makeStyles } from '@material-ui/core/styles';
 import { useIntl, FormattedMessage } from 'react-intl';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
@@ -12,8 +8,10 @@ import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
+import { useAppDispatch, useAppSelector } from '../../store/selectors';
+import { roomActions } from '../../store/slices/room';
 
-const styles = (theme) => ({
+const useStyles = makeStyles((theme) => ({
   dialogPaper: {
     width: '30vw',
     [theme.breakpoints.down('lg')]: {
@@ -51,17 +49,22 @@ const styles = (theme) => ({
     flexGrow: 1,
     marginBottom: theme.spacing(1),
   },
-});
+}));
 
-const Help = ({ helpOpen, handleCloseHelp, classes }) => {
+export const Help = React.memo(() => {
   const intl = useIntl();
+  const classes = useStyles();
+  const helpOpen = useAppSelector((state) => state.room.helpOpen);
+  const dispatch = useAppDispatch();
+
+  const handleCloseHelp = useCallback(() => {
+    dispatch(roomActions.set('helpOpen', false));
+  }, []);
 
   return (
     <Dialog
       open={helpOpen}
-      onClose={() => {
-        handleCloseHelp(false);
-      }}
+      onClose={handleCloseHelp}
       classes={{
         paper: classes.dialogPaper,
       }}
@@ -139,38 +142,11 @@ const Help = ({ helpOpen, handleCloseHelp, classes }) => {
       </div>
 
       <DialogActions>
-        <Button
-          onClick={() => {
-            handleCloseHelp(false);
-          }}
-          color="primary"
-        >
+        <Button onClick={handleCloseHelp} color="primary">
           <FormattedMessage id="label.close" defaultMessage="Close" />
         </Button>
       </DialogActions>
     </Dialog>
   );
-};
-
-Help.propTypes = {
-  roomClient: PropTypes.object.isRequired,
-  helpOpen: PropTypes.bool.isRequired,
-  handleCloseHelp: PropTypes.func.isRequired,
-  classes: PropTypes.object.isRequired,
-};
-
-const mapStateToProps = (state) => ({
-  helpOpen: state.room.helpOpen,
 });
-
-const mapDispatchToProps = {
-  handleCloseHelp: roomActions.setHelpOpen,
-};
-
-export default withRoomContext(
-  connect(mapStateToProps, mapDispatchToProps, null, {
-    areStatesEqual: (next, prev) => {
-      return prev.room.helpOpen === next.room.helpOpen;
-    },
-  })(withStyles(styles as any)(Help))
-);
+Help.displayName = 'Help';

@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import * as appPropTypes from './appPropTypes';
 import { withStyles } from '@material-ui/core/styles';
 import isElectron from 'is-electron';
-import * as roomActions from '../store/actions/roomActions';
 import { idle } from '../utils';
 import FullScreen from './FullScreen';
 import { FormattedMessage } from 'react-intl';
@@ -18,22 +17,23 @@ import { MeetingDrawer } from './MeetingDrawer/MeetingDrawer';
 import Democratic from './MeetingViews/Democratic';
 import Filmstrip from './MeetingViews/Filmstrip';
 import AudioPeers from './PeerAudio/AudioPeers';
-import FullScreenView from './VideoContainers/FullScreenView';
-import VideoWindow from './VideoWindow/VideoWindow';
-import LockDialog from './AccessControl/LockDialog/LockDialog';
+import { FullScreenView } from './VideoContainers/FullScreenView';
+import { VideoWindow } from './VideoWindow/VideoWindow';
+import { LockDialog } from './AccessControl/LockDialog/LockDialog';
 import { Settings } from './Settings/Settings';
-import TopBar from './Controls/TopBar';
+import { TopBar } from './Controls/TopBar';
 import WakeLock from 'react-wakelock-react16';
-import ExtraVideo from './Controls/ExtraVideo';
+import { ExtraVideo } from './Controls/ExtraVideo';
 import ButtonControlBar from './Controls/ButtonControlBar';
-import Help from './Controls/Help';
+import { Help } from './Controls/Help';
 import { About } from './Controls/About';
-import RolesManager from './Controls/RolesManager';
-import LeaveDialog from './LeaveDialog';
+import { RolesManager } from './Controls/RolesManager';
+import { LeaveDialog } from './LeaveDialog';
 import { config } from '../config';
 import type { AppState } from '../store/reducers/rootReducer';
 import { AutoMeetingView } from './MeetingViews/Auto';
 import { toolareaActions } from '../store/slices/toolarea';
+import { roomActions } from '../store/slices/room';
 
 const TIMEOUT = config.hideTimeout || 5000;
 
@@ -85,7 +85,6 @@ const styles = (theme) => ({
 interface RoomProps {
   room: AppState['room'];
   browser: any;
-  advancedMode: any;
   showNotifications: any;
   buttonControlBar: any;
   drawerOverlayed: any;
@@ -158,7 +157,6 @@ class Room extends React.PureComponent<RoomProps> {
     const {
       room,
       browser,
-      advancedMode,
       showNotifications,
       buttonControlBar,
       drawerOverlayed,
@@ -172,7 +170,7 @@ class Room extends React.PureComponent<RoomProps> {
       auto: AutoMeetingView,
       filmstrip: Filmstrip,
       democratic: Democratic,
-    }[room.mode];
+    }[room.layout];
 
     const container = window !== undefined ? window.document.body : undefined;
 
@@ -194,7 +192,7 @@ class Room extends React.PureComponent<RoomProps> {
           </CookieConsent>
         )}
 
-        <FullScreenView advancedMode={advancedMode} />
+        <FullScreenView />
 
         <VideoWindow />
 
@@ -251,7 +249,7 @@ class Room extends React.PureComponent<RoomProps> {
 
         {browser.platform === 'mobile' && browser.os !== 'ios' && <WakeLock />}
 
-        <View advancedMode={advancedMode} />
+        <View />
 
         {(buttonControlBar || room.hideSelfView) && <ButtonControlBar />}
 
@@ -272,7 +270,6 @@ class Room extends React.PureComponent<RoomProps> {
 (Room as any).propTypes = {
   room: appPropTypes.Room.isRequired,
   browser: PropTypes.object.isRequired,
-  advancedMode: PropTypes.bool.isRequired,
   showNotifications: PropTypes.bool.isRequired,
   buttonControlBar: PropTypes.bool.isRequired,
   drawerOverlayed: PropTypes.bool.isRequired,
@@ -286,7 +283,6 @@ class Room extends React.PureComponent<RoomProps> {
 const mapStateToProps = (state: AppState) => ({
   room: state.room,
   browser: state.me.browser,
-  advancedMode: state.settings.advancedMode,
   showNotifications: state.settings.showNotifications,
   buttonControlBar: state.settings.buttonControlBar,
   drawerOverlayed: state.settings.drawerOverlayed,
@@ -294,8 +290,8 @@ const mapStateToProps = (state: AppState) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  setToolbarsVisible: (visible) => {
-    dispatch(roomActions.setToolbarsVisible(visible));
+  setToolbarsVisible: (visible: boolean) => {
+    dispatch(roomActions.set('toolbarsVisible', visible));
   },
   toggleToolArea: () => {
     dispatch(toolareaActions.toggleToolArea());
@@ -307,7 +303,6 @@ export default connect(mapStateToProps, mapDispatchToProps, null, {
     return (
       prev.room === next.room &&
       prev.me.browser === next.me.browser &&
-      prev.settings.advancedMode === next.settings.advancedMode &&
       prev.settings.showNotifications === next.settings.showNotifications &&
       prev.settings.buttonControlBar === next.settings.buttonControlBar &&
       prev.settings.drawerOverlayed === next.settings.drawerOverlayed &&

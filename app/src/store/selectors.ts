@@ -274,7 +274,9 @@ export const peerConsumerSelector = createSelector(
   getPeerConsumers,
   getAllConsumers,
   (consumers, allConsumers) => {
-    if (!consumers) return null;
+    if (!consumers) {
+      return null;
+    }
 
     const consumersArray = consumers.map(
       (consumerId) => allConsumers[consumerId]

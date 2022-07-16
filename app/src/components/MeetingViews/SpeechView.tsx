@@ -15,7 +15,7 @@ import { useSelectedPeerId } from '../../store/hooks/useSelectedPeerId';
 import { useAppSelector } from '../../store/selectors';
 import { calcBoxSizeWithContainer } from '../../utils';
 import Me from '../Containers/Me';
-import Peer from '../Containers/Peer';
+import { Peer } from '../Containers/Peer';
 import { SpeakerPeer } from '../Containers/SpeakerPeer';
 
 const PADDING_V = 64;

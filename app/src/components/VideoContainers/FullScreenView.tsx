@@ -1,12 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useWindowSize } from '@react-hook/window-size';
-import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
 import classnames from 'classnames';
-import { withStyles } from '@material-ui/core/styles';
-import * as appPropTypes from '../appPropTypes';
-import * as roomActions from '../../store/actions/roomActions';
-import { withRoomContext } from '../../RoomContext';
+import { useTheme, makeStyles } from '@material-ui/core/styles';
+import { useRoomClient } from '../../RoomContext';
 import FullScreenExitIcon from '@material-ui/icons/FullscreenExit';
 import VideoView from './VideoView';
 import ButtonControlBar from '../Controls/ButtonControlBar';
@@ -17,8 +13,11 @@ import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import Collapse from '@material-ui/core/Collapse';
+import { roomActions } from '../../store/slices/room';
+import { useAppDispatch, useAppSelector } from '../../store/selectors';
+import type { ConsumerType } from '../../store/reducers/consumers';
 
-const styles = (theme) => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     position: 'absolute',
     top: 0,
@@ -123,27 +122,36 @@ const styles = (theme) => ({
       color: 'rgba(255, 255, 255, 0.55)',
     },
   },
-});
+}));
 
-interface FullScreenViewProps {
-  [key: string]: any;
-}
-const FullScreenView: React.FC<FullScreenViewProps> = React.memo((props) => {
+export const FullScreenView: React.FC = React.memo(() => {
   const [hover, setHover] = useState(false);
 
   let touchTimeout = null;
 
+  const roomClient = useRoomClient();
+  const classes = useStyles();
+  const theme = useTheme();
   const {
-    roomClient,
     advancedMode,
     consumer,
-    fullScreenConsumer,
-    toggleConsumerFullscreen,
     toolbarsVisible,
     permanentTopBar,
-    classes,
-    theme,
-  } = props;
+    fullScreenConsumer,
+  } = useAppSelector((state) => ({
+    advancedMode: state.settings.advancedMode,
+    consumer: state.consumers[state.room.fullScreenConsumer],
+    toolbarsVisible: state.room.toolbarsVisible,
+    permanentTopBar: state.settings.permanentTopBar,
+    fullScreenConsumer: state.room.fullScreenConsumer,
+  }));
+  const dispatch = useAppDispatch();
+
+  const toggleConsumerFullscreen = (consumer: ConsumerType) => {
+    if (consumer) {
+      dispatch(roomActions.toggleConsumerFullscreen(consumer.id));
+    }
+  };
 
   const smallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -249,12 +257,7 @@ const FullScreenView: React.FC<FullScreenViewProps> = React.memo((props) => {
           )}
         </IconButton>
 
-        <Collapse
-          in={expanded}
-          timeout="auto"
-          unmountOnExit
-          className={classes.buttonControlBar}
-        >
+        <Collapse in={expanded} timeout="auto" unmountOnExit>
           <ButtonControlBar />
         </Collapse>
       </div>
@@ -288,41 +291,3 @@ const FullScreenView: React.FC<FullScreenViewProps> = React.memo((props) => {
   );
 });
 FullScreenView.displayName = 'FullScreenView';
-
-FullScreenView.propTypes = {
-  roomClient: PropTypes.any.isRequired,
-  advancedMode: PropTypes.bool,
-  consumer: appPropTypes.Consumer,
-  fullScreenConsumer: PropTypes.string,
-  toggleConsumerFullscreen: PropTypes.func.isRequired,
-  toolbarsVisible: PropTypes.bool,
-  permanentTopBar: PropTypes.bool,
-  classes: PropTypes.object.isRequired,
-  theme: PropTypes.object.isRequired,
-};
-
-const mapStateToProps = (state) => ({
-  consumer: state.consumers[state.room.fullScreenConsumer],
-  toolbarsVisible: state.room.toolbarsVisible,
-  permanentTopBar: state.settings.permanentTopBar,
-  fullScreenConsumer: state.room.fullScreenConsumer,
-});
-
-const mapDispatchToProps = (dispatch) => ({
-  toggleConsumerFullscreen: (consumer) => {
-    if (consumer) dispatch(roomActions.toggleConsumerFullscreen(consumer.id));
-  },
-});
-
-export default withRoomContext(
-  connect(mapStateToProps, mapDispatchToProps, null, {
-    areStatesEqual: (next, prev) => {
-      return (
-        prev.consumers[prev.room.fullScreenConsumer] ===
-          next.consumers[next.room.fullScreenConsumer] &&
-        prev.room.toolbarsVisible === next.room.toolbarsVisible &&
-        prev.settings.permanentTopBar === next.settings.permanentTopBar
-      );
-    },
-  })(withStyles(styles as any, { withTheme: true })(FullScreenView))
-);

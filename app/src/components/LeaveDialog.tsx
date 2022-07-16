@@ -1,9 +1,6 @@
-import React, { useRef } from 'react';
-import { connect } from 'react-redux';
-import { withStyles } from '@material-ui/core/styles';
-import { withRoomContext } from '../RoomContext';
-import * as roomActions from '../store/actions/roomActions';
-import PropTypes from 'prop-types';
+import React, { useCallback, useRef } from 'react';
+import { makeStyles } from '@material-ui/core/styles';
+import { useRoomClient } from '../RoomContext';
 import { FormattedMessage } from 'react-intl';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
@@ -13,8 +10,10 @@ import Button from '@material-ui/core/Button';
 import MeetingRoomIcon from '@material-ui/icons/MeetingRoom';
 import CancelIcon from '@material-ui/icons/Cancel';
 import SaveIcon from '@material-ui/icons/Save';
+import { useAppDispatch, useAppSelector } from '../store/selectors';
+import { roomActions } from '../store/slices/room';
 
-const styles = (theme) => ({
+const useStyles = makeStyles((theme) => ({
   dialogPaper: {
     width: '30vw',
     [theme.breakpoints.down('lg')]: {
@@ -44,28 +43,33 @@ const styles = (theme) => ({
   divider: {
     marginBottom: theme.spacing(3),
   },
-});
+}));
 
-const LeaveDialog = ({
-  roomClient,
-  leaveOpen,
-  classes,
-  handleSetLeaveOpen,
-  chatCount,
-}) => {
+export const LeaveDialog: React.FC = React.memo(() => {
   const buttonYes = useRef<HTMLButtonElement>();
+  const classes = useStyles();
+  const roomClient = useRoomClient();
+  const { leaveOpen, chatCount } = useAppSelector((state) => ({
+    leaveOpen: state.room.leaveOpen,
+    chatCount: state.chat.count,
+  }));
+  const dispatch = useAppDispatch();
+
+  const handleSetLeaveOpenClose = useCallback(() => {
+    dispatch(roomActions.set('leaveOpen', false));
+  }, []);
 
   const handleEnterKey = (event) => {
     if (event.key === 'Enter') {
       buttonYes.current.click();
     } else if (event.key === 'Escape' || event.key === 'Esc') {
-      handleSetLeaveOpen(false);
+      handleSetLeaveOpenClose();
     }
   };
 
-  const handleStay = () => handleSetLeaveOpen(false);
-
-  const handleLeave = () => roomClient.close();
+  const handleLeave = () => {
+    roomClient.close();
+  };
 
   const handleLeaveWithSavingChat = () => {
     roomClient.saveChat();
@@ -79,7 +83,7 @@ const LeaveDialog = ({
     <Dialog
       onKeyDown={handleEnterKey}
       open={leaveOpen}
-      onClose={() => handleSetLeaveOpen(false)}
+      onClose={handleSetLeaveOpenClose}
       classes={{
         paper: classes.dialogPaper,
       }}
@@ -97,7 +101,11 @@ const LeaveDialog = ({
         />
       </DialogContent>
       <DialogActions className={classes.dialogActions}>
-        <Button onClick={handleStay} color="primary" startIcon={<CancelIcon />}>
+        <Button
+          onClick={handleSetLeaveOpenClose}
+          color="primary"
+          startIcon={<CancelIcon />}
+        >
           <FormattedMessage id="label.no" defaultMessage="No" />
         </Button>
         <Button
@@ -123,32 +131,5 @@ const LeaveDialog = ({
       </DialogActions>
     </Dialog>
   );
-};
-
-LeaveDialog.propTypes = {
-  roomClient: PropTypes.object.isRequired,
-  leaveOpen: PropTypes.bool.isRequired,
-  handleSetLeaveOpen: PropTypes.func.isRequired,
-  classes: PropTypes.object.isRequired,
-  chatCount: PropTypes.number.isRequired,
-};
-
-const mapStateToProps = (state) => ({
-  leaveOpen: state.room.leaveOpen,
-  chatCount: state.chat.count,
 });
-
-const mapDispatchToProps = {
-  handleSetLeaveOpen: roomActions.setLeaveOpen,
-};
-
-export default withRoomContext(
-  connect(mapStateToProps, mapDispatchToProps, null, {
-    areStatesEqual: (next, prev) => {
-      return (
-        prev.room.leaveOpen === next.room.leaveOpen &&
-        prev.chat.count === next.chat.count
-      );
-    },
-  })(withStyles(styles as any)(LeaveDialog))
-);
+LeaveDialog.displayName = 'LeaveDialog';

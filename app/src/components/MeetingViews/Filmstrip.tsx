@@ -6,9 +6,10 @@ import classnames from 'classnames';
 import { videoBoxesSelector } from '../../store/selectors';
 import { withRoomContext } from '../../RoomContext';
 import Me from '../Containers/Me';
-import Peer from '../Containers/Peer';
+import { Peer } from '../Containers/Peer';
 import { SpeakerPeer } from '../Containers/SpeakerPeer';
 import Grid from '@material-ui/core/Grid';
+import type { AppState } from '../../store/reducers/rootReducer';
 
 const PADDING_V = 64;
 const FILMSTRING_PADDING_V = 0;
@@ -346,9 +347,10 @@ class Filmstrip extends React.PureComponent<FilmstripProps, FilmstripState> {
   classes: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state: AppState) => {
   return {
     activeSpeakerId: state.room.activeSpeakerId,
+    advancedMode: state.settings.advancedMode,
     selectedPeers: state.room.selectedPeers,
     peers: state.peers,
     consumers: state.consumers,

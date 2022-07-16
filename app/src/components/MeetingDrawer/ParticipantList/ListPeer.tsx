@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { connect } from 'react-redux';
-import { makePeerConsumerSelector } from '../../../store/selectors';
-import { withStyles } from '@material-ui/core/styles';
-import * as roomActions from '../../../store/actions/roomActions';
-import PropTypes from 'prop-types';
-import * as appPropTypes from '../../appPropTypes';
-import { withRoomContext } from '../../../RoomContext';
+import {
+  peerConsumerSelector,
+  useAppDispatch,
+  useAppSelector,
+} from '../../../store/selectors';
+import { withStyles, makeStyles } from '@material-ui/core/styles';
+import { useRoomClient } from '../../../RoomContext';
 import { useIntl, FormattedMessage } from 'react-intl';
 import classnames from 'classnames';
 import { green } from '@material-ui/core/colors';
@@ -35,8 +35,34 @@ import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import ListItem from '@material-ui/core/ListItem';
 import Slider from '@material-ui/core/Slider';
+import { roomActions } from '../../../store/slices/room';
 
-const styles = (theme) => ({
+const VolumeSlider = withStyles({
+  root: {
+    color: '#3880ff',
+    height: 2,
+    padding: '15px 0',
+  },
+  track: {
+    height: 2,
+  },
+  rail: {
+    height: 2,
+    opacity: 0.2,
+  },
+  mark: {
+    backgroundColor: '#bfbfbf',
+    height: 10,
+    width: 3,
+    marginTop: -3,
+  },
+  markActive: {
+    opacity: 1,
+    backgroundColor: 'currentColor',
+  },
+})(Slider);
+
+const useStyles = makeStyles((theme) => ({
   root: {
     width: '100%',
     overflow: 'hidden',
@@ -75,34 +101,15 @@ const styles = (theme) => ({
   moderator: {
     color: 'rgba(220, 0, 78, 1)',
   },
-});
+}));
 
-const VolumeSlider = withStyles({
-  root: {
-    color: '#3880ff',
-    height: 2,
-    padding: '15px 0',
-  },
-  track: {
-    height: 2,
-  },
-  rail: {
-    height: 2,
-    opacity: 0.2,
-  },
-  mark: {
-    backgroundColor: '#bfbfbf',
-    height: 10,
-    width: 3,
-    marginTop: -3,
-  },
-  markActive: {
-    opacity: 1,
-    backgroundColor: 'currentColor',
-  },
-})(Slider);
-
-const ListPeer = (props) => {
+interface ListPeerProps {
+  id: string;
+  isModerator: boolean;
+  spotlight: boolean;
+  isSelected: boolean;
+}
+export const ListPeer: React.FC<ListPeerProps> = (props) => {
   const intl = useIntl();
 
   const [anchorEl, setAnchorEl] = useState(null);
@@ -121,20 +128,24 @@ const ListPeer = (props) => {
     setAnchorEl(null);
   };
 
-  const {
-    roomClient,
-    isModerator,
-    spotlight,
-    peer,
-    mode,
-    openRolesManager,
-    micConsumer,
-    webcamConsumer,
-    screenConsumer,
-    isSelected,
-    children,
-    classes,
-  } = props;
+  const roomClient = useRoomClient();
+
+  const { id, isModerator, spotlight, isSelected, children } = props;
+
+  const { peer, mode, micConsumer, webcamConsumer, screenConsumer } =
+    useAppSelector((state) => ({
+      peer: state.peers[id],
+      mode: state.room.layout,
+      ...peerConsumerSelector(state, id),
+    }));
+
+  const dispatch = useAppDispatch();
+  const openRolesManager = (peerId: string) => {
+    dispatch(roomActions.set('rolesManagerPeer', peerId));
+    dispatch(roomActions.set('rolesManagerOpen', true));
+  };
+
+  const classes = useStyles();
 
   const webcamEnabled =
     Boolean(webcamConsumer) &&
@@ -258,13 +269,9 @@ const ListPeer = (props) => {
             <Typography className={classes.moreActionsHeader}>
               {peer.displayName}
             </Typography>
-            <ListItem
-              className={classes.nested}
-              disabled={!micConsumer || peer.stopPeerAudioInProgress}
-            >
+            <ListItem disabled={!micConsumer || peer.stopPeerAudioInProgress}>
               <VolumeDownIcon />
               <VolumeSlider
-                className={classnames(classes.slider)}
                 key={'audio-gain-slider'}
                 disabled={!micConsumer || peer.stopPeerAudioInProgress}
                 min={0}
@@ -477,54 +484,3 @@ const ListPeer = (props) => {
     </div>
   );
 };
-
-ListPeer.propTypes = {
-  roomClient: PropTypes.any.isRequired,
-  advancedMode: PropTypes.bool,
-  isModerator: PropTypes.bool,
-  spotlight: PropTypes.bool,
-  peer: appPropTypes.Peer.isRequired,
-  mode: PropTypes.string.isRequired,
-  openRolesManager: PropTypes.func.isRequired,
-  micConsumer: appPropTypes.Consumer,
-  webcamConsumer: appPropTypes.Consumer,
-  screenConsumer: appPropTypes.Consumer,
-  isSelected: PropTypes.bool,
-  children: PropTypes.object,
-  classes: PropTypes.object.isRequired,
-};
-
-const makeMapStateToProps = (initialState, { id }) => {
-  const getPeerConsumers = makePeerConsumerSelector();
-
-  const mapStateToProps = (state) => {
-    return {
-      peer: state.peers[id],
-      mode: state.room.mode,
-      ...getPeerConsumers(state, id),
-    };
-  };
-
-  return mapStateToProps;
-};
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    openRolesManager: (peerId) => {
-      dispatch(roomActions.setRolesManagerPeer(peerId));
-      dispatch(roomActions.setRolesManagerOpen(true));
-    },
-  };
-};
-
-export default withRoomContext(
-  connect(makeMapStateToProps, mapDispatchToProps, null, {
-    areStatesEqual: (next, prev) => {
-      return (
-        prev.peers === next.peers &&
-        prev.room.mode === next.room.mode &&
-        prev.consumers === next.consumers
-      );
-    },
-  })(withStyles(styles as any)(ListPeer))
-);

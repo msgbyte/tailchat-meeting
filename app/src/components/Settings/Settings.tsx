@@ -1,6 +1,5 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import * as roomActions from '../../store/actions/roomActions';
 import { useIntl, FormattedMessage } from 'react-intl';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
@@ -13,6 +12,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import Button from '@material-ui/core/Button';
 import Close from '@material-ui/icons/Close';
 import { useAppDispatch, useAppSelector } from '../../store/selectors';
+import { roomActions } from '../../store/slices/room';
 
 const tabs = ['media', 'appearance', 'advanced'];
 
@@ -47,10 +47,10 @@ export const Settings: React.FC = React.memo(() => {
   const settingsOpen = useAppSelector((state) => state.room.settingsOpen);
   const dispatch = useAppDispatch();
   const handleCloseSettings = (settingsOpen) => {
-    dispatch(roomActions.setSettingsOpen(settingsOpen));
+    dispatch(roomActions.set('settingsOpen', settingsOpen));
   };
   const setSettingsTab = (tab) => {
-    dispatch(roomActions.setSettingsTab(tab));
+    dispatch(roomActions.set('currentSettingsTab', tab));
   };
 
   return (

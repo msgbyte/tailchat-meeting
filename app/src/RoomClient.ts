@@ -3,7 +3,6 @@ import hark from 'hark';
 import { getSignalingUrl } from './urlFactory';
 import { SocketTimeoutError } from './utils';
 import * as requestActions from './store/actions/requestActions';
-import * as roomActions from './store/actions/roomActions';
 import * as consumerActions from './store/actions/consumerActions';
 import * as producerActions from './store/actions/producerActions';
 import * as notificationActions from './store/actions/notificationActions';
@@ -34,6 +33,7 @@ import { recorderActions } from './store/slices/recorder';
 import { lobbyPeersActions } from './store/slices/lobbyPeers';
 import { settingsActions } from './store/slices/settings';
 import { transportsActions } from './store/slices/transports';
+import { roomActions } from './store/slices/room';
 
 type Priority = 'high' | 'medium' | 'low' | 'very-low';
 
@@ -542,7 +542,7 @@ export class RoomClient {
 
           case '1': {
             // Set democratic view
-            store.dispatch(roomActions.setDisplayMode('democratic'));
+            store.dispatch(roomActions.set('layout', 'democratic'));
             store.dispatch(
               requestActions.notify({
                 text: intl.formatMessage({
@@ -556,7 +556,7 @@ export class RoomClient {
 
           case '2': {
             // Set filmstrip view
-            store.dispatch(roomActions.setDisplayMode('filmstrip'));
+            store.dispatch(roomActions.set('layout', 'filmstrip'));
             store.dispatch(
               requestActions.notify({
                 text: intl.formatMessage({
@@ -625,7 +625,7 @@ export class RoomClient {
 
           case 'H': {
             // Open help dialog
-            store.dispatch(roomActions.setHelpOpen(true));
+            store.dispatch(roomActions.set('helpOpen', true));
 
             break;
           }
@@ -1151,7 +1151,7 @@ export class RoomClient {
   async updateSpotlights(spotlights) {
     logger.debug('updateSpotlights()');
 
-    store.dispatch(roomActions.setSpotlights(spotlights));
+    store.dispatch(roomActions.set('spotlights', spotlights));
 
     try {
       for (const consumer of this._consumers.values()) {
@@ -1717,7 +1717,7 @@ export class RoomClient {
   async promoteAllLobbyPeers() {
     logger.debug('promoteAllLobbyPeers()');
 
-    store.dispatch(roomActions.setLobbyPeersPromotionInProgress(true));
+    store.dispatch(roomActions.set('lobbyPeersPromotionInProgress', true));
 
     try {
       await this.sendRequest('promoteAllPeers');
@@ -1725,7 +1725,7 @@ export class RoomClient {
       logger.error('promoteAllLobbyPeers() [error:"%o"]', error);
     }
 
-    store.dispatch(roomActions.setLobbyPeersPromotionInProgress(false));
+    store.dispatch(roomActions.set('lobbyPeersPromotionInProgress', false));
   }
 
   async promoteLobbyPeer(peerId) {
@@ -1755,19 +1755,18 @@ export class RoomClient {
   async clearChat() {
     logger.debug('clearChat()');
 
-    store.dispatch(roomActions.setClearChatInProgress(true));
+    store.dispatch(roomActions.set('clearChatInProgress', true));
 
     try {
       await this.sendRequest('moderator:clearChat');
 
       store.dispatch(chatActions.clearChat());
-
       store.dispatch(filesActions.clearFiles());
     } catch (error) {
       logger.error('clearChat() [error:"%o"]', error);
     }
 
-    store.dispatch(roomActions.setClearChatInProgress(false));
+    store.dispatch(roomActions.set('clearChatInProgress', false));
   }
 
   /*
@@ -1897,7 +1896,7 @@ export class RoomClient {
   async muteAllPeers() {
     logger.debug('muteAllPeers()');
 
-    store.dispatch(roomActions.setMuteAllInProgress(true));
+    store.dispatch(roomActions.set('muteAllInProgress', true));
 
     try {
       await this.sendRequest('moderator:muteAll');
@@ -1905,13 +1904,13 @@ export class RoomClient {
       logger.error('muteAllPeers() [error:"%o"]', error);
     }
 
-    store.dispatch(roomActions.setMuteAllInProgress(false));
+    store.dispatch(roomActions.set('muteAllInProgress', false));
   }
 
   async stopAllPeerVideo() {
     logger.debug('stopAllPeerVideo()');
 
-    store.dispatch(roomActions.setStopAllVideoInProgress(true));
+    store.dispatch(roomActions.set('stopAllVideoInProgress', true));
 
     try {
       await this.sendRequest('moderator:stopAllVideo');
@@ -1919,13 +1918,13 @@ export class RoomClient {
       logger.error('stopAllPeerVideo() [error:"%o"]', error);
     }
 
-    store.dispatch(roomActions.setStopAllVideoInProgress(false));
+    store.dispatch(roomActions.set('stopAllVideoInProgress', false));
   }
 
   async stopAllPeerScreenSharing() {
     logger.debug('stopAllPeerScreenSharing()');
 
-    store.dispatch(roomActions.setStopAllScreenSharingInProgress(true));
+    store.dispatch(roomActions.set('stopAllScreenSharingInProgress', true));
 
     try {
       await this.sendRequest('moderator:stopAllScreenSharing');
@@ -1933,13 +1932,13 @@ export class RoomClient {
       logger.error('stopAllPeerScreenSharing() [error:"%o"]', error);
     }
 
-    store.dispatch(roomActions.setStopAllScreenSharingInProgress(false));
+    store.dispatch(roomActions.set('stopAllScreenSharingInProgress', false));
   }
 
   async closeMeeting() {
     logger.debug('closeMeeting()');
 
-    store.dispatch(roomActions.setCloseMeetingInProgress(true));
+    store.dispatch(roomActions.set('closeMeetingInProgress', true));
 
     try {
       await this.sendRequest('moderator:closeMeeting');
@@ -1947,7 +1946,7 @@ export class RoomClient {
       logger.error('closeMeeting() [error:"%o"]', error);
     }
 
-    store.dispatch(roomActions.setCloseMeetingInProgress(false));
+    store.dispatch(roomActions.set('closeMeetingInProgress', false));
   }
 
   // type: mic/webcam/screen
@@ -2384,7 +2383,7 @@ export class RoomClient {
 
     this._roomId = roomId;
 
-    store.dispatch(roomActions.setRoomName(roomId));
+    store.dispatch(roomActions.set('name', roomId));
 
     this._signalingUrl = getSignalingUrl(this._peerId, roomId);
 
@@ -2537,7 +2536,7 @@ export class RoomClient {
       try {
         switch (notification.method) {
           case 'enteredLobby': {
-            store.dispatch(roomActions.setInLobby(true));
+            store.dispatch(roomActions.set('inLobby', true));
 
             const { displayName } = store.getState().settings;
             const { picture } = store.getState().me;
@@ -2549,13 +2548,13 @@ export class RoomClient {
 
           case 'signInRequired': {
             store.dispatch(meActions.setLoggedIn(false));
-            store.dispatch(roomActions.setSignInRequired(true));
+            store.dispatch(roomActions.set('signInRequired', true));
 
             break;
           }
 
           case 'overRoomLimit': {
-            store.dispatch(roomActions.setOverRoomLimit(true));
+            store.dispatch(roomActions.set('overRoomLimit', true));
 
             break;
           }
@@ -2565,8 +2564,8 @@ export class RoomClient {
 
             this._turnServers = turnServers;
 
-            store.dispatch(roomActions.toggleJoined());
-            store.dispatch(roomActions.setInLobby(false));
+            store.dispatch(roomActions.set('joined', true));
+            store.dispatch(roomActions.set('inLobby', false));
 
             await this._joinRoom({ joinVideo, joinAudio } as any);
 
@@ -2584,7 +2583,7 @@ export class RoomClient {
           }
 
           case 'lockRoom': {
-            store.dispatch(roomActions.setRoomLocked());
+            store.dispatch(roomActions.set('locked', true));
 
             store.dispatch(
               requestActions.notify({
@@ -2599,7 +2598,7 @@ export class RoomClient {
           }
 
           case 'unlockRoom': {
-            store.dispatch(roomActions.setRoomUnLocked());
+            store.dispatch(roomActions.set('locked', false));
 
             store.dispatch(
               requestActions.notify({
@@ -2617,7 +2616,7 @@ export class RoomClient {
             const { peerId } = notification.data;
 
             store.dispatch(lobbyPeersActions.addLobbyPeer(peerId));
-            store.dispatch(roomActions.setToolbarsVisible(true));
+            store.dispatch(roomActions.set('toolbarsVisible', true));
 
             this._soundNotification(notification.method);
 
@@ -2655,7 +2654,7 @@ export class RoomClient {
                 );
               });
 
-              store.dispatch(roomActions.setToolbarsVisible(true));
+              store.dispatch(roomActions.set('toolbarsVisible', true));
 
               this._soundNotification(notification.method);
 
@@ -2746,7 +2745,7 @@ export class RoomClient {
           case 'setAccessCode': {
             const { accessCode } = notification.data;
 
-            store.dispatch(roomActions.setAccessCode(accessCode));
+            store.dispatch(roomActions.set('accessCode', accessCode));
 
             store.dispatch(
               requestActions.notify({
@@ -2763,7 +2762,9 @@ export class RoomClient {
           case 'setJoinByAccessCode': {
             const { joinByAccessCode } = notification.data;
 
-            store.dispatch(roomActions.setJoinByAccessCode(joinByAccessCode));
+            store.dispatch(
+              roomActions.set('joinByAccessCode', joinByAccessCode)
+            );
 
             if (joinByAccessCode) {
               store.dispatch(
@@ -2791,7 +2792,7 @@ export class RoomClient {
           case 'activeSpeaker': {
             const { peerId } = notification.data;
 
-            store.dispatch(roomActions.setRoomActiveSpeaker(peerId));
+            store.dispatch(roomActions.set('activeSpeakerId', peerId));
 
             if (peerId && peerId !== this._peerId)
               this._spotlights.handleActiveSpeaker(peerId);
@@ -2898,7 +2899,7 @@ export class RoomClient {
                 store.getState().toolarea.currentToolTab !== 'chat')
             ) {
               // Make sound
-              store.dispatch(roomActions.setToolbarsVisible(true));
+              store.dispatch(roomActions.set('toolbarsVisible', true));
               this._soundNotification(notification.method);
             }
 
@@ -2942,7 +2943,7 @@ export class RoomClient {
                 store.getState().toolarea.currentToolTab !== 'chat')
             ) {
               // Make sound
-              store.dispatch(roomActions.setToolbarsVisible(true));
+              store.dispatch(roomActions.set('toolbarsVisible', true));
               this._soundNotification(notification.method);
             }
 
@@ -3642,7 +3643,7 @@ export class RoomClient {
 
       store.dispatch(meActions.setLoggedIn(authenticated));
 
-      store.dispatch(roomActions.setRoomPermissions(roomPermissions));
+      store.dispatch(roomActions.set('roomPermissions', roomPermissions));
 
       const roomUserRoles = new Map();
 
@@ -3650,11 +3651,11 @@ export class RoomClient {
         roomUserRoles.set(val.id, val)
       );
 
-      store.dispatch(roomActions.setUserRoles(roomUserRoles));
+      store.dispatch(roomActions.set('userRoles', roomUserRoles));
 
       if (allowWhenRoleMissing)
         store.dispatch(
-          roomActions.setAllowWhenRoleMissing(allowWhenRoleMissing)
+          roomActions.set('allowWhenRoleMissing', allowWhenRoleMissing)
         );
 
       const myRoles = store.getState().me.roles;
@@ -3689,9 +3690,7 @@ export class RoomClient {
       fileHistory.length > 0 &&
         store.dispatch(filesActions.addFileHistory(fileHistory));
 
-      locked
-        ? store.dispatch(roomActions.setRoomLocked())
-        : store.dispatch(roomActions.setRoomUnLocked());
+      store.dispatch(roomActions.set('locked', locked));
 
       lobbyPeers.length > 0 &&
         lobbyPeers.forEach((peer) => {
@@ -3711,7 +3710,7 @@ export class RoomClient {
         });
 
       accessCode != null &&
-        store.dispatch(roomActions.setAccessCode(accessCode));
+        store.dispatch(roomActions.set('accessCode', accessCode));
 
       // Don't produce if explicitly requested to not to do it.
       if (this._produce) {
@@ -3834,7 +3833,7 @@ export class RoomClient {
     try {
       await this.sendRequest('lockRoom');
 
-      store.dispatch(roomActions.setRoomLocked());
+      store.dispatch(roomActions.set('locked', true));
 
       store.dispatch(
         requestActions.notify({
@@ -3865,7 +3864,7 @@ export class RoomClient {
     try {
       await this.sendRequest('unlockRoom');
 
-      store.dispatch(roomActions.setRoomUnLocked());
+      store.dispatch(roomActions.set('locked', false));
 
       store.dispatch(
         requestActions.notify({
@@ -3901,13 +3900,13 @@ export class RoomClient {
     }
   }
 
-  async setAccessCode(code) {
+  async setAccessCode(accessCode) {
     logger.debug('setAccessCode()');
 
     try {
-      await this.sendRequest('setAccessCode', { accessCode: code });
+      await this.sendRequest('setAccessCode', { accessCode });
 
-      store.dispatch(roomActions.setAccessCode(code));
+      store.dispatch(roomActions.set('accessCode', accessCode));
 
       store.dispatch(
         requestActions.notify({
@@ -3933,7 +3932,7 @@ export class RoomClient {
         joinByAccessCode: value,
       });
 
-      store.dispatch(roomActions.setJoinByAccessCode(value));
+      store.dispatch(roomActions.set('joinByAccessCode', value));
 
       store.dispatch(
         requestActions.notify({
@@ -3954,7 +3953,7 @@ export class RoomClient {
   async addExtraVideo(videoDeviceId) {
     logger.debug('addExtraVideo() [videoDeviceId:"%s"]', videoDeviceId);
 
-    store.dispatch(roomActions.setExtraVideoOpen(false));
+    store.dispatch(roomActions.set('extraVideoOpen', false));
 
     if (!this._mediasoupDevice.canProduce('video')) {
       logger.error('addExtraVideo() | cannot produce video');
@@ -4639,7 +4638,9 @@ export class RoomClient {
   _havePermission(permission) {
     const { roomPermissions, allowWhenRoleMissing } = store.getState().room;
 
-    if (!roomPermissions) return false;
+    if (!roomPermissions) {
+      return false;
+    }
 
     const { roles } = store.getState().me;
 
@@ -4649,9 +4650,13 @@ export class RoomClient {
       )
     );
 
-    if (permitted) return true;
+    if (permitted) {
+      return true;
+    }
 
-    if (!allowWhenRoleMissing) return false;
+    if (!allowWhenRoleMissing) {
+      return false;
+    }
 
     const peers = Object.values(store.getState().peers);
 

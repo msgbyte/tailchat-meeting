@@ -1,6 +1,5 @@
 import React, { useCallback } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import * as roomActions from '../../store/actions/roomActions';
 import { FormattedMessage } from 'react-intl';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
@@ -12,6 +11,7 @@ import Button from '@material-ui/core/Button';
 import Divider from '@material-ui/core/Divider';
 import { config } from '../../config';
 import { useAppDispatch, useAppSelector } from '../../store/selectors';
+import { roomActions } from '../../store/slices/room';
 
 const useStyles = makeStyles((theme) => ({
   dialogPaper: {
@@ -50,7 +50,7 @@ export const About: React.FC = React.memo(() => {
   const aboutOpen = useAppSelector((state) => state.room.aboutOpen);
   const dispatch = useAppDispatch();
   const handleCloseAbout = useCallback(() => {
-    dispatch(roomActions.setAboutOpen(false));
+    dispatch(roomActions.set('aboutOpen', false));
   }, []);
 
   return (
@@ -126,3 +126,4 @@ export const About: React.FC = React.memo(() => {
     </Dialog>
   );
 });
+About.displayName = 'About';

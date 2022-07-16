@@ -10,7 +10,7 @@ import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import { Flipper, Flipped } from 'react-flip-toolkit';
 import { FormattedMessage } from 'react-intl';
-import ListPeer from './ListPeer';
+import { ListPeer } from './ListPeer';
 import ListMe from './ListMe';
 import ListModerator from './ListModerator';
 import Volume from '../../Containers/Volume';
@@ -60,14 +60,8 @@ class ParticipantList extends React.PureComponent {
   }
 
   render() {
-    const {
-      advancedMode,
-      isModerator,
-      participants,
-      spotlights,
-      selectedPeers,
-      classes,
-    } = this.props as any;
+    const { isModerator, participants, spotlights, selectedPeers, classes } =
+      this.props as any;
 
     return (
       <div
@@ -106,7 +100,6 @@ class ParticipantList extends React.PureComponent {
                 <li key={peer.id} className={classnames(classes.listItem)}>
                   <ListPeer
                     id={peer.id}
-                    advancedMode={advancedMode}
                     isModerator={isModerator}
                     spotlight={spotlights.includes(peer.id)}
                     isSelected={selectedPeers.includes(peer.id)}

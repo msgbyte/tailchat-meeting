@@ -1,5 +1,4 @@
 import { CombinedState, combineReducers, Reducer } from '@reduxjs/toolkit';
-import room from './room';
 import { meReducer as me } from '../slices/me';
 import { chatReducer as chat } from '../slices/chat';
 import producers from './producers';
@@ -15,10 +14,11 @@ import { lobbyPeersReducer } from '../slices/lobbyPeers';
 import { settingsReducer } from '../slices/settings';
 import { toolareaReducer } from '../slices/toolarea';
 import { transportsReducer } from '../slices/transports';
+import { roomReducer } from '../slices/room';
 
 export const rootReducer = combineReducers({
   intl: intlReducer,
-  room,
+  room: roomReducer,
   me,
   producers,
   consumers,

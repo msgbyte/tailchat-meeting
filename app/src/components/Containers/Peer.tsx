@@ -1,15 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
-  makePeerConsumerSelector,
   recordingConsentsPeersSelector,
+  useAppSelector,
+  peerConsumerSelector,
+  useAppDispatch,
 } from '../../store/selectors';
-import PropTypes from 'prop-types';
 import classnames from 'classnames';
-import * as appPropTypes from '../appPropTypes';
-import { withRoomContext } from '../../RoomContext';
-import { withStyles } from '@material-ui/core/styles';
-import * as roomActions from '../../store/actions/roomActions';
+import { useRoomClient } from '../../RoomContext';
+import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { useIntl, FormattedMessage } from 'react-intl';
 import VideoView from '../VideoContainers/VideoView';
 import Tooltip from '@material-ui/core/Tooltip';
@@ -24,8 +22,9 @@ import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import Volume from './Volume';
+import { roomActions } from '../../store/slices/room';
 
-const styles = (theme) => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     flex: '0 0 auto',
     boxShadow: 'var(--peer-shadow)',
@@ -112,18 +111,34 @@ const styles = (theme) => ({
       color: 'rgba(255, 255, 255, 0.55)',
     },
   },
-});
+}));
 
-const Peer = (props) => {
+interface PeerProps {
+  id: string;
+  advancedMode: boolean;
+  spacing?: number;
+  style: {
+    width: number;
+    height: number;
+  };
+  enableLayersSwitch?: boolean;
+}
+export const Peer: React.FC<PeerProps> = (props) => {
   const [hover, setHover] = useState(false);
 
   const intl = useIntl();
 
   let touchTimeout = null;
 
+  const classes = useStyles();
+
+  const { id, advancedMode, style, spacing, enableLayersSwitch } = props;
+
+  const roomClient = useRoomClient();
+
+  const theme = useTheme();
+
   const {
-    roomClient,
-    advancedMode,
     peer,
     activeSpeaker,
     browser,
@@ -131,20 +146,36 @@ const Peer = (props) => {
     webcamConsumer,
     screenConsumer,
     extraVideoConsumers,
-    toggleConsumerFullscreen,
-    toggleConsumerWindow,
-    spacing,
-    style,
     windowConsumer,
     fullScreenConsumer,
-    classes,
-    enableLayersSwitch,
     isSelected,
     mode,
-    theme,
     localRecordingState,
     recordingConsents,
-  } = props;
+  } = useAppSelector((state) => ({
+    peer: state.peers[id],
+    ...peerConsumerSelector(state, id),
+    windowConsumer: state.room.windowConsumer,
+    fullScreenConsumer: state.room.fullScreenConsumer,
+    activeSpeaker: id === state.room.activeSpeakerId,
+    browser: state.me.browser,
+    isSelected: state.room.selectedPeers.includes(id),
+    mode: state.room.layout,
+    localRecordingState: state.recorder.localRecordingState.status,
+    recordingConsents: recordingConsentsPeersSelector(state as never),
+  }));
+  const dispatch = useAppDispatch();
+
+  const toggleConsumerFullscreen = useCallback((consumer) => {
+    if (consumer) {
+      dispatch(roomActions.toggleConsumerFullscreen(consumer.id));
+    }
+  }, []);
+  const toggleConsumerWindow = useCallback((consumer) => {
+    if (consumer) {
+      dispatch(roomActions.toggleConsumerWindow(consumer.id));
+    }
+  }, []);
 
   const micEnabled =
     Boolean(micConsumer) &&
@@ -161,14 +192,13 @@ const Peer = (props) => {
     !screenConsumer.locallyPaused &&
     !screenConsumer.remotelyPaused;
 
-  const rootStyle = {
+  const rootStyle: React.CSSProperties = {
     margin: spacing,
     ...style,
   };
 
-  const width = style.width;
-
-  const height = style.height;
+  const width = style.width as number;
+  const height = style.height as number;
 
   const [controls, setControls] = useState({
     root: {
@@ -949,82 +979,3 @@ const Peer = (props) => {
     </React.Fragment>
   );
 };
-
-Peer.propTypes = {
-  roomClient: PropTypes.any.isRequired,
-  advancedMode: PropTypes.bool,
-  peer: appPropTypes.Peer,
-  micConsumer: appPropTypes.Consumer,
-  webcamConsumer: appPropTypes.Consumer,
-  screenConsumer: appPropTypes.Consumer,
-  extraVideoConsumers: PropTypes.arrayOf(appPropTypes.Consumer),
-  windowConsumer: PropTypes.string,
-  fullScreenConsumer: PropTypes.string,
-  activeSpeaker: PropTypes.bool,
-  browser: PropTypes.object.isRequired,
-  spacing: PropTypes.number,
-  style: PropTypes.object,
-  toggleConsumerFullscreen: PropTypes.func.isRequired,
-  toggleConsumerWindow: PropTypes.func.isRequired,
-  classes: PropTypes.object.isRequired,
-  theme: PropTypes.object.isRequired,
-  enableLayersSwitch: PropTypes.bool,
-  isSelected: PropTypes.bool,
-  mode: PropTypes.string.isRequired,
-  localRecordingState: PropTypes.string,
-  recordingConsents: PropTypes.array,
-};
-
-const makeMapStateToProps = (initialState, { id }) => {
-  const getPeerConsumers = makePeerConsumerSelector();
-
-  const mapStateToProps = (state) => {
-    return {
-      peer: state.peers[id],
-      ...(getPeerConsumers as any)(state, id),
-      windowConsumer: state.room.windowConsumer,
-      fullScreenConsumer: state.room.fullScreenConsumer,
-      activeSpeaker: id === state.room.activeSpeakerId,
-      browser: state.me.browser,
-      isSelected: state.room.selectedPeers.includes(id),
-      mode: state.room.mode,
-      localRecordingState: state.recorder.localRecordingState.status,
-      recordingConsents: recordingConsentsPeersSelector(state as never),
-    };
-  };
-
-  return mapStateToProps;
-};
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    toggleConsumerFullscreen: (consumer) => {
-      if (consumer) dispatch(roomActions.toggleConsumerFullscreen(consumer.id));
-    },
-    toggleConsumerWindow: (consumer) => {
-      if (consumer) dispatch(roomActions.toggleConsumerWindow(consumer.id));
-    },
-  };
-};
-
-export default withRoomContext(
-  connect(makeMapStateToProps, mapDispatchToProps, null, {
-    areStatesEqual: (next, prev) => {
-      return (
-        prev.peers === next.peers &&
-        prev.consumers === next.consumers &&
-        prev.room.activeSpeakerId === next.room.activeSpeakerId &&
-        prev.room.windowConsumer === next.room.windowConsumer &&
-        prev.room.fullScreenConsumer === next.room.fullScreenConsumer &&
-        prev.room.mode === next.room.mode &&
-        prev.room.selectedPeers === next.room.selectedPeers &&
-        prev.me.browser === next.me.browser &&
-        prev.enableLayersSwitch === next.enableLayersSwitch &&
-        prev.recorder.localRecordingState.status ===
-          next.recorder.localRecordingState.status &&
-        recordingConsentsPeersSelector(prev as never) ===
-          recordingConsentsPeersSelector(next as never)
-      );
-    },
-  })(withStyles(styles as any, { withTheme: true })(Peer)) as any
-);

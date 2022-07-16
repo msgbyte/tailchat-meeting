@@ -1,14 +1,15 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { connect } from 'react-redux';
 import {
   lobbyPeersKeySelector,
   makePermissionSelector,
+  useAppDispatch,
+  useAppSelector,
 } from '../../../store/selectors';
 import { permissions } from '../../../permissions';
 import * as appPropTypes from '../../appPropTypes';
-import { withStyles } from '@material-ui/core/styles';
+import { makeStyles, withStyles } from '@material-ui/core/styles';
 import { useRoomClient, withRoomContext } from '../../../RoomContext';
-import * as roomActions from '../../../store/actions/roomActions';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import Dialog from '@material-ui/core/Dialog';
@@ -20,8 +21,9 @@ import Button from '@material-ui/core/Button';
 import List from '@material-ui/core/List';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import ListLobbyPeer from './ListLobbyPeer';
+import { roomActions } from '../../../store/slices/room';
 
-const styles = (theme) => ({
+const useStyles = makeStyles((theme) => ({
   root: {},
   dialogPaper: {
     width: '30vw',
@@ -41,22 +43,29 @@ const styles = (theme) => ({
   lock: {
     padding: theme.spacing(2),
   },
-});
+}));
 
-const LockDialog = ({
-  room,
-  handleCloseLockDialog,
-  lobbyPeers,
-  canPromote,
-  classes,
-}) => {
+const hasPermission = makePermissionSelector(permissions.PROMOTE_PEER);
+
+export const LockDialog: React.FC = React.memo(() => {
   const roomClient = useRoomClient();
+  const classes = useStyles();
+  const { room, lobbyPeers, canPromote } = useAppSelector((state) => ({
+    room: state.room,
+    lobbyPeers: lobbyPeersKeySelector(state),
+    canPromote: hasPermission(state),
+  }));
+  const dispatch = useAppDispatch();
+
+  const handleCloseLockDialog = useCallback(() => {
+    dispatch(roomActions.set('lockDialogOpen', false));
+  }, []);
 
   return (
     <Dialog
       className={classes.root}
       open={room.lockDialogOpen}
-      onClose={() => handleCloseLockDialog(false)}
+      onClose={handleCloseLockDialog}
       classes={{
         paper: classes.dialogPaper,
       }}
@@ -108,51 +117,10 @@ const LockDialog = ({
             defaultMessage="Promote all"
           />
         </Button>
-        <Button onClick={() => handleCloseLockDialog(false)} color="primary">
+        <Button onClick={handleCloseLockDialog} color="primary">
           <FormattedMessage id="label.close" defaultMessage="Close" />
         </Button>
       </DialogActions>
     </Dialog>
   );
-};
-
-LockDialog.propTypes = {
-  room: appPropTypes.Room.isRequired,
-  handleCloseLockDialog: PropTypes.func.isRequired,
-  handleAccessCode: PropTypes.func.isRequired,
-  lobbyPeers: PropTypes.array,
-  canPromote: PropTypes.bool,
-  classes: PropTypes.object.isRequired,
-};
-
-const makeMapStateToProps = () => {
-  const hasPermission = makePermissionSelector(permissions.PROMOTE_PEER);
-
-  const mapStateToProps = (state) => {
-    return {
-      room: state.room,
-      lobbyPeers: lobbyPeersKeySelector(state),
-      canPromote: hasPermission(state),
-    };
-  };
-
-  return mapStateToProps;
-};
-
-const mapDispatchToProps = {
-  handleCloseLockDialog: roomActions.setLockDialogOpen,
-  handleAccessCode: roomActions.setAccessCode,
-};
-
-export default withRoomContext(
-  connect(makeMapStateToProps, mapDispatchToProps, null, {
-    areStatesEqual: (next, prev) => {
-      return (
-        prev.room === next.room &&
-        prev.me.roles === next.me.roles &&
-        prev.peers === next.peers &&
-        prev.lobbyPeers === next.lobbyPeers
-      );
-    },
-  })(withStyles(styles)(LockDialog))
-);
+});

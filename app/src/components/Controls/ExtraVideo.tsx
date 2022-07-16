@@ -1,8 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { withStyles } from '@material-ui/core/styles';
-import { withRoomContext } from '../../RoomContext';
-import * as roomActions from '../../store/actions/roomActions';
+import { makeStyles, withStyles } from '@material-ui/core/styles';
+import { useRoomClient, withRoomContext } from '../../RoomContext';
 import PropTypes from 'prop-types';
 import { useIntl, FormattedMessage } from 'react-intl';
 import Dialog from '@material-ui/core/Dialog';
@@ -13,8 +12,10 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
+import { useAppDispatch, useAppSelector } from '../../store/selectors';
+import { roomActions } from '../../store/slices/room';
 
-const styles = (theme) => ({
+const useStyles = makeStyles((theme) => ({
   dialogPaper: {
     width: '30vw',
     [theme.breakpoints.down('lg')]: {
@@ -36,15 +37,9 @@ const styles = (theme) => ({
   formControl: {
     display: 'flex',
   },
-});
+}));
 
-const ExtraVideo = ({
-  roomClient,
-  extraVideoOpen,
-  webcamDevices,
-  handleCloseExtraVideo,
-  classes,
-}) => {
+export const ExtraVideo: React.FC = React.memo(() => {
   const intl = useIntl();
 
   const [videoDevice, setVideoDevice] = React.useState('');
@@ -52,6 +47,16 @@ const ExtraVideo = ({
   const handleChange = (event) => {
     setVideoDevice(event.target.value);
   };
+
+  const roomClient = useRoomClient();
+  const classes = useStyles();
+
+  const { webcamDevices, extraVideoOpen } = useAppSelector((state) => ({
+    webcamDevices: state.me.webcamDevices,
+    extraVideoOpen: state.room.extraVideoOpen,
+  }));
+
+  const dispatch = useAppDispatch();
 
   let videoDevices;
 
@@ -61,7 +66,7 @@ const ExtraVideo = ({
   return (
     <Dialog
       open={extraVideoOpen}
-      onClose={() => handleCloseExtraVideo(false)}
+      onClose={() => dispatch(roomActions.set('extraVideoOpen', false))}
       classes={{
         paper: classes.dialogPaper,
       }}
@@ -79,7 +84,6 @@ const ExtraVideo = ({
               defaultMessage: 'Camera',
             })}
             autoWidth
-            className={classes.selectEmpty}
             disabled={videoDevices.length === 0}
             onChange={handleChange}
           >
@@ -117,32 +121,5 @@ const ExtraVideo = ({
       </DialogActions>
     </Dialog>
   );
-};
-
-ExtraVideo.propTypes = {
-  roomClient: PropTypes.object.isRequired,
-  extraVideoOpen: PropTypes.bool.isRequired,
-  webcamDevices: PropTypes.object,
-  handleCloseExtraVideo: PropTypes.func.isRequired,
-  classes: PropTypes.object.isRequired,
-};
-
-const mapStateToProps = (state) => ({
-  webcamDevices: state.me.webcamDevices,
-  extraVideoOpen: state.room.extraVideoOpen,
 });
-
-const mapDispatchToProps = {
-  handleCloseExtraVideo: roomActions.setExtraVideoOpen,
-};
-
-export default withRoomContext(
-  connect(mapStateToProps, mapDispatchToProps, null, {
-    areStatesEqual: (next, prev) => {
-      return (
-        prev.me.webcamDevices === next.me.webcamDevices &&
-        prev.room.extraVideoOpen === next.room.extraVideoOpen
-      );
-    },
-  })(withStyles(styles)(ExtraVideo))
-);
+ExtraVideo.displayName = 'ExtraVideo';

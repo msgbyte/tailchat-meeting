@@ -1,13 +1,14 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { connect } from 'react-redux';
-import { withStyles } from '@material-ui/core/styles';
-import { withRoomContext } from '../../RoomContext';
+import { makeStyles, withStyles } from '@material-ui/core/styles';
+import { useRoomClient, withRoomContext } from '../../RoomContext';
 import {
   highestRoleLevelSelector,
   makePermissionSelector,
+  useAppDispatch,
+  useAppSelector,
 } from '../../store/selectors';
 import { permissions } from '../../permissions';
-import * as roomActions from '../../store/actions/roomActions';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import Dialog from '@material-ui/core/Dialog';
@@ -19,8 +20,11 @@ import Button from '@material-ui/core/Button';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
+import { roomActions } from '../../store/slices/room';
 
-const styles = (theme) => ({
+const canModifyRolesSelector = makePermissionSelector(permissions.MODIFY_ROLE);
+
+const useStyles = makeStyles((theme) => ({
   dialogPaper: {
     width: '30vw',
     [theme.breakpoints.down('lg')]: {
@@ -48,22 +52,30 @@ const styles = (theme) => ({
   green: {
     backgroundColor: 'rgba(0, 153, 0, 1)',
   },
-});
+}));
 
-const RolesManager = ({
-  roomClient,
-  peer,
-  userRoles,
-  canModifyRoles,
-  highestLevel,
-  rolesManagerOpen,
-  handleCloseRolesManager,
-  classes,
-}) => {
+export const RolesManager: React.FC = React.memo(() => {
+  const roomClient = useRoomClient();
+  const { peer, userRoles, canModifyRoles, highestLevel, rolesManagerOpen } =
+    useAppSelector((state) => ({
+      peer: state.peers[state.room.rolesManagerPeer],
+      userRoles: state.room.userRoles,
+      canModifyRoles: canModifyRolesSelector(state),
+      highestLevel: highestRoleLevelSelector(state),
+      rolesManagerOpen: state.room.rolesManagerOpen,
+    }));
+  const dispatch = useAppDispatch();
+
+  const classes = useStyles();
+
+  const handleCloseRolesManager = useCallback(() => {
+    dispatch(roomActions.set('rolesManagerOpen', false));
+  }, []);
+
   return (
     <Dialog
       open={rolesManagerOpen}
-      onClose={() => handleCloseRolesManager(false)}
+      onClose={handleCloseRolesManager}
       classes={{
         paper: classes.dialogPaper,
       }}
@@ -133,53 +145,10 @@ const RolesManager = ({
       )}
 
       <DialogActions>
-        <Button onClick={() => handleCloseRolesManager(false)} color="primary">
+        <Button onClick={handleCloseRolesManager} color="primary">
           <FormattedMessage id="label.close" defaultMessage="Close" />
         </Button>
       </DialogActions>
     </Dialog>
   );
-};
-
-RolesManager.propTypes = {
-  roomClient: PropTypes.object.isRequired,
-  peer: PropTypes.object,
-  userRoles: PropTypes.object.isRequired,
-  canModifyRoles: PropTypes.bool.isRequired,
-  highestLevel: PropTypes.number.isRequired,
-  rolesManagerOpen: PropTypes.bool.isRequired,
-  handleCloseRolesManager: PropTypes.func.isRequired,
-  classes: PropTypes.object.isRequired,
-};
-
-const makeMapStateToProps = () => {
-  const canModifyRoles = makePermissionSelector(permissions.MODIFY_ROLE);
-
-  const mapStateToProps = (state) => {
-    return {
-      peer: state.peers[state.room.rolesManagerPeer],
-      userRoles: state.room.userRoles,
-      canModifyRoles: canModifyRoles(state),
-      highestLevel: highestRoleLevelSelector(state),
-      rolesManagerOpen: state.room.rolesManagerOpen,
-    };
-  };
-
-  return mapStateToProps;
-};
-
-const mapDispatchToProps = {
-  handleCloseRolesManager: roomActions.setRolesManagerOpen,
-};
-
-export default withRoomContext(
-  connect(makeMapStateToProps, mapDispatchToProps, null, {
-    areStatesEqual: (next, prev) => {
-      return (
-        prev.me === next.me &&
-        prev.peers === next.peers &&
-        prev.room === next.room
-      );
-    },
-  })(withStyles(styles)(RolesManager))
-);
+});

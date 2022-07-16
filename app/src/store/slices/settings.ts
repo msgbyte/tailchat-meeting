@@ -113,14 +113,6 @@ const settingsSlice = createSlice({
     /**
      * 通用设置
      */
-    // set<K extends keyof SettingsState>(
-    //   state: SettingsState,
-    //   action: PayloadAction<{ key: K; value: SettingsState[K] }>
-    // ) {
-    //   const { key, value } = action.payload;
-
-    //   state[key] = value;
-    // },
     set: {
       reducer: <K extends keyof SettingsState>(
         state: SettingsState,

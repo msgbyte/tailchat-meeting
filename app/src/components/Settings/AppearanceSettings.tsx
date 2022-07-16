@@ -1,6 +1,5 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import * as roomActions from '../../store/actions/roomActions';
 import classnames from 'classnames';
 import { useIntl, FormattedMessage } from 'react-intl';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -12,9 +11,9 @@ import Switch from '@material-ui/core/Switch';
 import { useRoomClient } from '../../RoomContext';
 import { config } from '../../config';
 import { useAppDispatch, useAppSelector } from '../../store/selectors';
-import type { ViewModeType } from '../../store/reducers/room';
 import { getList } from '../../intl/locales';
 import { settingsActions } from '../../store/slices/settings';
+import { roomActions, ViewLayoutType } from '../../store/slices/room';
 
 const localesList = getList();
 
@@ -59,8 +58,8 @@ export const AppearanceSettings: React.FC = React.memo(() => {
     dispatch(settingsActions.toggle('mirrorOwnVideo'));
   const onToggleHideNoVideoParticipants = () =>
     dispatch(settingsActions.toggle('hideNoVideoParticipants'));
-  const handleChangeMode = (mode: ViewModeType) =>
-    dispatch(roomActions.setDisplayMode(mode));
+  const handleChangeMode = (layout: ViewLayoutType) =>
+    dispatch(roomActions.set('layout', layout));
   const handleChangeAspectRatio = (aspectRatio: number) =>
     dispatch(settingsActions.set('aspectRatio', aspectRatio));
 
@@ -123,7 +122,7 @@ export const AppearanceSettings: React.FC = React.memo(() => {
 
       <FormControl className={classes.setting}>
         <Select
-          value={room.mode || 'auto'}
+          value={room.layout || 'auto'}
           onChange={(event) => {
             if (event.target.value) handleChangeMode(event.target.value as any);
           }}
