@@ -6,6 +6,7 @@
 'use strict';
 
 import cloneDeep from 'lodash.clonedeep';
+import type { Schema } from 'convict';
 
 // Forbidden key paths, for protection against prototype pollution
 const FORBIDDEN_KEY_PATHS = ['__proto__.', 'this.constructor.prototype.'];
@@ -474,7 +475,7 @@ function walk(obj, path, initializeMissing?: boolean) {
 /**
  * @returns a config object
  */
-const convict = function convict(def) {
+const convict = function convict<T>(def: Schema<T>) {
   // TODO: Rename this `rv` variable (supposedly "return value") into something
   // more meaningful.
   const rv: any = {

@@ -320,11 +320,13 @@ importers:
 
   packages/tailchat-convict:
     specifiers:
+      '@types/convict': ^6.0.1
       lodash.clonedeep: ^4.5.0
       typescript: ^4.7.2
     dependencies:
       lodash.clonedeep: 4.5.0
     devDependencies:
+      '@types/convict': 6.1.1
       typescript: 4.7.2
 
   server:
@@ -3894,7 +3896,7 @@ packages:
   /@types/convict/6.1.1:
     resolution: {integrity: sha512-R+JLaTvhsD06p4jyjUDtbd5xMtZTRE3c0iI+lrFWZogSVEjgTWPYwvJPVf+t92E+yrlbXa4X4Eg9ro6gPdUt4w==}
     dependencies:
-      '@types/node': 14.18.18
+      '@types/node': 16.11.36
     dev: true
 
   /@types/cookie-parser/1.4.3:

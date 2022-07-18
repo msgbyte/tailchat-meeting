@@ -18,7 +18,7 @@
 		"i18n:extract": "formatjs extract",
 		"lint": "eslint ./ --ext .js,.jsx,.ts,.tsx; exit 0",
 		"lint-fix": "eslint ./ --fix --ext .js,.jsx,.ts,.tsx; exit 0",
-		"gen-config-docs": "node --loader ts-node/esm src/config.ts && eslint -c .eslintrc.json public/config/config.example.js --fix"
+		"gen-config-docs": "TS_NODE_PROJECT='tsconfig.node.json' ts-node ./scripts/buildConfigDoc.ts"
 	},
 	"dependencies": {
 		"@material-ui/core": "^4.11.3",

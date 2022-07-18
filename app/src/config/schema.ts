@@ -3,16 +3,19 @@ import { preset } from 'tailchat-meeting-sdk';
 export const configSchema = {
   loginEnabled: {
     doc: 'If the login is enabled.',
+    docZh: '登录是否可用',
     format: 'Boolean',
     default: false,
   },
   developmentPort: {
     doc: 'The development server listening port.',
+    docZh: '开发模式监听端口',
     format: 'port',
     default: 3443,
   },
   productionPort: {
     doc: 'The production server listening port.',
+    docZh: '生产模式监听端口',
     format: 'port',
     default: 443,
   },
