@@ -5,7 +5,6 @@ import {
   meProducersSelector,
   makePermissionSelector,
 } from '../../store/selectors';
-import { permissions } from '../../permissions';
 import { withStyles } from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import classnames from 'classnames';
@@ -20,6 +19,7 @@ import VideoIcon from '@material-ui/icons/Videocam';
 import VideoOffIcon from '@material-ui/icons/VideocamOff';
 import SettingsVoiceIcon from '@material-ui/icons/SettingsVoice';
 import ScreenIcon from '@material-ui/icons/ScreenShare';
+import { PermissionList } from 'tailchat-meeting-sdk';
 
 const styles = (theme) => ({
   root: {
@@ -329,9 +329,9 @@ ButtonControlBar.propTypes = {
 };
 
 const makeMapStateToProps = () => {
-  const canShareAudio = makePermissionSelector(permissions.SHARE_AUDIO);
-  const canShareVideo = makePermissionSelector(permissions.SHARE_VIDEO);
-  const canShareScreen = makePermissionSelector(permissions.SHARE_SCREEN);
+  const canShareAudio = makePermissionSelector(PermissionList.SHARE_AUDIO);
+  const canShareVideo = makePermissionSelector(PermissionList.SHARE_VIDEO);
+  const canShareScreen = makePermissionSelector(PermissionList.SHARE_SCREEN);
 
   const mapStateToProps = (state) => {
     let noise;

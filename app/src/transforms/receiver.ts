@@ -1,6 +1,6 @@
 import Logger from '../features/Logger';
+import { consumersActions } from '../store/slices/consumers';
 import { store } from '../store/store';
-import * as consumerActions from '../store/actions/consumerActions';
 
 const logger = new Logger('transforms.receiver');
 
@@ -113,7 +113,7 @@ export function opusReceiverTransform(
             opusConfig,
           });
           store.dispatch(
-            consumerActions.setConsumerOpusConfig(consumerId, opusConfig)
+            consumersActions.setConsumerOpusConfig({ consumerId, opusConfig })
           );
         }
       }

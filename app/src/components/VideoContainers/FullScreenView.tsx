@@ -15,7 +15,7 @@ import useMediaQuery from '@material-ui/core/useMediaQuery';
 import Collapse from '@material-ui/core/Collapse';
 import { roomActions } from '../../store/slices/room';
 import { useAppDispatch, useAppSelector } from '../../store/selectors';
-import type { ConsumerType } from '../../store/reducers/consumers';
+import type { ConsumerType } from '../../store/slices/consumers';
 
 const useStyles = makeStyles((theme) => ({
   root: {

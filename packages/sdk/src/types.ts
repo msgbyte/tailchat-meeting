@@ -8,6 +8,7 @@ import type {
 import type { DtlsParameters } from 'mediasoup-client/lib/Transport';
 import type { ProducerOptions } from 'mediasoup-client/lib/types';
 import type { VolumeWatcher } from './helper/volumeWatcher';
+import type { PermissionList } from './consts';
 
 export type { MediaKind };
 export type { Producer, Consumer } from 'mediasoup-client/lib/types';
@@ -39,7 +40,7 @@ export interface MediaDevice {
   label: string;
 }
 
-export interface Permission {
+export interface PermissionInfo {
   id: number;
   label: string;
   level: number;
@@ -54,8 +55,8 @@ export interface JoinResponse {
    * For webtorrent
    */
   tracker: string;
-  roomPermissions: Record<string, Permission[]>;
-  userRoles: Record<string, Permission[]>;
+  roomPermissions: Record<string, PermissionInfo[]>;
+  userRoles: Record<string, PermissionInfo[]>;
   allowWhenRoleMissing: string[];
   chatHistory: any[];
   fileHistory: any[];
@@ -252,3 +253,5 @@ export type OPUSPacketTime = 3 | 5 | 10 | 20 | 30 | 40 | 50 | 60;
  * OPUS 最大回放速率
  */
 export type OPUSMaxPlaybackRate = 8000 | 16000 | 24000 | 44100 | 48000;
+
+export type RoomPermissions = Record<PermissionList, PermissionInfo[]>;

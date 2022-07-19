@@ -7,8 +7,8 @@
   "types": "./lib/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "release": "npm publish --registry https://registry.npmjs.com/",
-    "prepare": "pnpm build"
+    "prepare": "pnpm build",
+    "release": "npm publish --registry https://registry.npmjs.com/"
   },
   "files": [
     "src",

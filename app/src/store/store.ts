@@ -7,10 +7,11 @@ import {
 import storage from 'redux-persist/lib/storage';
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
 import { diff } from 'deep-object-diff';
-import { AppState, rootReducer } from './reducers/rootReducer';
+import { AppState, rootReducer } from './slices/index';
 import Logger from '../features/Logger';
 import { config } from '../config';
 import { configureStore } from '@reduxjs/toolkit';
+import { configActions } from './slices/config';
 
 const logger = new Logger('store');
 
@@ -86,13 +87,6 @@ export const persistor = persistStore(store, null, () => {
 
   if (changedKeys.length) {
     logger.debug('store config changed:', changed);
-    const changedSettings = {};
-
-    changedKeys.forEach((key) => {
-      changedSettings[key] = config[key];
-    });
-
-    store.dispatch({ type: 'SETTINGS_UPDATE', payload: changedSettings });
-    store.dispatch({ type: 'CONFIG_SET', payload: config });
+    store.dispatch(configActions.set(config));
   }
 });

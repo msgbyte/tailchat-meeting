@@ -9,7 +9,7 @@ import Me from '../Containers/Me';
 import { Peer } from '../Containers/Peer';
 import { SpeakerPeer } from '../Containers/SpeakerPeer';
 import Grid from '@material-ui/core/Grid';
-import type { AppState } from '../../store/reducers/rootReducer';
+import type { AppState } from '../../store/slices';
 
 const PADDING_V = 64;
 const FILMSTRING_PADDING_V = 0;

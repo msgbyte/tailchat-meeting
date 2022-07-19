@@ -4,9 +4,9 @@ import PropTypes from 'prop-types';
 import { withRoomContext } from '../../../../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
 import { useIntl, FormattedMessage } from 'react-intl';
-import { permissions } from '../../../../permissions';
 import { makePermissionSelector } from '../../../../store/selectors';
 import Button from '@material-ui/core/Button';
+import { PermissionList } from 'tailchat-meeting-sdk';
 
 const styles = (theme) => ({
   root: {
@@ -72,7 +72,7 @@ ChatModerator.propTypes = {
 };
 
 const makeMapStateToProps = () => {
-  const hasPermission = makePermissionSelector(permissions.MODERATE_CHAT);
+  const hasPermission = makePermissionSelector(PermissionList.MODERATE_CHAT);
 
   const mapStateToProps = (state) => ({
     isChatModerator: hasPermission(state),

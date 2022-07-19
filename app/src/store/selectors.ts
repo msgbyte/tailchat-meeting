@@ -1,6 +1,7 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { useSelector, useDispatch } from 'react-redux';
-import type { AppState } from './reducers/rootReducer';
+import type { PermissionList } from 'tailchat-meeting-sdk';
+import type { AppState } from './slices';
 
 export function useAppSelector<T>(
   selector: (state: AppState) => T,
@@ -322,7 +323,7 @@ export const makePeerConsumerSelector = () => {
 // 			prev.me.roles === next.me.roles
 // 		);
 // }
-export const makePermissionSelector = (permission) => {
+export const makePermissionSelector = (permission: PermissionList) => {
   return createSelector(
     meRolesSelect,
     roomPermissionsSelect,

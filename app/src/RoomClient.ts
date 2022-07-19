@@ -2,10 +2,7 @@ import Logger from './features/Logger';
 import hark from 'hark';
 import { getSignalingUrl } from './urlFactory';
 import { SocketTimeoutError } from './utils';
-import * as consumerActions from './store/actions/consumerActions';
-import * as producerActions from './store/actions/producerActions';
 import Spotlights from './features/Spotlights';
-import { permissions } from './permissions';
 import * as locales from './intl/locales';
 import {
   directReceiverTransform,
@@ -15,9 +12,9 @@ import { config } from './config';
 import { store } from './store/store';
 import { virtualBackground } from './transforms/virtualBackgroundEffect';
 import type * as MediasoupClient from 'mediasoup-client';
-import type { ConsumerType } from './store/reducers/consumers';
+import { consumersActions, ConsumerType } from './store/slices/consumers';
 import type { IceParameters } from 'mediasoup-client/lib/types';
-import { getEncodings } from 'tailchat-meeting-sdk/lib/helper/encodings';
+import { PermissionList, getEncodings } from 'tailchat-meeting-sdk';
 import { meActions } from './store/slices/me';
 import isElectron from 'is-electron';
 import { updateIntl } from 'react-intl-redux';
@@ -36,6 +33,7 @@ import {
   notificationsActions,
   notifyAction,
 } from './store/slices/notifications';
+import { producersActions } from './store/slices/producers';
 
 type Priority = 'high' | 'medium' | 'low' | 'very-low';
 
@@ -1091,7 +1089,7 @@ export class RoomClient {
         producerId: this._micProducer.id,
       });
 
-      store.dispatch(producerActions.setProducerPaused(this._micProducer.id));
+      store.dispatch(producersActions.setProducerPaused(this._micProducer.id));
 
       store.dispatch(settingsActions.set('audioMuted', true));
     } catch (error) {
@@ -1123,7 +1121,7 @@ export class RoomClient {
         });
 
         store.dispatch(
-          producerActions.setProducerResumed(this._micProducer.id)
+          producersActions.setProducerResumed(this._micProducer.id)
         );
 
         store.dispatch(settingsActions.set('audioMuted', false));
@@ -1385,7 +1383,7 @@ export class RoomClient {
         });
 
         store.dispatch(
-          producerActions.addProducer({
+          producersActions.addProducer({
             id: this._micProducer.id,
             source: 'mic',
             paused: this._micProducer.paused,
@@ -1614,7 +1612,7 @@ export class RoomClient {
         }
 
         store.dispatch(
-          producerActions.addProducer({
+          producersActions.addProducer({
             id: this._webcamProducer.id,
             source: 'webcam',
             paused: this._webcamProducer.paused,
@@ -2015,7 +2013,10 @@ export class RoomClient {
       for (const consumer of this._consumers.values()) {
         if (consumer.appData.peerId === peerId) {
           store.dispatch(
-            consumerActions.setConsumerAudioGain(consumer.id, audioGain)
+            consumersActions.setConsumerAudioGain({
+              consumerId: consumer.id,
+              audioGain,
+            })
           );
         }
       }
@@ -2034,7 +2035,12 @@ export class RoomClient {
 
       consumer.pause();
 
-      store.dispatch(consumerActions.setConsumerPaused(consumer.id, 'local'));
+      store.dispatch(
+        consumersActions.setConsumerPaused({
+          consumerId: consumer.id,
+          originator: 'local',
+        })
+      );
     } catch (error) {
       logger.error(
         '_pauseConsumer() [consumerId: %s; error:"%o"]',
@@ -2055,7 +2061,12 @@ export class RoomClient {
     try {
       consumer.resume();
       await this.sendRequest('resumeConsumer', { consumerId: consumer.id });
-      store.dispatch(consumerActions.setConsumerResumed(consumer.id, 'local'));
+      store.dispatch(
+        consumersActions.setConsumerResumed({
+          consumerId: consumer.id,
+          originator: 'local',
+        })
+      );
     } catch (error) {
       logger.error(
         '_resumeConsumer() [consumerId: %s; error:"%o"]',
@@ -2141,11 +2152,11 @@ export class RoomClient {
       });
 
       store.dispatch(
-        consumerActions.setConsumerPreferredLayers(
+        consumersActions.setConsumerPreferredLayers({
           consumerId,
           spatialLayer,
-          temporalLayer
-        )
+          temporalLayer,
+        })
       );
     } catch (error) {
       logger.error(
@@ -2324,7 +2335,9 @@ export class RoomClient {
     try {
       await this.sendRequest('setConsumerPriority', { consumerId, priority });
 
-      store.dispatch(consumerActions.setConsumerPriority(consumerId, priority));
+      store.dispatch(
+        consumersActions.setConsumerPriority({ consumerId, priority })
+      );
     } catch (error) {
       logger.error(
         'setConsumerPriority() [consumerId: %s; error:"%o"]',
@@ -2430,7 +2443,7 @@ export class RoomClient {
         this._screenSharingProducer.close();
 
         store.dispatch(
-          producerActions.removeProducer(this._screenSharingProducer.id)
+          producersActions.removeProducer(this._screenSharingProducer.id)
         );
 
         this._screenSharingProducer = null;
@@ -2439,7 +2452,9 @@ export class RoomClient {
       if (this._webcamProducer) {
         this._webcamProducer.close();
 
-        store.dispatch(producerActions.removeProducer(this._webcamProducer.id));
+        store.dispatch(
+          producersActions.removeProducer(this._webcamProducer.id)
+        );
 
         this._webcamProducer = null;
       }
@@ -2447,14 +2462,14 @@ export class RoomClient {
       for (const producer of this._extraVideoProducers.values()) {
         producer.close();
 
-        store.dispatch(producerActions.removeProducer(producer.id));
+        store.dispatch(producersActions.removeProducer(producer.id));
       }
       this._extraVideoProducers.clear();
 
       if (this._micProducer) {
         this._micProducer.close();
 
-        store.dispatch(producerActions.removeProducer(this._micProducer.id));
+        store.dispatch(producersActions.removeProducer(this._micProducer.id));
 
         this._micProducer = null;
       }
@@ -2474,7 +2489,7 @@ export class RoomClient {
       this._spotlights.clearSpotlights();
 
       store.dispatch(peersActions.clearPeers());
-      store.dispatch(consumerActions.clearConsumers());
+      store.dispatch(consumersActions.clearConsumers());
       store.dispatch(roomActions.clearSpotlights());
       store.dispatch(roomActions.setRoomState('connecting'));
     });
@@ -2972,7 +2987,9 @@ export class RoomClient {
           case 'producerScore': {
             const { producerId, score } = notification.data;
 
-            store.dispatch(producerActions.setProducerScore(producerId, score));
+            store.dispatch(
+              producersActions.setProducerScore({ producerId, score })
+            );
 
             break;
           }
@@ -3098,7 +3115,7 @@ export class RoomClient {
             this._spotlights.addVideoConsumer(consumerStoreObject);
 
             store.dispatch(
-              consumerActions.addConsumer({
+              consumersActions.addConsumer({
                 consumer: consumerStoreObject,
                 peerId,
               })
@@ -3151,7 +3168,10 @@ export class RoomClient {
             if (!consumer) break;
 
             store.dispatch(
-              consumerActions.setConsumerPaused(consumerId, 'remote')
+              consumersActions.setConsumerPaused({
+                consumerId: consumer.id,
+                originator: 'remote',
+              })
             );
 
             this._spotlights.pauseVideoConsumer(consumerId);
@@ -3166,7 +3186,10 @@ export class RoomClient {
             if (!consumer) break;
 
             store.dispatch(
-              consumerActions.setConsumerResumed(consumerId, 'remote')
+              consumersActions.setConsumerResumed({
+                consumerId,
+                originator: 'remote',
+              })
             );
 
             this._spotlights.resumeVideoConsumer(consumerId);
@@ -3182,11 +3205,11 @@ export class RoomClient {
             if (!consumer) break;
 
             store.dispatch(
-              consumerActions.setConsumerCurrentLayers(
+              consumersActions.setConsumerCurrentLayers({
                 consumerId,
                 spatialLayer,
-                temporalLayer
-              )
+                temporalLayer,
+              })
             );
 
             break;
@@ -3195,7 +3218,9 @@ export class RoomClient {
           case 'consumerScore': {
             const { consumerId, score } = notification.data;
 
-            store.dispatch(consumerActions.setConsumerScore(consumerId, score));
+            store.dispatch(
+              consumersActions.setConsumerScore({ consumerId, score })
+            );
 
             break;
           }
@@ -3716,13 +3741,13 @@ export class RoomClient {
 
       // Don't produce if explicitly requested to not to do it.
       if (this._produce) {
-        if (joinVideo && this._havePermission(permissions.SHARE_VIDEO)) {
+        if (joinVideo && this._havePermission(PermissionList.SHARE_VIDEO)) {
           this.updateWebcam({ init: true, start: true });
         }
         if (
           joinAudio &&
           this._mediasoupDevice.canProduce('audio') &&
-          this._havePermission(permissions.SHARE_AUDIO)
+          this._havePermission(PermissionList.SHARE_AUDIO)
         )
           if (!this._muted) {
             await this.updateMic({ start: true });
@@ -4048,7 +4073,7 @@ export class RoomClient {
         this._extraVideoProducers.set(producer.id, producer);
 
         store.dispatch(
-          producerActions.addProducer({
+          producersActions.addProducer({
             id: producer.id,
             deviceLabel: device.label,
             source: 'extravideo',
@@ -4124,7 +4149,7 @@ export class RoomClient {
 
     this._micProducer.close();
 
-    store.dispatch(producerActions.removeProducer(this._micProducer.id));
+    store.dispatch(producersActions.removeProducer(this._micProducer.id));
 
     try {
       await this.sendRequest('closeProducer', {
@@ -4293,7 +4318,7 @@ export class RoomClient {
         }
 
         store.dispatch(
-          producerActions.addProducer({
+          producersActions.addProducer({
             id: this._screenSharingProducer.id,
             deviceLabel: 'screen',
             source: 'screen',
@@ -4341,7 +4366,7 @@ export class RoomClient {
           });
 
           store.dispatch(
-            producerActions.addProducer({
+            producersActions.addProducer({
               id: this._screenSharingAudioProducer.id,
               source: 'mic',
               paused: this._screenSharingAudioProducer.paused,
@@ -4428,12 +4453,12 @@ export class RoomClient {
       this._screenSharingAudioProducer.close();
 
       store.dispatch(
-        producerActions.removeProducer(this._screenSharingAudioProducer.id)
+        producersActions.removeProducer(this._screenSharingAudioProducer.id)
       );
     }
 
     store.dispatch(
-      producerActions.removeProducer(this._screenSharingProducer.id)
+      producersActions.removeProducer(this._screenSharingProducer.id)
     );
 
     try {
@@ -4469,7 +4494,7 @@ export class RoomClient {
 
     producer.close();
 
-    store.dispatch(producerActions.removeProducer(id));
+    store.dispatch(producersActions.removeProducer(id));
 
     try {
       await this.sendRequest('closeProducer', { producerId: id });
@@ -4499,7 +4524,7 @@ export class RoomClient {
 
     this._webcamProducer.close();
 
-    store.dispatch(producerActions.removeProducer(this._webcamProducer.id));
+    store.dispatch(producersActions.removeProducer(this._webcamProducer.id));
 
     try {
       await this.sendRequest('closeProducer', {
@@ -4694,7 +4719,7 @@ export class RoomClient {
 
     const { peerId } = consumer.appData;
 
-    store.dispatch(consumerActions.removeConsumer({ consumerId, peerId }));
+    store.dispatch(consumersActions.removeConsumer({ consumerId, peerId }));
   }
 
   _getEncodings(width, height, screenSharing = false) {

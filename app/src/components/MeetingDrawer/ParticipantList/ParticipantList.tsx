@@ -4,7 +4,6 @@ import {
   participantListSelector,
   makePermissionSelector,
 } from '../../../store/selectors';
-import { permissions } from '../../../permissions';
 import classnames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
@@ -14,6 +13,7 @@ import { ListPeer } from './ListPeer';
 import ListMe from './ListMe';
 import ListModerator from './ListModerator';
 import Volume from '../../Containers/Volume';
+import { PermissionList } from 'tailchat-meeting-sdk';
 
 const styles = (theme) => ({
   root: {
@@ -126,7 +126,7 @@ class ParticipantList extends React.PureComponent {
 };
 
 const makeMapStateToProps = () => {
-  const hasPermission = makePermissionSelector(permissions.MODERATE_ROOM);
+  const hasPermission = makePermissionSelector(PermissionList.MODERATE_ROOM);
 
   const mapStateToProps = (state) => {
     return {

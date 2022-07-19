@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { withRoomContext } from '../../../../RoomContext';
 import { useIntl } from 'react-intl';
-import { permissions } from '../../../../permissions';
 import { makePermissionSelector } from '../../../../store/selectors';
 import Paper from '@material-ui/core/Paper';
 import { Grid } from '@material-ui/core';
@@ -24,6 +23,7 @@ import FormatBoldIcon from '@material-ui/icons/FormatBold';
 import FormatItalicIcon from '@material-ui/icons/FormatItalic';
 import FormatUnderlinedIcon from '@material-ui/icons/FormatUnderlined';
 import SortIcon from '@material-ui/icons/Sort';
+import { PermissionList } from 'tailchat-meeting-sdk';
 
 const styles = (theme) => ({
   root: {
@@ -523,7 +523,7 @@ const ChatInput = (props) => {
 };
 
 const makeMapStateToProps = () => {
-  const hasPermission = makePermissionSelector(permissions.SEND_CHAT);
+  const hasPermission = makePermissionSelector(PermissionList.SEND_CHAT);
 
   const mapStateToProps = (state) => ({
     displayName: state.settings.displayName,

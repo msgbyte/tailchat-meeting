@@ -9,7 +9,7 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { Peer } from '../Containers/Peer';
 import Me from '../Containers/Me';
-import type { AppState } from '../../store/reducers/rootReducer';
+import type { AppState } from '../../store/slices';
 
 const PADDING_V = 64;
 const PADDING_H = 50;

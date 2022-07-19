@@ -1,15 +1,12 @@
 import React, { useCallback } from 'react';
-import { connect } from 'react-redux';
-import { makeStyles, withStyles } from '@material-ui/core/styles';
-import { useRoomClient, withRoomContext } from '../../RoomContext';
+import { makeStyles } from '@material-ui/core/styles';
+import { useRoomClient } from '../../RoomContext';
 import {
   highestRoleLevelSelector,
   makePermissionSelector,
   useAppDispatch,
   useAppSelector,
 } from '../../store/selectors';
-import { permissions } from '../../permissions';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
@@ -21,8 +18,11 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import { roomActions } from '../../store/slices/room';
+import { PermissionList } from 'tailchat-meeting-sdk';
 
-const canModifyRolesSelector = makePermissionSelector(permissions.MODIFY_ROLE);
+const canModifyRolesSelector = makePermissionSelector(
+  PermissionList.MODIFY_ROLE
+);
 
 const useStyles = makeStyles((theme) => ({
   dialogPaper: {

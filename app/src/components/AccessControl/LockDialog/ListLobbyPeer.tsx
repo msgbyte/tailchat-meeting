@@ -1,12 +1,12 @@
 import React from 'react';
-import { connect } from 'react-redux';
-import { withStyles } from '@material-ui/core/styles';
-import PropTypes from 'prop-types';
+import { makeStyles } from '@material-ui/core/styles';
 import classnames from 'classnames';
-import { withRoomContext } from '../../../RoomContext';
+import { useRoomClient } from '../../../RoomContext';
 import { useIntl } from 'react-intl';
-import { permissions } from '../../../permissions';
-import { makePermissionSelector } from '../../../store/selectors';
+import {
+  makePermissionSelector,
+  useAppSelector,
+} from '../../../store/selectors';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import IconButton from '@material-ui/core/IconButton';
@@ -15,15 +15,24 @@ import Avatar from '@material-ui/core/Avatar';
 import EmptyAvatar from '../../../images/avatar-empty.jpeg';
 import PromoteIcon from '@material-ui/icons/OpenInBrowser';
 import Tooltip from '@material-ui/core/Tooltip';
+import { PermissionList } from 'tailchat-meeting-sdk';
 
-const styles = () => ({
+const useStyles = makeStyles(() => ({
   root: {
     alignItems: 'center',
   },
-});
+}));
 
-const ListLobbyPeer: React.FC<{ id: string }> = React.memo((props: any) => {
-  const { roomClient, peer, promotionInProgress, canPromote, classes } = props;
+const hasPermission = makePermissionSelector(PermissionList.PROMOTE_PEER);
+
+export const ListLobbyPeer: React.FC<{ id: string }> = React.memo((props) => {
+  const classes = useStyles();
+  const roomClient = useRoomClient();
+  const { peer, promotionInProgress, canPromote } = useAppSelector((state) => ({
+    peer: state.lobbyPeers[props.id],
+    promotionInProgress: state.room.lobbyPeersPromotionInProgress,
+    canPromote: hasPermission(state),
+  }));
 
   const intl = useIntl();
 
@@ -32,7 +41,7 @@ const ListLobbyPeer: React.FC<{ id: string }> = React.memo((props: any) => {
   return (
     <ListItem
       className={classnames(classes.root)}
-      key={peer.peerId}
+      key={peer.id}
       button
       alignItems="flex-start"
     >
@@ -63,39 +72,3 @@ const ListLobbyPeer: React.FC<{ id: string }> = React.memo((props: any) => {
   );
 });
 ListLobbyPeer.displayName = 'ListLobbyPeer';
-
-(ListLobbyPeer as any).propTypes = {
-  roomClient: PropTypes.any.isRequired,
-  advancedMode: PropTypes.bool,
-  peer: PropTypes.object.isRequired,
-  promotionInProgress: PropTypes.bool.isRequired,
-  canPromote: PropTypes.bool.isRequired,
-  classes: PropTypes.object.isRequired,
-};
-
-const makeMapStateToProps = (initialState, { id }) => {
-  const hasPermission = makePermissionSelector(permissions.PROMOTE_PEER);
-
-  const mapStateToProps = (state) => {
-    return {
-      peer: state.lobbyPeers[id],
-      promotionInProgress: state.room.lobbyPeersPromotionInProgress,
-      canPromote: hasPermission(state),
-    };
-  };
-
-  return mapStateToProps;
-};
-
-export default withRoomContext(
-  connect(makeMapStateToProps, null, null, {
-    areStatesEqual: (next, prev) => {
-      return (
-        prev.room === next.room &&
-        prev.peers === next.peers && // For checking permissions
-        prev.me.roles === next.me.roles &&
-        prev.lobbyPeers === next.lobbyPeers
-      );
-    },
-  })(withStyles(styles)(ListLobbyPeer))
-);

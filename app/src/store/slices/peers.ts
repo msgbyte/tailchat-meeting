@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { Peer } from 'tailchat-meeting-sdk';
-import { addConsumer, removeConsumer } from '../actions/consumerActions';
+import { consumersActions } from '../slices/consumers';
 
 interface PeerInfo extends Peer {
   consumers: string[];
@@ -226,14 +226,14 @@ const peersSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(addConsumer, (state, action) => {
+      .addCase(consumersActions.addConsumer, (state, action) => {
         const { consumer, peerId } = action.payload;
 
         if (state[peerId]) {
           state[peerId].consumers.push(consumer.id);
         }
       })
-      .addCase(removeConsumer, (state, action) => {
+      .addCase(consumersActions.removeConsumer, (state, action) => {
         const { consumerId, peerId } = action.payload;
 
         if (state[peerId]) {

@@ -30,7 +30,7 @@ import { About } from './Controls/About';
 import { RolesManager } from './Controls/RolesManager';
 import { LeaveDialog } from './LeaveDialog';
 import { config } from '../config';
-import type { AppState } from '../store/reducers/rootReducer';
+import type { AppState } from '../store/slices';
 import { AutoMeetingView } from './MeetingViews/Auto';
 import { toolareaActions } from '../store/slices/toolarea';
 import { roomActions } from '../store/slices/room';

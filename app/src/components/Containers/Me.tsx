@@ -5,7 +5,6 @@ import {
   makePermissionSelector,
   recordingConsentsPeersSelector,
 } from '../../store/selectors';
-import { permissions } from '../../permissions';
 import { withRoomContext } from '../../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
@@ -25,6 +24,7 @@ import SettingsVoiceIcon from '@material-ui/icons/SettingsVoice';
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
+import { PermissionList } from 'tailchat-meeting-sdk';
 
 const styles = (theme) => ({
   root: {
@@ -957,9 +957,9 @@ Me.propTypes = {
 };
 
 const makeMapStateToProps = () => {
-  const canShareAudio = makePermissionSelector(permissions.SHARE_AUDIO);
-  const canShareVideo = makePermissionSelector(permissions.SHARE_VIDEO);
-  const canShareScreen = makePermissionSelector(permissions.SHARE_SCREEN);
+  const canShareAudio = makePermissionSelector(PermissionList.SHARE_AUDIO);
+  const canShareVideo = makePermissionSelector(PermissionList.SHARE_VIDEO);
+  const canShareScreen = makePermissionSelector(PermissionList.SHARE_SCREEN);
 
   const mapStateToProps = (state) => {
     let noise;

@@ -10,7 +10,6 @@ import {
   useAppSelector,
   useAppDispatch,
 } from '../../store/selectors';
-import { permissions } from '../../permissions';
 import { useRoomClient } from '../../RoomContext';
 import { withStyles } from '@material-ui/core/styles';
 import { useIntl, FormattedMessage } from 'react-intl';
@@ -66,19 +65,26 @@ import {
   notificationsActions,
   notifyAction,
 } from '../../store/slices/notifications';
+import { PermissionList } from 'tailchat-meeting-sdk';
 
 const logger = new Logger('Recorder');
 
 const localesList = getList();
 
-const hasExtraVideoPermission = makePermissionSelector(permissions.EXTRA_VIDEO);
+const hasExtraVideoPermission = makePermissionSelector(
+  PermissionList.EXTRA_VIDEO
+);
 
-const hasLockPermission = makePermissionSelector(permissions.CHANGE_ROOM_LOCK);
+const hasLockPermission = makePermissionSelector(
+  PermissionList.CHANGE_ROOM_LOCK
+);
 
 const hasRecordPermission = makePermissionSelector(
-  permissions.LOCAL_RECORD_ROOM
+  PermissionList.LOCAL_RECORD_ROOM
 );
-const hasPromotionPermission = makePermissionSelector(permissions.PROMOTE_PEER);
+const hasPromotionPermission = makePermissionSelector(
+  PermissionList.PROMOTE_PEER
+);
 
 const PulsingBadge = withStyles((theme) => ({
   badge: {

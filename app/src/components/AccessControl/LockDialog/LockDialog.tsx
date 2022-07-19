@@ -1,16 +1,12 @@
 import React, { useCallback } from 'react';
-import { connect } from 'react-redux';
 import {
   lobbyPeersKeySelector,
   makePermissionSelector,
   useAppDispatch,
   useAppSelector,
 } from '../../../store/selectors';
-import { permissions } from '../../../permissions';
-import * as appPropTypes from '../../appPropTypes';
-import { makeStyles, withStyles } from '@material-ui/core/styles';
-import { useRoomClient, withRoomContext } from '../../../RoomContext';
-import PropTypes from 'prop-types';
+import { makeStyles } from '@material-ui/core/styles';
+import { useRoomClient } from '../../../RoomContext';
 import { FormattedMessage } from 'react-intl';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
@@ -20,8 +16,9 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import Button from '@material-ui/core/Button';
 import List from '@material-ui/core/List';
 import ListSubheader from '@material-ui/core/ListSubheader';
-import ListLobbyPeer from './ListLobbyPeer';
+import { ListLobbyPeer } from './ListLobbyPeer';
 import { roomActions } from '../../../store/slices/room';
+import { PermissionList } from 'tailchat-meeting-sdk';
 
 const useStyles = makeStyles((theme) => ({
   root: {},
@@ -45,7 +42,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const hasPermission = makePermissionSelector(permissions.PROMOTE_PEER);
+const hasPermission = makePermissionSelector(PermissionList.PROMOTE_PEER);
 
 export const LockDialog: React.FC = React.memo(() => {
   const roomClient = useRoomClient();
