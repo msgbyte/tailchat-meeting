@@ -14,7 +14,7 @@ import Drawer from '@material-ui/core/Drawer';
 import Hidden from '@material-ui/core/Hidden';
 import { Notifications } from './Notifications/Notifications';
 import { MeetingDrawer } from './MeetingDrawer/MeetingDrawer';
-import Democratic from './MeetingViews/Democratic';
+import { Democratic } from './MeetingViews/Democratic';
 import Filmstrip from './MeetingViews/Filmstrip';
 import AudioPeers from './PeerAudio/AudioPeers';
 import { FullScreenView } from './VideoContainers/FullScreenView';
@@ -34,8 +34,11 @@ import type { AppState } from '../store/slices';
 import { AutoMeetingView } from './MeetingViews/Auto';
 import { toolareaActions } from '../store/slices/toolarea';
 import { roomActions } from '../store/slices/room';
+import clsx from 'clsx';
+import { ResizeBox } from '@arco-design/web-react';
 
 const TIMEOUT = config.hideTimeout || 5000;
+const PADDING_V = 64;
 
 const styles = (theme) => ({
   root: {
@@ -80,6 +83,14 @@ const styles = (theme) => ({
       width: '80vw',
     },
   },
+  hiddenToolBar: {
+    paddingTop: 0,
+    transition: 'padding .5s',
+  },
+  showingToolBar: {
+    paddingTop: PADDING_V,
+    transition: 'padding .5s',
+  },
 });
 
 interface RoomProps {
@@ -92,6 +103,7 @@ interface RoomProps {
   toggleToolArea: any;
   classes: any;
   theme: any;
+  showToolbar: boolean;
   setToolbarsVisible: (visible: boolean) => void;
 }
 class Room extends React.PureComponent<RoomProps> {
@@ -249,7 +261,33 @@ class Room extends React.PureComponent<RoomProps> {
 
         {browser.platform === 'mobile' && browser.os !== 'ios' && <WakeLock />}
 
-        <View />
+        <div
+          className={clsx(
+            this.props.showToolbar
+              ? classes.showingToolBar
+              : classes.hiddenToolBar,
+            'w-full h-full flex'
+          )}
+        >
+          <View key="2" />
+          {/* For Test */}
+          {/* <ResizeBox.Split
+            className="w-full h-full"
+            direction="horizontal"
+            size={0.75}
+            max={0.8}
+            min={0.2}
+            panes={[
+              <div key="1" className="w-full h-full">
+                <iframe
+                  className="w-full h-full"
+                  src="https://excalidraw.com/"
+                />
+              </div>,
+              <View key="2" />,
+            ]}
+          /> */}
+        </div>
 
         {(buttonControlBar || room.hideSelfView) && <ButtonControlBar />}
 
@@ -287,6 +325,7 @@ const mapStateToProps = (state: AppState) => ({
   buttonControlBar: state.settings.buttonControlBar,
   drawerOverlayed: state.settings.drawerOverlayed,
   toolAreaOpen: state.toolarea.toolAreaOpen,
+  showToolbar: state.room.toolbarsVisible || state.settings.permanentTopBar,
 });
 
 const mapDispatchToProps = (dispatch) => ({

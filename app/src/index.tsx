@@ -29,6 +29,7 @@ import { config, configError } from './config';
 import { meActions } from './store/slices/me';
 import { generateRandomString } from './utils';
 
+import '@arco-design/web-react/dist/css/arco.css';
 import './index.css';
 
 const App = LazyPreload(

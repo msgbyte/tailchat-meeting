@@ -24,6 +24,7 @@
 		"gen-config-docs": "TS_NODE_PROJECT='tsconfig.node.json' ts-node ./scripts/buildConfigDoc.ts"
 	},
 	"dependencies": {
+		"@arco-design/web-react": "^2.39.3",
 		"@material-ui/core": "^4.11.3",
 		"@material-ui/icons": "^4.11.2",
 		"@material-ui/lab": "^4.0.0-alpha.57",
@@ -33,7 +34,7 @@
 		"@types/node": "^14.14.37",
 		"@types/react": "^17.0.3",
 		"@types/react-dom": "^17.0.3",
-		"ahooks": "^3.3.10",
+		"ahooks": "^3.3.13",
 		"axios": "^0.21.1",
 		"bowser": "^2.7.0",
 		"chroma-js": "^2.1.1",
@@ -124,6 +125,7 @@
 		"@typescript-eslint/eslint-plugin": "^4.20.0",
 		"@typescript-eslint/parser": "^4.20.0",
 		"@vitejs/plugin-react": "^2.1.0",
+		"autoprefixer": "^10.4.8",
 		"babel-eslint": "^10.1.0",
 		"cross-env": "^7.0.3",
 		"eslint-config-react-app": "^6.0.0",
@@ -136,10 +138,12 @@
 		"eslint-plugin-react-hooks": "^4.2.0",
 		"eslint-webpack-plugin": "^2.5.3",
 		"foreman": "^3.0.1",
+		"postcss": "^8.4.16",
 		"react-scripts": "4.0.3",
 		"redux-mock-store": "^1.5.3",
 		"rollup-plugin-node-polyfills": "^0.2.1",
 		"rollup-plugin-polyfill-node": "^0.10.2",
+		"tailwindcss": "^3.1.8",
 		"vite": "^3.1.0"
 	}
 }

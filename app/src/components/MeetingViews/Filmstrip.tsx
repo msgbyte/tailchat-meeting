@@ -11,7 +11,6 @@ import { SpeakerPeer } from '../Containers/SpeakerPeer';
 import Grid from '@material-ui/core/Grid';
 import type { AppState } from '../../store/slices';
 
-const PADDING_V = 64;
 const FILMSTRING_PADDING_V = 0;
 const FILMSTRING_PADDING_H = 10;
 
@@ -44,14 +43,6 @@ const styles = () => ({
     '&.active': {
       borderColor: 'var(--selected-peer-border-color)',
     },
-  },
-  hiddenToolBar: {
-    paddingTop: 0,
-    transition: 'padding .5s',
-  },
-  showingToolBar: {
-    paddingTop: PADDING_V,
-    transition: 'padding .5s',
   },
 });
 
@@ -145,7 +136,7 @@ class Filmstrip extends React.PureComponent<FilmstripProps, FilmstripState> {
     );
 
   updateDimensions = () => {
-    const { toolbarsVisible, permanentTopBar, boxes, aspectRatio } = this.props;
+    const { boxes, aspectRatio } = this.props;
 
     const newState: Partial<FilmstripState> = {};
 
@@ -159,9 +150,7 @@ class Filmstrip extends React.PureComponent<FilmstripProps, FilmstripState> {
     // Grid is:
     // 4/5 speaker
     // 1/5 filmstrip
-    const availableSpeakerHeight =
-      root.clientHeight * 0.8 -
-      (toolbarsVisible || permanentTopBar ? PADDING_V : 0);
+    const availableSpeakerHeight = root.clientHeight * 0.8;
 
     const availableFilmstripHeight = root.clientHeight * 0.2;
 
@@ -242,8 +231,6 @@ class Filmstrip extends React.PureComponent<FilmstripProps, FilmstripState> {
       myId,
       advancedMode,
       spotlights,
-      toolbarsVisible,
-      permanentTopBar,
       hideSelfView,
       classes,
     } = this.props;
@@ -261,15 +248,7 @@ class Filmstrip extends React.PureComponent<FilmstripProps, FilmstripState> {
     };
 
     return (
-      <div
-        className={classnames(
-          classes.root,
-          toolbarsVisible || permanentTopBar
-            ? classes.showingToolBar
-            : classes.hiddenToolBar
-        )}
-        ref={this.rootContainer}
-      >
+      <div className={classnames(classes.root)} ref={this.rootContainer}>
         <div className={classes.speaker} ref={this.activePeerContainer}>
           {peers[activePeerId] && (
             <SpeakerPeer
@@ -339,10 +318,8 @@ class Filmstrip extends React.PureComponent<FilmstripProps, FilmstripState> {
   selectedPeers: PropTypes.array,
   spotlights: PropTypes.array.isRequired,
   boxes: PropTypes.number,
-  toolbarsVisible: PropTypes.bool.isRequired,
   hideSelfView: PropTypes.bool.isRequired,
   toolAreaOpen: PropTypes.bool.isRequired,
-  permanentTopBar: PropTypes.bool.isRequired,
   aspectRatio: PropTypes.number.isRequired,
   classes: PropTypes.object.isRequired,
 };
@@ -357,11 +334,9 @@ const mapStateToProps = (state: AppState) => {
     myId: state.me.id,
     spotlights: state.room.spotlights,
     boxes: videoBoxesSelector(state),
-    toolbarsVisible: state.room.toolbarsVisible,
     hideSelfView: state.room.hideSelfView,
     toolAreaOpen: state.toolarea.toolAreaOpen,
     aspectRatio: state.settings.aspectRatio,
-    permanentTopBar: state.settings.permanentTopBar,
   };
 };
 
@@ -371,10 +346,8 @@ export default withRoomContext(
       return (
         prev.room.activeSpeakerId === next.room.activeSpeakerId &&
         prev.room.selectedPeers === next.room.selectedPeers &&
-        prev.room.toolbarsVisible === next.room.toolbarsVisible &&
         prev.room.hideSelfView === next.room.hideSelfView &&
         prev.toolarea.toolAreaOpen === next.toolarea.toolAreaOpen &&
-        prev.settings.permanentTopBar === next.settings.permanentTopBar &&
         prev.settings.aspectRatio === next.settings.aspectRatio &&
         prev.peers === next.peers &&
         prev.consumers === next.consumers &&

@@ -1,6 +1,6 @@
 import React from 'react';
 import { someoneSharingSelector, useAppSelector } from '../../store/selectors';
-import Democratic from './Democratic';
+import { Democratic } from './Democratic';
 import Filmstrip from './Filmstrip';
 import { SpeechView } from './SpeechView';
 
