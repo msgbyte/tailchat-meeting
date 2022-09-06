@@ -20,8 +20,8 @@ import IconButton from '@material-ui/core/IconButton';
 import ChatIcon from '@material-ui/icons/Chat';
 import GroupIcon from '@material-ui/icons/Group';
 
-import { ReactComponent as PinIcon } from '../../images/pin-icon-baseline.svg';
-import { ReactComponent as UnpinIcon } from '../../images/pin-icon-outline.svg';
+import pinIcon from '../../images/pin-icon-baseline.svg';
+import unpinIcon from '../../images/pin-icon-outline.svg';
 import { settingsActions } from '../../store/slices/settings';
 import { toolareaActions } from '../../store/slices/toolarea';
 
@@ -122,7 +122,11 @@ export const MeetingDrawer: React.FC<Props> = React.memo((props) => {
                 dispatch(settingsActions.toggle('drawerOverlayed'))
               }
             >
-              {drawerOverlayed ? <UnpinIcon /> : <PinIcon />}
+              {drawerOverlayed ? (
+                <img src={unpinIcon} />
+              ) : (
+                <img src={pinIcon} />
+              )}
             </IconButton>
             <IconButton onClick={closeDrawer}>
               {theme.direction === 'ltr' ? (

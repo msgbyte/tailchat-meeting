@@ -45,7 +45,6 @@ import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 import PauseCircleOutlineIcon from '@material-ui/icons/PauseCircleOutline';
 import PauseCircleFilledIcon from '@material-ui/icons/PauseCircleFilled';
 import StopIcon from '@material-ui/icons/Stop';
-import randomString from 'crypto-random-string';
 import { recorder } from '../../features/BrowserRecorder';
 import Logger from '../../features/Logger';
 import { config } from '../../config';
@@ -66,6 +65,7 @@ import {
   notifyAction,
 } from '../../store/slices/notifications';
 import { PermissionList } from 'tailchat-meeting-sdk';
+import { generateRandomString } from '../../utils';
 
 const logger = new Logger('Recorder');
 
@@ -362,7 +362,7 @@ export const TopBar: React.FC<TopBarProps> = React.memo((props) => {
       (recordingPeers.includes(meId) && recordingPeers.length === 1);
 
     if (recordingInProgress && !recordingNotificationsId && !hasConsent) {
-      const notificationId = randomString({ length: 6 }).toLowerCase();
+      const notificationId = generateRandomString(6).toLowerCase();
 
       setRecordingNotificationsId(notificationId);
       addNotification({

@@ -64,3 +64,23 @@ export function calcBoxSizeWithContainer(
 
   return { width, height };
 }
+
+/**
+ * 生成随机字符串
+ */
+export function generateRandomString(
+  length: number,
+  charset: 'alphabetic' | 'numeric' = 'alphabetic'
+) {
+  let result = '';
+  const characters =
+    charset === 'numeric'
+      ? '0123456789'
+      : charset === 'alphabetic'
+      ? 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+      : '';
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return result;
+}

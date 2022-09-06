@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import randomString from 'crypto-random-string';
+import { generateRandomString } from '../../utils';
 
 export interface NotificationType {
   id: string;
@@ -74,7 +74,7 @@ export const notifyAction = createAsyncThunk(
     }
 
     const notification = {
-      id: randomString({ length: 6 }).toLowerCase(),
+      id: generateRandomString(6).toLowerCase(),
       type: type,
       text: text,
       timeout: timeout,

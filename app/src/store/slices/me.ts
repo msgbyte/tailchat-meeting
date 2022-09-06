@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { deviceInfo, DeviceInfo } from '../../deviceInfo';
-import randomString from 'crypto-random-string';
 import { uniq, without } from 'lodash-es';
+import { generateRandomString } from '../../utils';
 
 export interface MeState {
   id: string;
@@ -36,7 +36,7 @@ export interface MeState {
 }
 
 const initialState: MeState = {
-  id: randomString({ length: 8 }).toLowerCase(),
+  id: generateRandomString(8).toLowerCase(),
   browser: deviceInfo(),
   picture: undefined,
   from: undefined,

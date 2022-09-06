@@ -33,6 +33,7 @@ import {
   notificationsActions,
   notifyAction,
 } from './store/slices/notifications';
+import { isEqual } from 'lodash-es';
 import { producersActions } from './store/slices/producers';
 
 type Priority = 'high' | 'medium' | 'low' | 'very-low';
@@ -695,12 +696,12 @@ export class RoomClient {
     });
   }
 
-  setLocale(locale: string) {
+  async setLocale(locale: string) {
     if (locale === null) {
       locale = locales.detect();
     }
 
-    const one = locales.loadOne(locale);
+    const one = await locales.loadOne(locale);
 
     store.dispatch(
       updateIntl({
@@ -3763,7 +3764,10 @@ export class RoomClient {
 
       const { selectedAudioOutputDevice } = store.getState().settings;
 
-      if (!selectedAudioOutputDevice && this._audioOutputDevices !== {}) {
+      if (
+        !selectedAudioOutputDevice &&
+        !isEqual(this._audioOutputDevices, {})
+      ) {
         store.dispatch(
           settingsActions.set(
             'selectedAudioOutputDevice',

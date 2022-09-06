@@ -1,4 +1,4 @@
-import WebTorrent, { Torrent } from 'webtorrent';
+import WebTorrent, { Torrent } from 'webtorrent/webtorrent.min'; // 确保使用的是浏览器版本
 import { store } from '../store/store';
 import Logger from './Logger';
 import { intl } from '../intl';

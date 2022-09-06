@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Logger from '../features/Logger';
 import { withStyles } from '@material-ui/core/styles';
 import { useRoomClient } from '../RoomContext';
-import randomString from 'crypto-random-string';
 import classnames from 'classnames';
 import isElectron from 'is-electron';
 import { useIntl, FormattedMessage } from 'react-intl';
@@ -39,7 +38,7 @@ import { useRequest } from 'ahooks';
 import { getRoomStatus } from '../api/room';
 import { makeStyles } from '@material-ui/core/styles';
 import { useAppDispatch, useAppSelector } from '../store/selectors';
-import { isValidStr } from '../utils';
+import { generateRandomString, isValidStr } from '../utils';
 import { RoomIdInput } from './RoomIdInput';
 import { useHistory } from 'react-router';
 import { getList } from '../intl/locales';
@@ -179,7 +178,7 @@ const JoinDialog: React.FC<{
   const [roomId, setRoomId] = useState<string>(
     props.defaultRoomId ||
       search.get('roomId') ||
-      randomString({ length: 9, type: 'numeric' })
+      generateRandomString(9, 'numeric')
   );
   const from = search.get('from') ?? '';
   useEffect(() => {

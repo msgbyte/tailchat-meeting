@@ -134,7 +134,7 @@ export interface ILocale {
   messages: any;
 }
 
-export const loadOne = (locale: string): ILocale => {
+export const loadOne = async (locale: string): Promise<ILocale> => {
   let res: any = {};
 
   try {
@@ -143,11 +143,11 @@ export const loadOne = (locale: string): ILocale => {
       (item) => item.locale.includes(locale)
     )[0];
 
-    res.messages = require(`./translations/${res.file}`);
+    res.messages = (await import(`./translations/${res.file}.json`)).default;
   } catch {
     res = list.filter((item) => item.locale.includes('en'))[0];
 
-    res.messages = require(`./translations/${res.file}`);
+    res.messages = (await import(`./translations/${res.file}.json`)).default;
   }
 
   return res;

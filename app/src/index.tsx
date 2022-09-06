@@ -6,7 +6,6 @@ import isElectron from 'is-electron';
 import { createIntl } from 'react-intl';
 import { IntlProvider } from 'react-intl-redux';
 import { Route, HashRouter, BrowserRouter, Switch } from 'react-router-dom';
-import randomString from 'crypto-random-string';
 import Logger from './features/Logger';
 import debug from 'debug';
 import { RoomClient } from './RoomClient';
@@ -28,6 +27,7 @@ import { detectDevice } from 'mediasoup-client';
 import { recorder } from './features/BrowserRecorder';
 import { config, configError } from './config';
 import { meActions } from './store/slices/me';
+import { generateRandomString } from './utils';
 
 import './index.css';
 
@@ -172,7 +172,7 @@ function run() {
   }
 
   // 生成随机的唯一标识
-  const peerId = randomString({ length: 8 }).toLowerCase();
+  const peerId = generateRandomString(8).toLowerCase();
   store.dispatch(
     meActions.setMe({
       peerId,
