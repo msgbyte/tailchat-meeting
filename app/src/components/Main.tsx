@@ -7,7 +7,7 @@ import { useParams } from 'react-router';
 
 const Room = LazyPreload(() => import(/* webpackChunkName: "room" */ './Room'));
 
-const App = () => {
+const Main = () => {
   const { id } = useParams<{ id: string }>();
   const joined = useAppSelector((state) => state.room.joined);
 
@@ -26,4 +26,4 @@ const App = () => {
   }
 };
 
-export default App;
+export default Main;
