@@ -1,7 +1,15 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { config } from '../../config';
+import type { RoomClient } from '../../RoomClient';
+import { generateRandomString } from '../../utils';
 
 export type ViewLayoutType = 'auto' | 'democratic' | 'filmstrip';
+
+export type CollaborationInfo = {
+  tabId: string; // 长度为8的随机字符串
+  type: 'excalidraw';
+  url: string;
+};
 
 export interface RoomState {
   name: string;
@@ -52,6 +60,11 @@ export interface RoomState {
     }
   >;
   allowWhenRoleMissing: string[];
+  /**
+   * 多人协同
+   */
+  collaboration: CollaborationInfo[];
+  client: RoomClient;
 }
 
 const initialState: RoomState = {
@@ -93,6 +106,20 @@ const initialState: RoomState = {
   roomPermissions: null,
   userRoles: null,
   allowWhenRoleMissing: null,
+  collaboration: [
+    // For Test
+    {
+      tabId: generateRandomString(8),
+      type: 'excalidraw',
+      url: 'https://excalidraw.com/',
+    },
+    {
+      tabId: generateRandomString(8),
+      type: 'excalidraw',
+      url: 'https://excalidraw.com/',
+    },
+  ],
+  client: null,
 };
 
 type CommonSetKey = Exclude<
@@ -160,6 +187,31 @@ const roomSlice = createSlice({
     },
     clearSpotlights(state) {
       state.spotlights = [];
+    },
+    /**
+     * 开启一个白板
+     */
+    createExcalidraw(state, action: PayloadAction<{ url: string }>) {
+      state.collaboration.push({
+        tabId: generateRandomString(8),
+        type: 'excalidraw',
+        url: action.payload.url,
+      });
+    },
+    /**
+     * 移除一个共享
+     */
+    stopCollaboration(state, action: PayloadAction<{ index: number }>) {
+      const index = action.payload.index;
+      if (state.collaboration[index]) {
+        state.collaboration.splice(index, 1);
+      }
+    },
+    /**
+     * 移除所有共享
+     */
+    clearCollaboration(state) {
+      state.collaboration = [];
     },
   },
 });
