@@ -1,18 +1,16 @@
 import React from 'react';
-import { connect } from 'react-redux';
 import {
   raisedHandsSelector,
   useAppDispatch,
   useAppSelector,
 } from '../../store/selectors';
-import PropTypes from 'prop-types';
-import { makeStyles, useTheme, withStyles } from '@material-ui/core/styles';
+import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { useIntl } from 'react-intl';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Badge from '@material-ui/core/Badge';
-import Chat from './Chat/Chat';
+import { Chat } from './Chat/Chat';
 import ParticipantList from './ParticipantList/ParticipantList';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';

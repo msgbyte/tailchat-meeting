@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import { withRoomContext } from '../../../../RoomContext';
+import { useRoomClient, withRoomContext } from '../../../../RoomContext';
 import { useIntl } from 'react-intl';
 import { makePermissionSelector } from '../../../../store/selectors';
 import Paper from '@material-ui/core/Paper';
@@ -53,7 +53,6 @@ const styles = (theme) => ({
 
 const ChatInput = (props) => {
   const {
-    roomClient,
     displayName,
     peerId,
     picture,
@@ -66,6 +65,7 @@ const ChatInput = (props) => {
     files,
     toolAreaOpen,
   } = props;
+  const roomClient = useRoomClient();
 
   const intl = useIntl();
 

@@ -1386,8 +1386,9 @@ export class Room extends EventEmitter {
       }
 
       case 'chatMessage': {
-        if (!this._hasPermission(peer, SEND_CHAT))
+        if (!this._hasPermission(peer, SEND_CHAT)) {
           throw new Error('peer not authorized');
+        }
 
         const { chatMessage } = request.data;
 

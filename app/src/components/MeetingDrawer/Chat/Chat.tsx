@@ -1,12 +1,11 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Moderator from './Menu/Moderator';
 import List from './List/List';
 import Input from './Menu/Input';
 
-const styles = () => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
     flexDirection: 'column',
@@ -14,10 +13,10 @@ const styles = () => ({
     height: '100%',
     overflowY: 'auto',
   },
-});
+}));
 
-const Chat = (props) => {
-  const { classes } = props;
+export const Chat: React.FC = React.memo((props) => {
+  const classes = useStyles();
 
   return (
     <Paper className={classes.root}>
@@ -26,10 +25,4 @@ const Chat = (props) => {
       <Input />
     </Paper>
   );
-};
-
-Chat.propTypes = {
-  classes: PropTypes.object.isRequired,
-};
-
-export default withStyles(styles as any)(Chat);
+});
