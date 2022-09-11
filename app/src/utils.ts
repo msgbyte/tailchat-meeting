@@ -84,3 +84,10 @@ export function generateRandomString(
   }
   return result;
 }
+
+/**
+ * 返回是否在开发环境
+ */
+export function isDev(): boolean {
+  return !!import.meta.env.DEV;
+}

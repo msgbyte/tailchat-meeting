@@ -33,7 +33,7 @@ import {
   notificationsActions,
   notifyAction,
 } from './store/slices/notifications';
-import { isEqual } from 'lodash-es';
+import { cloneDeep, isEqual } from 'lodash-es';
 import { producersActions } from './store/slices/producers';
 
 type Priority = 'high' | 'medium' | 'low' | 'very-low';
@@ -4726,13 +4726,16 @@ export class RoomClient {
     store.dispatch(consumersActions.removeConsumer({ consumerId, peerId }));
   }
 
-  _getEncodings(width, height, screenSharing = false) {
-    return getEncodings(
-      this._mediasoupDevice.rtpCapabilities,
-      config.simulcastProfiles,
-      width,
-      height,
-      screenSharing
+  _getEncodings(width: number, height: number, screenSharing = false) {
+    return cloneDeep(
+      // 这一行cloneDeep是为了解决修改时会报 object is not extensible 错误的问题
+      getEncodings(
+        this._mediasoupDevice.rtpCapabilities,
+        config.simulcastProfiles,
+        width,
+        height,
+        screenSharing
+      )
     );
   }
 

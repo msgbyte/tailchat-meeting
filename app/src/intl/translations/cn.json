@@ -192,6 +192,7 @@
     "settings.echoCancellation": "回声消除",
     "settings.enableOpusDetails": "启用 OPUS 详细信息（需要刷新页面）",
     "settings.enableVirtualBackground": "开启虚拟背景",
+    "settings.enableVirtualAvatar": "开启虚拟形象",
     "settings.frameRate": "选择视频帧率",
     "settings.hiddenControls": "隐藏媒体控制",
     "settings.hideNoVideoParticipants": "隐藏没有视频的参会者",

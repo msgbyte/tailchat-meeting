@@ -34,6 +34,7 @@ import type {
   AudioSampleSize,
   OPUSPacketTime,
 } from 'tailchat-meeting-sdk';
+import { isDev } from '../../../utils';
 
 const insertableStreamsSupported = Boolean(
   // @ts-ignore
@@ -295,6 +296,7 @@ export const MediaSettings: React.FC = React.memo(({}) => {
             </FormHelperText>
           </FormControl>
 
+          {/* 虚拟背景 */}
           <FormControlLabel
             className={classnames(classes.setting, classes.switchLabel)}
             control={
@@ -308,7 +310,6 @@ export const MediaSettings: React.FC = React.memo(({}) => {
                     restart: true,
                   });
                 }}
-                value="enableVirtualBackground"
               />
             }
             labelPlacement="start"
@@ -324,6 +325,31 @@ export const MediaSettings: React.FC = React.memo(({}) => {
                   restart: true,
                 });
               }}
+            />
+          )}
+
+          {/* 虚拟形象 */}
+          {isDev() && (
+            <FormControlLabel
+              className={classnames(classes.setting, classes.switchLabel)}
+              control={
+                <Switch
+                  checked={settings.virtualAvatarEnabled}
+                  onChange={(_, checked) => {
+                    dispatch(
+                      settingsActions.set('virtualAvatarEnabled', checked)
+                    );
+                    roomClient.updateWebcam({
+                      restart: true,
+                    });
+                  }}
+                />
+              }
+              labelPlacement="start"
+              label={intl.formatMessage({
+                id: 'settings.enableVirtualAvatar',
+                defaultMessage: 'Enable Virtual Avatar',
+              })}
             />
           )}
 

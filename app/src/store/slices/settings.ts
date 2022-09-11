@@ -56,6 +56,10 @@ export interface SettingsState {
   selectedAudioOutputDevice: string;
   virtualBackgroundEnabled: boolean;
   virtualBackgroundUrl: string | 'blur';
+  /**
+   * 开启虚拟形象
+   */
+  virtualAvatarEnabled: boolean;
 }
 
 const initialState: SettingsState = {

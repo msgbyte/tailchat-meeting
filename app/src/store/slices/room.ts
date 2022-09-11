@@ -108,16 +108,16 @@ const initialState: RoomState = {
   allowWhenRoleMissing: null,
   collaboration: [
     // For Test
-    {
-      tabId: generateRandomString(8),
-      type: 'excalidraw',
-      url: 'https://excalidraw.com/',
-    },
-    {
-      tabId: generateRandomString(8),
-      type: 'excalidraw',
-      url: 'https://excalidraw.com/',
-    },
+    // {
+    //   tabId: generateRandomString(8),
+    //   type: 'excalidraw',
+    //   url: 'https://excalidraw.com/',
+    // },
+    // {
+    //   tabId: generateRandomString(8),
+    //   type: 'excalidraw',
+    //   url: 'https://excalidraw.com/',
+    // },
   ],
   client: null,
 };
