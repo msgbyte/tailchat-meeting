@@ -9,7 +9,7 @@
 	"main": "src/electron-starter.js",
 	"scripts": {
 		"dev": "vite",
-		"build": "tsc && vite build",
+		"build": "tsc && vite build && DEST='../server/dist/public' && rm -rf $DEST && mkdir -p $DEST && cp -r dist/ $DEST",
 		"preview": "vite preview",
 		"analyze": "source-map-explorer build/static/js/*",
 		"start": "cross-env HTTPS=true PORT=4443 react-scripts start",
