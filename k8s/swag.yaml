@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: swag-deployment
+  labels:
+    app: swag
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: swag
+  template:
+    metadata:
+      labels:
+        app: swag
+    spec:
+      containers:
+        - name: swag
+          image: linuxserver/letsencrypt
+          ports:
+            - containerPort: 80
+          env:
+            - name: URL
+              value: meeting.msgbyte.com
+            - name: TZ
+              value: Asia/Shanghai
+          resources:
+            limits:
+              memory: 512Mi
+              cpu: "1"
+            requests:
+              memory: 256Mi
+              cpu: "0.2"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: swag-service
+spec:
+  selector:
+    app: swag
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 80
+    - protocol: TCP
+      port: 443
+      targetPort: 443
+      nodePort: 443
+  type: NodePort
