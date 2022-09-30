@@ -1,6 +1,7 @@
 node_modules
 /app/build/
 /app/public/config/config.js
+/app/dist/
 /server/config/
 /server/public/
 /server/certs/

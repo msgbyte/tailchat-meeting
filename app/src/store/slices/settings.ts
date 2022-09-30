@@ -107,6 +107,7 @@ const initialState: SettingsState = {
   selectedAudioOutputDevice: '',
   virtualBackgroundEnabled: false,
   virtualBackgroundUrl: 'blur',
+  virtualAvatarEnabled: false,
 };
 
 const settingsSlice = createSlice({
