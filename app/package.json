@@ -9,7 +9,7 @@
 	"main": "src/electron-starter.js",
 	"scripts": {
 		"dev": "vite",
-		"build": "tsc && vite build && DEST='../server/dist/public' && rm -rf $DEST && mkdir -p $DEST && cp -r dist/ $DEST",
+		"build": "tsc && vite build && DEST='../server/dist/public' && rm -rf $DEST && mkdir -p $DEST && cp -r dist/* $DEST",
 		"preview": "vite preview",
 		"analyze": "source-map-explorer build/static/js/*",
 		"start": "cross-env HTTPS=true PORT=4443 react-scripts start",
@@ -106,6 +106,7 @@
 		"@esbuild-plugins/node-globals-polyfill": "^0.1.1",
 		"@esbuild-plugins/node-modules-polyfill": "^0.1.4",
 		"@formatjs/cli": "^4.8.4",
+		"@rollup/plugin-inject": "^4.0.4",
 		"@types/chroma-js": "^2.1.3",
 		"@types/convict": "^6.0.1",
 		"@types/convict-format-with-validator": "^6.0.2",
@@ -128,6 +129,7 @@
 		"autoprefixer": "^10.4.8",
 		"babel-eslint": "^10.1.0",
 		"cross-env": "^7.0.3",
+		"esbuild": "^0.15.10",
 		"eslint-config-react-app": "^6.0.0",
 		"eslint-import-resolver-typescript": "^2.4.0",
 		"eslint-plugin-flowtype": "^5.4.0",
@@ -144,6 +146,6 @@
 		"rollup-plugin-node-polyfills": "^0.2.1",
 		"rollup-plugin-polyfill-node": "^0.10.2",
 		"tailwindcss": "^3.1.8",
-		"vite": "^3.1.0"
+		"vite": "3.1.0"
 	}
 }
