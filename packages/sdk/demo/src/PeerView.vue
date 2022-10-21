@@ -1,7 +1,19 @@
 <template>
   <div>
     <div>{{ props.track?.id }}</div>
-    <video ref="videoEl" :autoplay="true" />
+    <div>{{ props.track?.kind }}</div>
+
+    <video
+      ref="videoEl"
+      :autoplay="true"
+      v-if="props.track?.kind === 'video'"
+    />
+
+    <audio
+      ref="videoEl"
+      :autoplay="true"
+      v-if="props.track?.kind === 'audio'"
+    />
   </div>
 </template>
 
@@ -17,6 +29,9 @@ const props = defineProps<{
 effect(() => {
   if (videoEl.value && props.track) {
     videoEl.value.srcObject = new MediaStream([props.track]);
+    if (videoEl.value.paused) {
+      videoEl.value.play();
+    }
   }
 });
 </script>

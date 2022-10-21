@@ -226,10 +226,10 @@ function switchScreenSharing() {
 
 function getPeerMediaTracks(peerId: string): MediaStreamTrack[] {
   if (!client.value || !client.value.media) {
-    return;
+    return [];
   }
 
-  const { webcamConsumer, screenConsumer } =
+  const { webcamConsumer, micConsumer, screenConsumer } =
     client.value.getConsumersByPeerId(peerId);
 
   console.log(
@@ -239,6 +239,10 @@ function getPeerMediaTracks(peerId: string): MediaStreamTrack[] {
     screenConsumer?.track
   );
 
-  return [webcamConsumer?.track, screenConsumer?.track].filter(Boolean);
+  return [
+    webcamConsumer?.track,
+    micConsumer?.track,
+    screenConsumer?.track,
+  ].filter<MediaStreamTrack>((item): item is MediaStreamTrack => !!item);
 }
 </script>
