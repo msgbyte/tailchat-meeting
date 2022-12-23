@@ -102,7 +102,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { TailchatMeetingClient } from '../../src';
+import { TailchatMeetingClient } from 'tailchat-meeting-sdk';
 
 const settingView = ref('video');
 

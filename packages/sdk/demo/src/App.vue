@@ -64,7 +64,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { TailchatMeetingClient, Peer } from '../../src';
+import { TailchatMeetingClient, Peer } from 'tailchat-meeting-sdk';
 import PeerContainer from './Peer.vue';
 import Settings from './Settings.vue';
 import { AvatarGenerator } from 'random-avatar-generator';
