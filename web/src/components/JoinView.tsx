@@ -4,6 +4,8 @@ import { IconUser, IconSettings } from '@arco-design/web-react/icon';
 import { useSetState } from 'ahooks';
 import { Icon } from './Icon';
 import logoSvg from '../assets/logo.svg';
+import { CameraPreview } from './CameraPreview';
+import { openSettingsModal } from './modal/Settings';
 
 export const JoinView: React.FC = React.memo(() => {
   const [mediaPerms, setMediaPerms] = useSetState({
@@ -30,9 +32,13 @@ export const JoinView: React.FC = React.memo(() => {
         <Input size="large" placeholder="你的名字" />
 
         <div className="w-full bg-gray-300 aspect-video">
-          <div className="w-full h-full flex justify-center items-center">
-            <IconUser fontSize={44} style={{ color: '#666' }} />
-          </div>
+          {mediaPerms.video ? (
+            <CameraPreview />
+          ) : (
+            <div className="w-full h-full flex justify-center items-center">
+              <IconUser fontSize={44} style={{ color: '#666' }} />
+            </div>
+          )}
         </div>
 
         <div className="space-x-1">
@@ -65,7 +71,12 @@ export const JoinView: React.FC = React.memo(() => {
             }
           />
 
-          <Button type="secondary" icon={<IconSettings />} title="设置" />
+          <Button
+            type="secondary"
+            icon={<IconSettings />}
+            title="设置"
+            onClick={openSettingsModal}
+          />
         </div>
 
         <Button type="primary" size="large" long={true}>
