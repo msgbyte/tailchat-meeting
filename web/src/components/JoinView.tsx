@@ -1,38 +1,38 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Input, Button, Message } from '@arco-design/web-react';
 import { IconUser } from '@arco-design/web-react/icon';
 import { useMemoizedFn, useSetState } from 'ahooks';
 import logoSvg from '../assets/logo.svg';
 import { CameraPreview } from './CameraPreview';
 import { useMeetingClient } from '../client';
-import { Controls } from './Controls';
+import { JoinControls } from './JoinControls';
 import { useMeetingSettings } from '../store/settings';
+import { useNavigate } from 'react-router';
 
 export const JoinView: React.FC = React.memo(() => {
-  const { mediaPerms } = useMeetingSettings();
-  const [joinInfo, setJoinInfo] = useSetState({
-    roomId: '',
-    displayName: '',
-  });
+  const mediaPerms = useMeetingSettings((state) => state.mediaPerms);
+  const displayName = useMeetingSettings((state) => state.displayName);
+  const [roomId, setRoomId] = useState('');
   const client = useMeetingClient();
+  const navigate = useNavigate();
 
   const handleJoin = useMemoizedFn(async () => {
-    if (!joinInfo.roomId) {
+    if (!roomId) {
       Message.error('请填写房间号');
       return;
     }
-    if (!joinInfo.displayName) {
+    if (!displayName) {
       Message.error('请填写名称');
       return;
     }
 
-    await client.join(joinInfo.roomId, {
+    await client.join(roomId, {
       ...mediaPerms,
-      displayName: joinInfo.displayName,
+      displayName,
       picture: '',
     });
     Message.success('加入成功');
-    // TODO: 页面跳转
+    navigate(`/meeting/${roomId}`);
   });
 
   return (
@@ -52,15 +52,17 @@ export const JoinView: React.FC = React.memo(() => {
         <Input
           size="large"
           placeholder="房间号"
-          value={joinInfo.roomId}
-          onChange={(roomId) => setJoinInfo({ roomId })}
+          value={roomId}
+          onChange={(roomId) => setRoomId(roomId)}
         />
 
         <Input
           size="large"
           placeholder="你的名字"
-          value={joinInfo.displayName}
-          onChange={(displayName) => setJoinInfo({ displayName })}
+          value={displayName}
+          onChange={(displayName) =>
+            useMeetingSettings.setState({ displayName })
+          }
         />
 
         <div className="w-full bg-gray-300 aspect-video">
@@ -74,7 +76,7 @@ export const JoinView: React.FC = React.memo(() => {
         </div>
 
         <div>
-          <Controls />
+          <JoinControls />
         </div>
 
         <Button type="primary" size="large" long={true} onClick={handleJoin}>

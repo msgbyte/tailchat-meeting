@@ -226,6 +226,10 @@ export class RoomClient extends EventEmitter<RoomClientEventMap> {
 
   init({ peers, lobbyPeers }: { peers: Peer[]; lobbyPeers: LobbyPeer[] }) {
     if (peers.length > 0) {
+      for (const peer of peers) {
+        this.emit('peerJoin', peer);
+      }
+
       this.peers = peers;
       this.emit('peersUpdated', this.peers);
     }

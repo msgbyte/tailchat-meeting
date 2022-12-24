@@ -2,8 +2,11 @@ import type {
   JoinOptions,
   MediaClientConsumer,
   MediaDevice,
+  MicProducer,
   Peer,
   Producer,
+  ScreenSharingProducer,
+  WebcamProducer,
 } from '../types';
 import { SignalingClient } from './signaling';
 import { Logger } from '../helper/logger';
@@ -227,7 +230,7 @@ export class TailchatMeetingClient extends EventEmitter<TailchatMeetingClientEve
   /**
    * 当本地打开网络摄像头
    */
-  public onWebcamProduce(callback: (webcamProducer: Producer) => void) {
+  public onWebcamProduce(callback: (webcamProducer: WebcamProducer) => void) {
     this.producer.on('webcamProduce', callback);
   }
 
@@ -241,7 +244,7 @@ export class TailchatMeetingClient extends EventEmitter<TailchatMeetingClientEve
   /**
    * 当本地麦克风打开
    */
-  public onMicProduce(callback: (micProducer: Producer) => void) {
+  public onMicProduce(callback: (micProducer: MicProducer) => void) {
     this.producer.on('micProduce', callback);
   }
 
@@ -253,16 +256,16 @@ export class TailchatMeetingClient extends EventEmitter<TailchatMeetingClientEve
   }
 
   /**
-   * 当本地麦克风打开
+   * 当本地屏幕共享打开
    */
   public onScreenSharingProduce(
-    callback: (screenVideoProducer: Producer) => void
+    callback: (screenVideoProducer: ScreenSharingProducer) => void
   ) {
     this.producer.on('screenVideoProduce', callback);
   }
 
   /**
-   * 当本地麦克风关闭
+   * 当本地屏幕共享关闭
    */
   public onScreenSharingClose(callback: () => void) {
     this.producer.on('screenVideoClose', callback);

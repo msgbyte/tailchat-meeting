@@ -6,12 +6,16 @@ import type {
   RtpParameters,
 } from 'mediasoup-client/lib/RtpParameters';
 import type { DtlsParameters } from 'mediasoup-client/lib/Transport';
-import type { ProducerOptions } from 'mediasoup-client/lib/types';
+import type {
+  Producer,
+  Consumer,
+  ProducerOptions,
+} from 'mediasoup-client/lib/types';
 import type { VolumeWatcher } from './helper/volumeWatcher';
 import type { PermissionList } from './consts';
 
 export type { MediaKind };
-export type { Producer, Consumer } from 'mediasoup-client/lib/types';
+export type { Producer, Consumer };
 
 export interface JoinOptions {
   video: boolean;
@@ -255,3 +259,13 @@ export type OPUSPacketTime = 3 | 5 | 10 | 20 | 30 | 40 | 50 | 60;
 export type OPUSMaxPlaybackRate = 8000 | 16000 | 24000 | 44100 | 48000;
 
 export type RoomPermissions = Record<PermissionList, PermissionInfo[]>;
+
+export type WebcamProducer = Producer;
+
+export type ScreenSharingProducer = Producer;
+
+export interface MicProducer extends Producer {
+  appData: {
+    volumeWatcher: VolumeWatcher;
+  };
+}
