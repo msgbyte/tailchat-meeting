@@ -13,6 +13,7 @@ import { defaultSettings, TailchatMeetingClientSettings } from './settings';
 import { EventEmitter } from 'eventemitter-strict';
 import { RoomClient } from './room';
 import { ProducerClient } from './producer';
+import { nanoid } from 'nanoid';
 
 const logger = new Logger('client');
 
@@ -35,7 +36,10 @@ export class TailchatMeetingClient extends EventEmitter<TailchatMeetingClientEve
    * @param signalingHost 信令服务器地址，形如: wss://xxxx.com:443
    * @param peerId 用户的唯一标识
    */
-  constructor(public signalingHost: string, public peerId: string) {
+  constructor(
+    public signalingHost: string,
+    public peerId: string = nanoid(10)
+  ) {
     super();
   }
 

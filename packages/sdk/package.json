@@ -6,6 +6,7 @@
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "scripts": {
+    "dev": "tsc --watch",
     "build": "tsc",
     "prepare": "pnpm build",
     "release": "npm publish --registry https://registry.npmjs.com/"
@@ -24,6 +25,7 @@
     "hark": "^1.2.3",
     "lodash": "^4.17.21",
     "mediasoup-client": "^3.6.47",
+    "nanoid": "^4.0.0",
     "socket.io-client": "^4.5.0"
   },
   "devDependencies": {

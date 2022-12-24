@@ -298,6 +298,7 @@ importers:
       hark: ^1.2.3
       lodash: ^4.17.21
       mediasoup-client: ^3.6.47
+      nanoid: ^4.0.0
       process: ^0.11.10
       socket.io-client: ^4.5.0
       typescript: ^4.6.4
@@ -308,6 +309,7 @@ importers:
       hark: 1.2.3
       lodash: 4.17.21
       mediasoup-client: 3.6.52
+      nanoid: 4.0.0
       socket.io-client: 4.5.1
     devDependencies:
       '@types/debug': 4.1.7
@@ -487,6 +489,8 @@ importers:
       react-dom: ^18.2.0
       react-router: ^6.6.1
       react-router-dom: ^6.6.1
+      react-split: ^2.0.14
+      tailchat-meeting-conference-layout-manager: workspace:^1.0.1
       tailchat-meeting-sdk: workspace:^1.2.5
       tailwindcss: ^3.1.8
       typescript: ^4.9.3
@@ -500,6 +504,8 @@ importers:
       react-dom: 18.2.0_react@18.2.0
       react-router: 6.6.1_react@18.2.0
       react-router-dom: 6.6.1_biqbaboplfbrettd7655fr4n2y
+      react-split: 2.0.14_react@18.2.0
+      tailchat-meeting-conference-layout-manager: link:../packages/conference-layout-manager
       tailchat-meeting-sdk: link:../packages/sdk
       tailwindcss: 3.1.8
       zustand: 4.1.5_react@18.2.0
@@ -12809,6 +12815,12 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
+  /nanoid/4.0.0:
+    resolution: {integrity: sha512-IgBP8piMxe/gf73RTQx7hmnhwz0aaEXYakvqZyE302IXW3HyVNhdNGC+O2MwMAVhLEnvXlvKtGbtJf6wvHihCg==}
+    engines: {node: ^14 || ^16 || >=18}
+    hasBin: true
+    dev: false
+
   /nanomatch/1.2.13:
     resolution: {integrity: sha512-fpoe2T0RbHwBTBUOftAfBPaDEi06ufaUai0mE6Yn1kacc3SnTErfb/h+X94VXzI64rKFHYImXSvdwGGCmwOqCA==}
     engines: {node: '>=0.10.0'}
@@ -15221,6 +15233,16 @@ packages:
       - webpack-plugin-serve
     dev: true
 
+  /react-split/2.0.14_react@18.2.0:
+    resolution: {integrity: sha512-bKWydgMgaKTg/2JGQnaJPg51T6dmumTWZppFgEbbY0Fbme0F5TuatAScCLaqommbGQQf/ZT1zaejuPDriscISA==}
+    peerDependencies:
+      react: '*'
+    dependencies:
+      prop-types: 15.8.1
+      react: 18.2.0
+      split.js: 1.6.5
+    dev: false
+
   /react-transition-group/4.4.2_biqbaboplfbrettd7655fr4n2y:
     resolution: {integrity: sha512-/RNYfRAMlZwDSr6z4zNKV6xu53/e2BuaBbGhbyYIXTrmgu/bGHzmqOs7mJSJBHy9Ud+ApHx3QjrkKSp1pxvlFg==}
     peerDependencies:
@@ -16646,6 +16668,10 @@ packages:
     dependencies:
       extend-shallow: 3.0.2
     dev: true
+
+  /split.js/1.6.5:
+    resolution: {integrity: sha512-mPTnGCiS/RiuTNsVhCm9De9cCAUsrNFFviRbADdKiiV+Kk8HKp/0fWu7Kr8pi3/yBmsqLFHuXGT9UUZ+CNLwFw==}
+    dev: false
 
   /split/1.0.1:
     resolution: {integrity: sha512-mTyOoPbrivtXnwnIxZRFYRrPNtEFKlpB2fvjSnCQUiAA6qAZzqwna5envK4uk6OIeP17CsdF3rSBGYVBsU0Tkg==}

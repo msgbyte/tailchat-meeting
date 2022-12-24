@@ -1,16 +1,38 @@
 import React from 'react';
-import { Input, Button } from '@arco-design/web-react';
-import { IconUser, IconSettings } from '@arco-design/web-react/icon';
-import { useSetState } from 'ahooks';
-import { Icon } from './Icon';
+import { Input, Button, Message } from '@arco-design/web-react';
+import { IconUser } from '@arco-design/web-react/icon';
+import { useMemoizedFn, useSetState } from 'ahooks';
 import logoSvg from '../assets/logo.svg';
 import { CameraPreview } from './CameraPreview';
-import { openSettingsModal } from './modal/Settings';
+import { useMeetingClient } from '../client';
+import { Controls } from './Controls';
+import { useMeetingSettings } from '../store/settings';
 
 export const JoinView: React.FC = React.memo(() => {
-  const [mediaPerms, setMediaPerms] = useSetState({
-    audio: false,
-    video: false,
+  const { mediaPerms } = useMeetingSettings();
+  const [joinInfo, setJoinInfo] = useSetState({
+    roomId: '',
+    displayName: '',
+  });
+  const client = useMeetingClient();
+
+  const handleJoin = useMemoizedFn(async () => {
+    if (!joinInfo.roomId) {
+      Message.error('请填写房间号');
+      return;
+    }
+    if (!joinInfo.displayName) {
+      Message.error('请填写名称');
+      return;
+    }
+
+    await client.join(joinInfo.roomId, {
+      ...mediaPerms,
+      displayName: joinInfo.displayName,
+      picture: '',
+    });
+    Message.success('加入成功');
+    // TODO: 页面跳转
   });
 
   return (
@@ -27,9 +49,19 @@ export const JoinView: React.FC = React.memo(() => {
           </div>
         </div>
 
-        <Input size="large" placeholder="房间号" />
+        <Input
+          size="large"
+          placeholder="房间号"
+          value={joinInfo.roomId}
+          onChange={(roomId) => setJoinInfo({ roomId })}
+        />
 
-        <Input size="large" placeholder="你的名字" />
+        <Input
+          size="large"
+          placeholder="你的名字"
+          value={joinInfo.displayName}
+          onChange={(displayName) => setJoinInfo({ displayName })}
+        />
 
         <div className="w-full bg-gray-300 aspect-video">
           {mediaPerms.video ? (
@@ -41,45 +73,11 @@ export const JoinView: React.FC = React.memo(() => {
           )}
         </div>
 
-        <div className="space-x-1">
-          <Button
-            type={mediaPerms.audio ? 'primary' : 'secondary'}
-            icon={
-              <Icon
-                icon={
-                  mediaPerms.audio ? 'mdi:microphone' : 'mdi:microphone-off'
-                }
-              />
-            }
-            title={mediaPerms.audio ? '关闭麦克风' : '开启麦克风'}
-            onClick={() =>
-              setMediaPerms({
-                audio: !mediaPerms.audio,
-              })
-            }
-          />
-          <Button
-            type={mediaPerms.video ? 'primary' : 'secondary'}
-            icon={
-              <Icon icon={mediaPerms.video ? 'mdi:video' : 'mdi:video-off'} />
-            }
-            title={mediaPerms.video ? '关闭摄像头' : '开启摄像头'}
-            onClick={() =>
-              setMediaPerms({
-                video: !mediaPerms.video,
-              })
-            }
-          />
-
-          <Button
-            type="secondary"
-            icon={<IconSettings />}
-            title="设置"
-            onClick={openSettingsModal}
-          />
+        <div>
+          <Controls />
         </div>
 
-        <Button type="primary" size="large" long={true}>
+        <Button type="primary" size="large" long={true} onClick={handleJoin}>
           加入房间
         </Button>
       </div>
