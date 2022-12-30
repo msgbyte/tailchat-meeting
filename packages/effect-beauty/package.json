@@ -1,5 +1,5 @@
 {
-  "name": "tailchat-meeting-effect-virtual-background",
+  "name": "tailchat-meeting-effect-beauty",
   "private": true,
   "version": "1.0.0",
   "description": "",
@@ -15,7 +15,5 @@
     "typescript": "^4.7.2"
   },
   "dependencies": {
-    "@mediapipe/selfie_segmentation": "^0.1.1632777926",
-    "lodash.once": "^4.1.1"
   }
 }
