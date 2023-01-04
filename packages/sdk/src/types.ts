@@ -262,7 +262,9 @@ export type RoomPermissions = Record<PermissionList, PermissionInfo[]>;
 
 export type WebcamProducer = Producer;
 
-export type ScreenSharingProducer = Producer;
+export type ScreenSharingVideoProducer = Producer;
+
+export type ScreenSharingAudioProducer = Producer;
 
 export interface MicProducer extends Producer {
   appData: {

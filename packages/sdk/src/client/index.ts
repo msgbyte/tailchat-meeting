@@ -4,8 +4,7 @@ import type {
   MediaDevice,
   MicProducer,
   Peer,
-  Producer,
-  ScreenSharingProducer,
+  ScreenSharingVideoProducer,
   WebcamProducer,
 } from '../types';
 import { SignalingClient } from './signaling';
@@ -111,7 +110,7 @@ export class TailchatMeetingClient extends EventEmitter<TailchatMeetingClientEve
       locked,
       lobbyPeers,
       accessCode,
-    } = await this.signaling.sendRequest('join', {
+    } = await this.signaling.sendRequest<any>('join', {
       displayName: options.displayName,
       picture: options.picture,
       from: options.from,
@@ -259,7 +258,7 @@ export class TailchatMeetingClient extends EventEmitter<TailchatMeetingClientEve
    * 当本地屏幕共享打开
    */
   public onScreenSharingProduce(
-    callback: (screenVideoProducer: ScreenSharingProducer) => void
+    callback: (screenVideoProducer: ScreenSharingVideoProducer) => void
   ) {
     this.producer.on('screenVideoProduce', callback);
   }

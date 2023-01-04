@@ -5,20 +5,23 @@ import { InitClientError } from '../error';
 import { getEncodings } from '../helper/encodings';
 import { Logger } from '../helper/logger';
 import type {
+  MicProducer,
   Producer,
+  ScreenSharingVideoProducer,
   UpdateDeviceParams,
   UpdateWebcamParams,
+  WebcamProducer,
 } from '../types';
 
 const logger = new Logger('producer');
 
 interface ProducerClientEventMap {
-  webcamProduce: (webcamProducer: Producer) => void;
+  webcamProduce: (webcamProducer: WebcamProducer) => void;
   webcamClose: (webcamProducerId: string) => void;
-  micProduce: (micProducer: Producer) => void;
+  micProduce: (micProducer: MicProducer) => void;
   micClose: (micProducerId: string) => void;
-  screenVideoProduce: (screenVideoProducer: Producer) => void;
-  screenAudioProduce: (screenAudioProducer: Producer) => void;
+  screenVideoProduce: (screenVideoProducer: ScreenSharingVideoProducer) => void;
+  screenAudioProduce: (screenAudioProducer: ScreenSharingVideoProducer) => void;
   screenVideoClose: (screenVideoId: string) => void;
   screenAudioClose: (screenAudioId: string) => void;
 }
@@ -252,7 +255,7 @@ export class ProducerClient extends EventEmitter<ProducerClientEventMap> {
     }
 
     let track: MediaStreamTrack | null | undefined;
-    let micProducer: Producer | null | undefined;
+    let micProducer: MicProducer | undefined;
 
     try {
       await this.device.updateMediaDevices();
@@ -290,7 +293,7 @@ export class ProducerClient extends EventEmitter<ProducerClientEventMap> {
         opusMaxPlaybackRate,
       } = this.settings;
 
-      micProducer = this.media.findProducerWithSourceType('mic');
+      micProducer = this.media.findProducerWithSourceType('mic') as MicProducer;
 
       if ((restart && micProducer) || start) {
         if (micProducer) {
@@ -315,7 +318,7 @@ export class ProducerClient extends EventEmitter<ProducerClientEventMap> {
 
         if (!track) throw new Error('no mic track');
 
-        micProducer = await this.media.produce({
+        micProducer = await this.media.produce<MicProducer>({
           track,
           codecOptions: {
             opusStereo: opusStereo,

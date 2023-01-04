@@ -333,7 +333,7 @@ export class MediaClient extends EventEmitter<MediaClientEventMap> {
     iceServers?: RTCIceServer[]
   ): Promise<Transport> {
     const { id, iceParameters, iceCandidates, dtlsParameters } =
-      await this.signaling.sendRequest('createWebRtcTransport', {
+      await this.signaling.sendRequest<any>('createWebRtcTransport', {
         forceTcp: false,
         producing: creator === 'createSendTransport',
         consuming: creator === 'createRecvTransport',
@@ -382,7 +382,9 @@ export class MediaClient extends EventEmitter<MediaClientEventMap> {
     return transport;
   }
 
-  public async produce(producerOptions: ProducerOptions): Promise<Producer> {
+  public async produce<T extends Producer>(
+    producerOptions: ProducerOptions
+  ): Promise<T> {
     logger.debug('produce() [options:%o]', producerOptions);
 
     if (!this.sendTransport) {
@@ -434,7 +436,7 @@ export class MediaClient extends EventEmitter<MediaClientEventMap> {
       this.changeProducer(producer.id, 'close', true);
     });
 
-    return producer;
+    return producer as T;
   }
 
   private async resumeConsumer(
