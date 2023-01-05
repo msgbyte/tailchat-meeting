@@ -73,7 +73,7 @@ const styles = (theme) => ({
 
 type StylesKeys = keyof ReturnType<typeof styles>;
 
-interface NewWindowProps {
+interface NewWindowProps extends React.PropsWithChildren {
   classes: ClassNameMap<StylesKeys>;
   copyStyles: boolean;
   url: string;

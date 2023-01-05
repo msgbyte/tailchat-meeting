@@ -3,7 +3,7 @@ import React from 'react';
 import { render } from 'react-dom';
 import { Provider } from 'react-redux';
 import { createIntl } from 'react-intl';
-import { IntlProvider } from 'react-intl-redux';
+import { IntlProvider } from './lib/react-intl-redux/index';
 import Logger from './features/Logger';
 import debug from 'debug';
 import deviceInfo from './deviceInfo';

@@ -158,7 +158,7 @@ const styles = (theme) => ({
   },
 });
 
-interface VideoViewProps {
+interface VideoViewProps extends React.PropsWithChildren {
   peer?: Peer;
   isMe?: boolean;
   isMirrored?: boolean;

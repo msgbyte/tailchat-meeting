@@ -103,7 +103,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-interface ListPeerProps {
+interface ListPeerProps extends React.PropsWithChildren {
   id: string;
   isModerator: boolean;
   spotlight: boolean;

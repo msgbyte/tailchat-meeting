@@ -33,6 +33,12 @@ import { toolareaActions } from '../store/slices/toolarea';
 import { roomActions } from '../store/slices/room';
 import { RoomMainView } from './RoomMainView';
 
+declare module '@material-ui/core/Hidden' {
+  interface HiddenProps {
+    children?: React.ReactNode | undefined;
+  }
+}
+
 const TIMEOUT = config.hideTimeout || 5000;
 
 const styles = (theme) => ({

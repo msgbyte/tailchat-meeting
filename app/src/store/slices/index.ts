@@ -1,5 +1,5 @@
 import { CombinedState, combineReducers, Reducer } from '@reduxjs/toolkit';
-import { intlReducer } from 'react-intl-redux';
+import { intlReducer } from '../../lib/react-intl-redux/index';
 import { meReducer } from './me';
 import { chatReducer } from './chat';
 import { peersReducer } from './peers';

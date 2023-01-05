@@ -1,6 +1,6 @@
 import { MuiThemeProvider, Theme } from '@material-ui/core';
 import React, { Suspense, useMemo, useRef } from 'react';
-import { IntlProvider } from 'react-intl-redux';
+import { IntlProvider } from './lib/react-intl-redux/index';
 import { persistor, store } from './store/store';
 import { PersistGate } from 'redux-persist/lib/integration/react';
 import { LoadingView } from './components/Loader/LoadingView';

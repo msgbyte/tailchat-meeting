@@ -17,7 +17,7 @@ import type { IceParameters } from 'mediasoup-client/lib/types';
 import { PermissionList, getEncodings } from 'tailchat-meeting-sdk';
 import { meActions } from './store/slices/me';
 import isElectron from 'is-electron';
-import { updateIntl } from 'react-intl-redux';
+import { updateIntl } from './lib/react-intl-redux/index';
 import { chatActions, ChatMessage } from './store/slices/chat';
 import { peersActions } from './store/slices/peers';
 import { filesActions } from './store/slices/files';
