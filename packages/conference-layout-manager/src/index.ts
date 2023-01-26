@@ -127,3 +127,27 @@ export class ConferenceLayoutManager {
     return this.options.layout[this.options.layout.length - 1];
   }
 }
+
+export const grid9Layout = defaultLayout;
+export const grid4Layout: ConferenceLayoutManagerOptionsLayoutGrid[] = [
+  { from: 1, to: 1, col: 1, row: 1 },
+  { from: 2, to: 2, col: 2, row: 1 },
+  { from: 3, to: 4, col: 2, row: 2 },
+];
+export const grid16Layout: ConferenceLayoutManagerOptionsLayoutGrid[] = [
+  { from: 1, to: 1, col: 1, row: 1 },
+  { from: 2, to: 2, col: 2, row: 1 },
+  { from: 3, to: 4, col: 2, row: 2 },
+  { from: 5, to: 6, col: 3, row: 2 },
+  { from: 7, to: 9, col: 3, row: 3 },
+  { from: 10, to: 16, col: 4, row: 4 },
+];
+export const grid25Layout: ConferenceLayoutManagerOptionsLayoutGrid[] = [
+  { from: 1, to: 1, col: 1, row: 1 },
+  { from: 2, to: 2, col: 2, row: 1 },
+  { from: 3, to: 4, col: 2, row: 2 },
+  { from: 5, to: 6, col: 3, row: 2 },
+  { from: 7, to: 9, col: 3, row: 3 },
+  { from: 10, to: 16, col: 4, row: 4 },
+  { from: 17, to: 25, col: 5, row: 5 },
+];

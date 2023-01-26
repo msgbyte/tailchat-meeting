@@ -28,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, effect, ref } from 'vue';
+import { computed, ref } from 'vue';
 import { ConferenceLayoutManager } from '../../src/index';
 
 const count = ref(2);
