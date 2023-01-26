@@ -1,18 +1,24 @@
 {
   "name": "tailchat-meeting-conference-layout-manager",
   "version": "1.0.1",
-  "description": "",
+  "description": "Tailchat 视频会议布局管理器",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "files": [
     "lib"
   ],
   "scripts": {
+    "dev": "concurrently --kill-others npm:dev:lib npm:dev:demo",
+    "dev:lib": "tsc --watch",
+    "dev:demo": "cd demo && pnpm dev",
     "prepare": "tsc",
     "release": "npm publish --registry https://registry.npmjs.com/",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "moonrailgun <moonrailgun@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^7.6.0"
+  }
 }

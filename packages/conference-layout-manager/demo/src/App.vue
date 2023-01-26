@@ -3,7 +3,9 @@
     <div>
       <button @click="() => count++">增加</button>
       <button @click="() => count--" :disabled="count <= 1">减少</button>
-      <div>总数: {{ count }}</div>
+      <button @click="() => page--" :disabled="page === 1">前一页</button>
+      <button @click="() => page++" :disabled="page >= maxPage">后一页</button>
+      <div>总数: {{ count }} 当前页: {{ page }}</div>
     </div>
     <div ref="containerEl" class="peers">
       <div
@@ -18,7 +20,7 @@
         class="peer"
       >
         <div>
-          {{ i }}
+          {{ item.seq }}
         </div>
       </div>
     </div>
@@ -26,25 +28,42 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import { PeerLayoutManager } from '../../src/index';
+import { computed, effect, ref } from 'vue';
+import { ConferenceLayoutManager } from '../../src/index';
 
 const count = ref(2);
+const page = ref(1);
+const maxPage = ref(1);
 const containerEl = ref<HTMLDivElement>();
 
-const layout = computed(() => {
+const layoutManager = computed(() => {
   if (!containerEl.value) {
-    return [];
+    return null;
   }
 
   const rect = containerEl.value.getBoundingClientRect();
 
-  const layoutManager = new PeerLayoutManager({
+  const layoutManager = new ConferenceLayoutManager({
     width: rect.width,
     height: rect.height,
+    fillIfLoose: false,
   });
 
-  return layoutManager.parse(count.value);
+  return layoutManager;
+});
+
+const layout = computed(() => {
+  if (!layoutManager.value) {
+    return [];
+  }
+
+  layoutManager.value.updateCount(count.value);
+  layoutManager.value.updatePage(page.value);
+
+  page.value = layoutManager.value.currentPage;
+  maxPage.value = layoutManager.value.maxPage;
+
+  return layoutManager.value.getLayout();
 });
 </script>
 
