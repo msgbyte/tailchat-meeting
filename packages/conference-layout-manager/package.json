@@ -1,6 +1,6 @@
 {
   "name": "tailchat-meeting-conference-layout-manager",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Tailchat 视频会议布局管理器",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
