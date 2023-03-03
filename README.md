@@ -1,39 +1,40 @@
 # tailchat-meeting
-Tailchat 视频会议
 
-基于 [edumeet](https://github.com/edumeet/edumeet) 进行二次开发。
+Tailchat video conferencing
 
-> 不在原项目的fork上进行开发是因为会进行很多深度的改造，并适配**Tailchat**，因此并不准备回归到原项目.
+Secondary development based on [edumeet](https://github.com/edumeet/edumeet).
+
+> The reason for not developing on the fork of the original project is that there will be a lot of in-depth transformations and adaptation to **Tailchat**, so it is not ready to return to the original project.
 
 ## start with docker
 
-若要查看完整文档, 请访问: [部署视频会议](https://tailchat.msgbyte.com/docs/meeting/deployment)
+To view the full documentation, please visit: [Deployment Video Meeting](https://tailchat.msgbyte.com/docs/meeting/deployment)
 
-#### 构建镜像
+#### Build Docker Image
 ```bash
 cd compose
 docker-compose build
 ```
 
-#### 配置与启动
+#### Configuration and Startup
 ```bash
 cd compose
 cp docker-compose.env.example docker-compose.env
-vim docker-compose.env # 修改环境变量至实际情况，具体环境变量内容见注释(需要配置域名以自动申请https证书。rtc服务依赖https协议)
+vim docker-compose.env # Modify the environment variable to the actual situation, see the notes for the specific environment variable content (you need to configure the domain name to automatically apply for the https certificate. The rtc service relies on the https protocol)
 docker-compose up -d
 ```
 
-访问服务器地址即可，docker-compose 配置的 nginx 已经默认绑定443端口
+Just access the server address. The nginx configured by docker-compose has been bound to port 443 by default.
 
-### 安装优化
+### Installation optimization
 
-可以使用 `MEDIASOUP_WORKER_BIN` 指定之前编译好的二进制文件, 来阻止`mediasoup`的编译行为
+You can use `MEDIASOUP_WORKER_BIN` to specify a previously compiled binary file to prevent `mediasoup` from compiling
 
 ```
 MEDIASOUP_WORKER_BIN=/path/to/mediasoup-worker
 ```
 
-### 翻译
+### i18n
 
 ```
 cd app
