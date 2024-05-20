@@ -12,6 +12,6 @@ RUN apt-get update && \
     apt-get clean
 
 RUN echo "registry = https://registry.npmmirror.com" > ~/.npmrc
-RUN npm install -g pnpm
+RUN npm install -g pnpm@8
 RUN npm install -g mediasoup@3.9.10
 ENV MEDIASOUP_WORKER_BIN=/usr/local/lib/node_modules/mediasoup/worker/out/Release/mediasoup-worker
