@@ -16,7 +16,7 @@ RUN pnpm install
 EXPOSE 40000-49999/udp
 
 
-RUN cd app && pnpm build
+RUN cd app && NODE_OPTIONS="--max-old-space-size=2048" pnpm build
 RUN cd server && pnpm build
 
 CMD cd server && pnpm start
