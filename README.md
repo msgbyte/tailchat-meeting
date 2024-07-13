@@ -6,12 +6,12 @@ Secondary development based on [edumeet](https://github.com/edumeet/edumeet).
 
 > The reason for not developing on the fork of the original project is that there will be a lot of in-depth transformations and adaptation to **Tailchat**, so it is not ready to return to the original project.
 
-## start with docker
+## Start with docker
 To view the full documentation, please visit: [Deployment Video Meeting](https://tailchat.msgbyte.com/docs/meeting/deployment)
 
 #### Clone Repo
 ```bash
-git clone https://github.com/TNTcraftHIM/tailchat-meeting --depth=1
+git clone https://github.com/msgbyte/tailchat-meeting --depth=1
 ```
 
 #### Configuration
