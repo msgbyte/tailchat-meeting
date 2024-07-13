@@ -344,15 +344,15 @@ const JoinDialog: React.FC<{
                       <PopupState variant="popover" popupId="demo-popup-menu">
                         {(popupState) => (
                           <React.Fragment>
-                            <Button
-                              aria-label={locale.split(/[-_]/)[0]}
-                              color="secondary"
-                              disableRipple
-                              style={{ backgroundColor: 'transparent' }}
-                              {...bindTrigger(popupState)}
-                            >
-                              {locale.split(/[-_]/)[0]}
-                            </Button>
+							<Button
+							  aria-label={locale ? locale.split(/[-_]/)[0] : ''}
+							  color="secondary"
+							  disableRipple
+							  style={{ backgroundColor: 'transparent' }}
+							  {...bindTrigger(popupState)}
+							>
+							  {locale ? locale.split(/[-_]/)[0] : ''}
+							</Button>
                             <Menu {...bindMenu(popupState)}>
                               {(localesList ?? []).map((item, index) => (
                                 <MenuItem

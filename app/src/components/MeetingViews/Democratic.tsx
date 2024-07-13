@@ -13,7 +13,6 @@ import { useDebounceFn, useMemoizedFn } from 'ahooks';
 import { useWatch } from '../../hooks/useWatch';
 
 const PADDING_H = 50;
-
 const FILL_RATE = 0.95;
 
 const useStyles = makeStyles((theme) => ({
@@ -46,7 +45,7 @@ export const Democratic: React.FC<DemocraticProps> = React.memo((props) => {
     width: 0,
     height: 0,
   });
-  const containerRef = useRef<HTMLDivElement>();
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const {
     boxes,
@@ -75,9 +74,7 @@ export const Democratic: React.FC<DemocraticProps> = React.memo((props) => {
     }
 
     const n = boxes;
-
-    const width =
-      containerRef.current.clientWidth - (buttonControlBar ? PADDING_H : 0);
+    const width = containerRef.current.clientWidth - (buttonControlBar ? PADDING_H : 0);
     const height = containerRef.current.clientHeight;
 
     let x, y, space;
@@ -89,12 +86,10 @@ export const Democratic: React.FC<DemocraticProps> = React.memo((props) => {
       if (height < y * rows) {
         y = height / rows;
         x = aspectRatio * y;
-
         break;
       }
 
       space = height - y * rows;
-
       if (space < y) break;
     }
 
@@ -118,15 +113,19 @@ export const Democratic: React.FC<DemocraticProps> = React.memo((props) => {
     window.addEventListener('resize', runUpdate);
 
     const observer = new ResizeObserver(() => runUpdate());
-    observer.observe(containerRef.current);
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
 
     runUpdate();
 
     return () => {
       window.removeEventListener('resize', runUpdate);
-      observer.unobserve(containerRef.current);
+      if (containerRef.current) {
+        observer.unobserve(containerRef.current);
+      }
     };
-  }, []);
+  }, [runUpdate]);
 
   useWatch([props], () => {
     runUpdate();
